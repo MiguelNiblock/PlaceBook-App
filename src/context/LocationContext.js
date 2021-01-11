@@ -12,9 +12,11 @@ const locationReducer = (state,action) => {
     case 'stop_recording':
       return {...state, recording: false};
     case 'record_location':
-      return {...state, location: [...state.location, action.payload ]}
+      return {...state, locations: [...state.locations, action.payload ]}
     case 'change_name':
       return {...state, name: action.payload}
+    case 'reset':
+      return {...state, name: '', locations: [] }
     default:
       return state;
   };
@@ -28,6 +30,7 @@ const startRecording = dispatch => () => {
 const stopRecording = dispatch => () => {
   dispatch({type:'stop_recording'})
 }
+//update current location. If recording, each new location will be added to locations array.
 const addLocation = dispatch => (recording, location) => {
   dispatch({type:'add_current_location',payload:location})
   if (recording){
@@ -37,9 +40,12 @@ const addLocation = dispatch => (recording, location) => {
 const changeName = dispatch => (name) => {
   dispatch({type:'change_name',payload: name})
 }
+const reset = dispatch => () => {
+  dispatch({type:'reset'})
+}
 
 export const {Context, Provider} = createDataContext(
   locationReducer,
-  {startRecording,stopRecording,addLocation,changeName},
+  {startRecording,stopRecording,addLocation,changeName,reset},
   {name: '', recording: false, locations: [], currentLocation: null}
 );
