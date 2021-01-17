@@ -5,7 +5,7 @@ import {View, StyleSheet} from 'react-native';
 import {Text} from 'react-native-elements';
 import {SafeAreaView, withNavigationFocus} from 'react-navigation';
 import Map from '../components/Map';
-import {Context as LocationContext} from '../context/LocationContext';
+import {Context as LocationContext} from '../context/LocationContext-tracker';
 import useLocation from '../hooks/useLocation';
 import TrackForm from '../components/TrackForm';
 import {FontAwesome} from '@expo/vector-icons'

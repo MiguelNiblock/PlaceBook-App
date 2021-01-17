@@ -31,7 +31,7 @@ const signup = (dispatch) => async ({email,password}) => {
         //update state.
         dispatch({type:'signin',payload:response.data.token});
         //navigate to main flow
-        navigate('TrackList');
+        navigate('mainFlow');
     } catch (err) {
         console.log(err.response.data);
         dispatch({type:'add_error',payload:'Something went wrong with signup.'})
@@ -39,7 +39,7 @@ const signup = (dispatch) => async ({email,password}) => {
 };
     
 
-const signin = (dispatch) => async ({email,password}) => {
+const signin = (dispatch) => async({email,password}) => {
     try {
         //http request to signin route
         const response = await locationApi.post('/signin',{email,password})
@@ -48,7 +48,7 @@ const signin = (dispatch) => async ({email,password}) => {
         //update state
         dispatch({type:'signin',payload:response.data.token})
         //navigate to main flow
-        navigate('TrackList')
+        navigate('mainFlow')
     } catch (err) {
         dispatch({type:'add_error',payload:'Something went wrong with sign in'})
     }
@@ -58,7 +58,7 @@ const clearErrorMessage = (dispatch) => () => {
     dispatch({type:'clear_error_message'})
 }
 
-const tryLocalSignin = dispatch => async () => {
+const tryLocalSignin = dispatch => async() => {
     const token = await AsyncStorage.getItem('token');
     if(token) {
         dispatch({type:'signin',payload:token})
@@ -71,7 +71,7 @@ const tryLocalSignin = dispatch => async () => {
 const signout = (dispatch) => async () => {
     await AsyncStorage.removeItem('token');
     dispatch({type:'signout'})
-    navigate('Signup')
+    navigate('Signin')
 }
 
 //EXPORT

@@ -1,6 +1,6 @@
 import {useContext} from 'react';
 import {Context as TrackContext} from '../context/TrackContext';
-import {Context as LocationContext} from '../context/LocationContext';
+import {Context as LocationContext} from '../context/LocationContext-tracker';
 import {navigate} from '../navigationRef';
 
 export default () => {

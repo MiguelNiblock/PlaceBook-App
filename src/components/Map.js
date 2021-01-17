@@ -1,7 +1,7 @@
 import React,{useContext} from 'react';
 import {Text,StyleSheet} from 'react-native';
 import MapView, {Polyline,Circle} from 'react-native-maps';
-import {Context as LocationContext} from '../context/LocationContext';
+import {Context as LocationContext} from '../context/LocationContext-tracker';
 
 const Map = () => {
   const {state: {currentLocation,locations}} = useContext(LocationContext);
