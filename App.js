@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import AccountScreen from './src/screens/AccountScreen';
 import SigninScreen from './src/screens/SigninScreen';
 import SignupScreen from './src/screens/SignupScreen';
+import MapScreen from './src/screens/MapScreen';
 import TrackCreateScreen from './src/screens/TrackCreateScreen';
 import TrackDetailScreen from './src/screens/TrackDetailScreen';
 import TrackListScreen from './src/screens/TrackListScreen';
@@ -33,6 +34,7 @@ const switchNavigator = createSwitchNavigator({
     Signin: SigninScreen
   }),
   mainFlow: createBottomTabNavigator({
+    Map: MapScreen,
     trackListFlow,
     TrackCreate: TrackCreateScreen,
     Account: AccountScreen
@@ -47,7 +49,7 @@ export default () => {
     <TrackProvider>
       <LocationProvider>
         <AuthProvider>
-          <App ref={ (navigator)=>{setNavigator(navigator) }}/>
+          <App ref={ (navigator)=>{ setNavigator(navigator) }}/>
         </AuthProvider>
       </LocationProvider>
     </TrackProvider>
