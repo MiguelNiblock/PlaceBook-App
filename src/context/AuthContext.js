@@ -26,7 +26,6 @@ const signup = (dispatch) => async ({email,password}) => {
     try {
         //make api req to sign up with that email and passwd
         const response = await trackerApi.post('/signup',{email,password});
-        console.log(response.data);
         //save token in phone storage
         await AsyncStorage.setItem('token',response.data.token);
         //update state.
@@ -44,7 +43,6 @@ const signin = (dispatch) => async ({email,password}) => {
     try {
         //http request to signin route
         const response = await trackerApi.post('/signin',{email,password})
-        console.log(response.data)
         //save token in phone storage
         await AsyncStorage.setItem('token',response.data.token)
         //update state
@@ -64,7 +62,7 @@ const tryLocalSignin = dispatch => async () => {
     const token = await AsyncStorage.getItem('token');
     if(token) {
         dispatch({type:'signin',payload:token})
-        navigate('TrackList')
+        navigate('Map')
     } else {
         navigate('Signup')
     }
@@ -76,6 +74,8 @@ const signout = (dispatch) => async () => {
     navigate('Signup')
 }
 
+//EXPORT
+//////////////////
 export const { Provider, Context} = createDataContext(//fn creates Provider & Context
     authReducer, //reducer
     {signup, signin, signout, clearErrorMessage, tryLocalSignin}, //actions
