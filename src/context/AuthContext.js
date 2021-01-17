@@ -1,5 +1,5 @@
 import createDataContext from './createDataContext';
-import trackerApi from '../api/tracker';
+import locationApi from '../api/location';
 import {AsyncStorage} from 'react-native';
 import {navigate} from '../navigationRef';
 
@@ -25,7 +25,7 @@ const authReducer = (state, action) => {
 const signup = (dispatch) => async ({email,password}) => {
     try {
         //make api req to sign up with that email and passwd
-        const response = await trackerApi.post('/signup',{email,password});
+        const response = await locationApi.post('/signup',{email,password});
         //save token in phone storage
         await AsyncStorage.setItem('token',response.data.token);
         //update state.
@@ -42,7 +42,7 @@ const signup = (dispatch) => async ({email,password}) => {
 const signin = (dispatch) => async ({email,password}) => {
     try {
         //http request to signin route
-        const response = await trackerApi.post('/signin',{email,password})
+        const response = await locationApi.post('/signin',{email,password})
         //save token in phone storage
         await AsyncStorage.setItem('token',response.data.token)
         //update state
@@ -62,7 +62,7 @@ const tryLocalSignin = dispatch => async () => {
     const token = await AsyncStorage.getItem('token');
     if(token) {
         dispatch({type:'signin',payload:token})
-        navigate('Map')
+        navigate('mainFlow')
     } else {
         navigate('Signup')
     }
