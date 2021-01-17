@@ -15,6 +15,7 @@ const ListReducer = (state,action) => {
 const fetchLists = dispatch => async() => {
   const response = await locationApi.get('/lists');
   dispatch({type:'fetch_lists', payload: response.data})
+  // console.log(response.data)
 }
 const createList = dispatch => async(name,color,icon) => {
   await locationApi.post('/lists',{name,color,icon});

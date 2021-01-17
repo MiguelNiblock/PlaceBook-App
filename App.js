@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { createDrawerNavigator } from 'react-navigation-drawer';
 
 import DrawerContentComponent from './src/components/DrawerContentComponent'
+import LocationListScreen from './src/screens/LocationListScreen';
 
 import SigninScreen from './src/screens/SigninScreen';
 import SignupScreen from './src/screens/SignupScreen';
@@ -17,9 +18,15 @@ import {setNavigator}  from './src/navigationRef';
 import ResolveAuthScreen from './src/screens/ResolveAuthScreen'
 import {FontAwesome} from '@expo/vector-icons';
 
+console.disableYellowBox = true;
+// import { LogBox } from "react-native"
+
+// LogBox.ignoreAllLogs(true)
+
+
 const Drawer = createDrawerNavigator({
   Map: MapScreen,
-  Account: AccountScreen
+  Account: AccountScreen,
 },{
   drawerBackgroundColor: 'rgba(100,25,33,33)',
   drawerPosition: 'right',
@@ -27,13 +34,19 @@ const Drawer = createDrawerNavigator({
   contentComponent: DrawerContentComponent
 });
 
+const Stack = createStackNavigator({
+  Drawer,
+  LocationList: LocationListScreen
+})
+
+
 const switchNavigator = createSwitchNavigator({
   ResolveAuth: ResolveAuthScreen,
   loginFlow: createStackNavigator({
     Signup: SignupScreen,
     Signin: SigninScreen
   }),
-  mainFlow: Drawer
+  mainFlow: Stack
 });
 
 const App = createAppContainer(switchNavigator);
