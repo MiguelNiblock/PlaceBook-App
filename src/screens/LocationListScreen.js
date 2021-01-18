@@ -1,7 +1,7 @@
 import React,{useEffect,useContext} from 'react';
 import {View, Text, FlatList, TouchableOpacity} from 'react-native';
 import {Context as LocationContext} from '../context/LocationContext';
-import {ListItem} from 'react-native-elements';
+import {ListItem, Button} from 'react-native-elements';
 import {navigate} from '../navigationRef'
 
 const LocationListScreen = ({navigation}) => {
@@ -24,9 +24,18 @@ const LocationListScreen = ({navigation}) => {
         renderItem={({item})=>{
           return (
             <TouchableOpacity
-              onPress={()=>navigate('LocationEdit',{loc: item})}
+              style={{}}
+              // onPress={}
             >
-              <ListItem title={item.name} />
+              <ListItem 
+                title={item.name} 
+
+              />
+              <Button 
+                title="Edit"
+                onPress={()=>navigate('LocationEdit',{loc: item, list})}
+                buttonStyle={{width:50}}
+              />
             </TouchableOpacity>
           )
         }}
