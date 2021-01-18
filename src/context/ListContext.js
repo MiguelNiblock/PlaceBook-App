@@ -18,8 +18,8 @@ const fetchLists = dispatch => async() => {
   // console.log(response.data)
 }
 const createList = dispatch => async(name,color,icon) => {
-  await locationApi.post('/lists',{name,color,icon});
-  dispatch({type:'create_list',payload:{name,color,icon}})
+  const response = await locationApi.post('/lists',{name,color,icon});
+  dispatch({type:'create_list', payload:response.data})
 }
 
 export const {Context, Provider} = createDataContext(

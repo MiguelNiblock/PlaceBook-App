@@ -13,7 +13,7 @@ import AccountScreen from './src/screens/AccountScreen';
 import MapScreen from './src/screens/MapScreen';
 import {Provider as AuthProvider} from './src/context/AuthContext';
 import {Provider as ListProvider} from './src/context/ListContext';
-import {Provider as TrackProvider} from './src/context/TrackContext';
+import {Provider as LocationProvider} from './src/context/LocationContext';
 import {setNavigator}  from './src/navigationRef';
 import ResolveAuthScreen from './src/screens/ResolveAuthScreen'
 import {FontAwesome} from '@expo/vector-icons';
@@ -54,12 +54,12 @@ const App = createAppContainer(switchNavigator);
 
 export default () => {
   return (
-    <TrackProvider>
+    <LocationProvider>
       <ListProvider>
         <AuthProvider>
           <App ref={ (navigator)=>{ setNavigator(navigator) }}/>
         </AuthProvider>
       </ListProvider>
-    </TrackProvider>
+    </LocationProvider>
   )
 }
