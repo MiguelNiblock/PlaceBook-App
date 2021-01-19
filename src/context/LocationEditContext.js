@@ -11,6 +11,12 @@ const LocationEditReducer = (state,action) => {
       return {...state, notes:action.payload}
     case 'change_tags':
       return {...state, tags:action.payload}
+    case 'change_address':
+      return {...state, address:action.payload}
+    case 'change_coords':
+      return {...state, coords:action.payload}
+    case 'change_list':
+      return {...state, listId:action.payload}
     default:
       return state;
   };
@@ -32,9 +38,18 @@ const changeTags = dispatch => tags => {
   } else {payload = tags}
   dispatch({type:'change_tags', payload})
 }
+const changeAddress = dispatch => address => {
+  dispatch({type:'change_address', payload:address})
+}
+const changeCoords = dispatch => coords => {
+  dispatch({type:'change_coords', payload:coords})
+}
+const changeList = dispatch => listId => {
+  dispatch({type:'change_list', payload:listId})
+}
 
 export const {Context, Provider} = createDataContext(
   LocationEditReducer,
-  {changeName,changeStars,changeNotes,changeTags},
-  {name:'', stars:0, notes:'', tags:[], listId:null}
+  {changeName,changeStars,changeNotes,changeTags,changeAddress,changeCoords,changeList},
+  {name:'', address:'', coords:[], stars:0, notes:'', tags:[], listId:null}
   )
