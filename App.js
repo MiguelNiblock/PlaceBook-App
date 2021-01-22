@@ -12,6 +12,7 @@ import AccountScreen from './src/screens/AccountScreen';
 import MapScreen from './src/screens/MapScreen';
 import LocationListScreen from './src/screens/LocationListScreen';
 import LocationEditScreen from './src/screens/LocationEditScreen';
+import Callouts from './src/screens/Callouts';
 import {Provider as AuthProvider} from './src/context/AuthContext';
 import {Provider as ListProvider} from './src/context/ListContext';
 import {Provider as LocationProvider} from './src/context/LocationContext';
@@ -29,6 +30,7 @@ console.disableYellowBox = true;
 const Drawer = createDrawerNavigator({
   Map: MapScreen,
   Account: AccountScreen,
+  Callouts,
 },{
   drawerBackgroundColor: 'rgba(100,25,33,33)',
   drawerPosition: 'right',

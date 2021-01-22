@@ -1,5 +1,5 @@
 import React,{useEffect,useContext,useState} from 'react';
-import {View, ScrollView,TextInput, FlatList, TouchableOpacity} from 'react-native';
+import {View, ScrollView,TextInput, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
 // import {Context as LocationContext} from '../context/LocationContext';
 import {ListItem, Input, Rating, Text, Button} from 'react-native-elements';
 import {navigate} from '../navigationRef'
@@ -36,7 +36,7 @@ const LocationEditScreen = ({navigation}) => {
   return (
     <ScrollView>
       <Input label="Place Name" value={name} onChangeText={changeName}/>
-      <Input disabled label="Address" value={loc.address} />
+      <Input style={styles.addressInput} disabled label="Address" value={loc.address} />
       <Rating startingValue={stars} onFinishRating={changeStars}/>
       <Input label="Notes" value={notes} onChangeText={changeNotes}/>
       <Input label="Tags" value={tags.join(' ')} onChangeText={changeTags}/>
@@ -46,5 +46,11 @@ const LocationEditScreen = ({navigation}) => {
     </ScrollView>
   )
 };
+
+const styles = StyleSheet.create({
+  addressInput: {
+    // height: 150
+  }
+})
 
 export default LocationEditScreen;
