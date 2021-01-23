@@ -1,19 +1,20 @@
 import React,{useEffect,useContext,useState} from 'react';
-import {View, ScrollView,TextInput, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, ScrollView,TextInput, FlatList, TouchableOpacity, StyleSheet, Picker} from 'react-native';
 // import {Context as LocationContext} from '../context/LocationContext';
 import {ListItem, Input, Rating, Text, Button} from 'react-native-elements';
 import {navigate} from '../navigationRef'
 import {Context as LocationEditContext} from '../context/LocationEditContext';
 import {Context as LocationContext} from '../context/LocationContext';
+import {Context as ListContext} from '../context/ListContext';
 
 const LocationEditScreen = ({navigation}) => {
 
-  const {state:{name,address,coords,notes,stars,tags,listId},changeName,changeAddress,changeCoords,changeStars,changeNotes,changeTags,changeList} = useContext(LocationEditContext);
+  const {state:{name,address,coords,notes,stars,tags,listId},changeName,changeAddress,changeCoords,changeStars,changeNotes,changeTags,changeListId} = useContext(LocationEditContext);
   const {editLocation,createLocation} = useContext(LocationContext);
+  const {state:lists} = useContext(ListContext);
 
-  const loc = navigation.getParam('loc')
-  const list = navigation.getParam('list')
-  const {latitude, longitude} = loc.coords
+  const loc = navigation.getParam('loc');
+  const {latitude, longitude} = loc.coords;
 
   useEffect(()=>{
     changeName(loc.name)
@@ -22,12 +23,12 @@ const LocationEditScreen = ({navigation}) => {
     changeNotes(loc.notes)
     changeStars(loc.stars)
     changeTags(loc.tags)
-    changeList(loc.listId)
+    changeListId(loc.listId)
   },[])
 
-  const saveLocation = (_id,name,address,coords,notes,stars,tags,listId) => {
-    if (_id){//if location exists...
-      editLocation(_id,name,address,coords,notes,stars,tags,listId);
+  const saveLocation = (locId,name,address,coords,notes,stars,tags,listId) => {
+    if (locId){//if location exists...
+      editLocation(locId,name,address,coords,notes,stars,tags,listId);
     } else {
       createLocation(name,address,coords,notes,stars,tags,listId);
     }
@@ -41,7 +42,17 @@ const LocationEditScreen = ({navigation}) => {
       <Input label="Notes" value={notes} onChangeText={changeNotes}/>
       <Input label="Tags" value={tags.join(' ')} onChangeText={changeTags}/>
       <Input disabled label="Coordinates" value={[latitude,longitude].join(', ')} />
-      <Input disabled label="List" value={list.name} />      
+      <Picker
+        selectedValue={listId}
+        onValueChange={(itemValue)=>changeListId(itemValue)}
+        mode="dropdown"
+        prompt="Lists of Places"
+      >
+        <Picker.Item label="Select a List" value={null} />
+        {lists.map((item)=>{
+          return <Picker.Item label={item.name} value={item._id} />
+        })}
+      </Picker>
       <Button title="Save" onPress={()=>saveLocation(loc._id,name,address,coords,notes,stars,tags,listId)}/>
     </ScrollView>
   )

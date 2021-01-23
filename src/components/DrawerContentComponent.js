@@ -28,7 +28,7 @@ const DrawerContentComponent = (props) => {
           renderItem={({item})=>{
             return (
               <TouchableOpacity
-                onPress={()=>navigate('LocationList',{list: item})}
+                onPress={()=>navigate('LocationList',{listId: item._id})}
               >
                 <ListItem title={item.name} />
               </TouchableOpacity>

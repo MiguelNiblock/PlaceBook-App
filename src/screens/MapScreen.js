@@ -16,6 +16,7 @@ const MapScreen = ({navigation})=>{
   const markerRef = useRef();
   const [address,setAddress] = useState('');
   const [addressCallout,setAddressCallout] = useState('')
+  const [showSaveButton,setShowSaveButton] =useState(false)
 
   useEffect(()=>{
     const { status } = Permissions.askAsync(Permissions.LOCATION)
@@ -32,6 +33,7 @@ const MapScreen = ({navigation})=>{
     setAddress(`${name} ${street}\n${city}, ${region}\n${postalCode}, ${country}`);
     setAddressCallout(`${name} ${street}, ${city}, ${region} ${postalCode}`);
     markerRef.current.showCallout();
+    setShowSaveButton(true);
     // markerRef.current.redraw();
   };
 
@@ -45,12 +47,8 @@ const MapScreen = ({navigation})=>{
       stars:0,
       tags:'',
       listId:null
-    }
-    const list = {
-      _id:null,
-      name:'None'
-    }
-    navigate('LocationEdit',{loc, list})
+    };
+    navigate('LocationEdit',{loc})
   };
 
   return (
@@ -59,7 +57,7 @@ const MapScreen = ({navigation})=>{
         onPress={() => navigation.openDrawer()}
         title="Drawer"
       />
-      {showMarker ?
+      {showSaveButton ?
       <Button
         onPress={saveLocation}
         title="Save"
@@ -84,7 +82,7 @@ const MapScreen = ({navigation})=>{
         onRegionChangeComplete={(region)=>console.log(region)}
         // onUserLocationChange={}
         onLongPress={handleLongPress}
-        onPress={()=>setShowMarker(false)}
+        onPress={()=>{setShowMarker(false);setShowSaveButton(false);}}
       >
       {showMarker ?//becomes false when onPress mapview
         <Marker draggable

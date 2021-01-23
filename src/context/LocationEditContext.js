@@ -44,12 +44,12 @@ const changeAddress = dispatch => address => {
 const changeCoords = dispatch => coords => {
   dispatch({type:'change_coords', payload:coords})
 }
-const changeList = dispatch => listId => {
+const changeListId = dispatch => listId => {
   dispatch({type:'change_list', payload:listId})
 }
 
 export const {Context, Provider} = createDataContext(
   LocationEditReducer,
-  {changeName,changeStars,changeNotes,changeTags,changeAddress,changeCoords,changeList},
+  {changeName,changeStars,changeNotes,changeTags,changeAddress,changeCoords,changeListId},
   {name:'', address:'', coords:[], stars:0, notes:'', tags:[], listId:null}
   )
