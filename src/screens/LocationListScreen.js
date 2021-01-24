@@ -26,13 +26,10 @@ const LocationListScreen = ({navigation}) => {
         data={locations.filter(item=>item.listId === listId)}
         renderItem={({item})=>{
           return (
-            <TouchableOpacity
-              style={{}}
+            <TouchableOpacity style={{}}
               // onPress={}
             >
-              <ListItem 
-                title={item.name} 
-              />
+              <ListItem title={item.name} />
               <Button 
                 title="Edit"
                 onPress={()=>navigate('LocationEdit',{loc: item})}

@@ -29,7 +29,7 @@ const createLocation = dispatch => async(name,address,coords,notes,stars,tags,li
   navigate('LocationList',{listId})
 }
 const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tags,listId) => {
-  const response = await locationApi.put( `/locs/${locId}`,
+  const response = await locationApi.put(`/locs/${locId}`,
     {name,address,coords,notes,stars,tags,listId}
   );
   dispatch({type:'edit_loc', payload:response.data})

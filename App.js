@@ -12,6 +12,7 @@ import AccountScreen from './src/screens/AccountScreen';
 import MapScreen from './src/screens/MapScreen';
 import LocationListScreen from './src/screens/LocationListScreen';
 import LocationEditScreen from './src/screens/LocationEditScreen';
+import ListEditScreen from './src/screens/ListEditScreen';
 import Callouts from './src/screens/Callouts';
 import {Provider as AuthProvider} from './src/context/AuthContext';
 import {Provider as ListProvider} from './src/context/ListContext';
@@ -41,7 +42,8 @@ const Drawer = createDrawerNavigator({
 const Stack = createStackNavigator({
   Drawer,
   LocationList: LocationListScreen,
-  LocationEdit: LocationEditScreen
+  LocationEdit: LocationEditScreen,
+  ListEdit: ListEditScreen
 })
 
 
