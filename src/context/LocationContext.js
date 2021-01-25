@@ -20,7 +20,7 @@ const LocationReducer = (state,action) => {
 const fetchLocs = dispatch => async() => {
   console.log('fetchLocs called')
   const response = await locationApi.get('/locs');
-  console.log('fetchLocs response:',response.data);
+  console.log('fetchLocs response received');
   dispatch({type:'fetch_locs', payload: response.data});
 };
 const createLocation = dispatch => async(name,address,coords,notes,stars,tags,listId) => {

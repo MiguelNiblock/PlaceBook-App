@@ -19,13 +19,11 @@ const MapScreen = ({navigation})=>{
     addressShort:'',
     address:''
   })
-  const [editMap,setEditMap] = useState(false);//workaround for bug: mapview not showing controls
   const markerRef = useRef();
+  const [editMap,setEditMap] = useState(false);//workaround for bug: mapview not showing controls
   const [showSaveButton,setShowSaveButton] = useState(false);
-  // const [hideDrawer,setHideDrawer] = useState(false);
-  // setHideDrawer(navigation.getParam('hideDrawer'));
   // const [loc,setLoc] = useState(null);
-  const navLoc = navigation.getParam('loc');
+  const navLoc = navigation.getParam('loc');//marker to focus map. onPress from locationlistscr
   // console.log(navLoc)
 
   useEffect(()=>{
@@ -34,21 +32,10 @@ const MapScreen = ({navigation})=>{
     fetchLocs();
   },[]);
 
-  // useEffect(()=>{
-  //   console.log('useEffect ran. new navLoc:',navLoc)
-  //   if(navLoc){
-  //     // setLoc(navLoc);
-  //     navigation.closeDrawer();
-  //     if (showMarker===false) setShowMarker(true);
-  //     if (showMarker===true) markerRef.current.hideCallout();
-  //     setMarkerCoords(navLoc.coords);  
-  //     if (markerOpacity === 0) setMarkerOpacity(1); 
-  //     // setAddress(navLoc.address);
-  //     setAddressCallout(navLoc.address);
-  //     if (showMarker===true) markerRef.current.showCallout();
-  //     // setShowSaveButton(true);
-  //   }
-  // },[navLoc])
+  useEffect(()=>{
+    if(navigation.getParam('hideDrawer')){navigation.closeDrawer()};
+    //focus on loc nav param.
+  });
 
   const handleLongPress = async(e)=>{
     console.log('handleLongPress called')
@@ -114,7 +101,7 @@ const MapScreen = ({navigation})=>{
       >
       {markerState.show //becomes false with mapview's onPress (short tap)
       ? <Marker draggable
-          opacity={markerState.markerOpacity}//initially 0. Allows markerRef to be defined on first load
+          opacity={markerState.opacity}//initially 0. Allows markerRef to be defined on first load
           ref={markerRef}
           coordinate={{
             "latitude": markerState.coords.latitude,
