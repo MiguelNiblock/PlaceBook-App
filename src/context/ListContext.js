@@ -18,15 +18,16 @@ const ListReducer = (state,action) => {
 };
 
 const fetchLists = dispatch => async() => {
+  console.log('fetchLists called');
   const response = await locationApi.get('/lists');
-  dispatch({type:'fetch_lists', payload: response.data})
-  // console.log(response.data)
-}
+  console.log('fetchLists resp received');
+  dispatch({type:'fetch_lists', payload:response.data});
+};
 const createList = dispatch => async(name,color,icon) => {
   const response = await locationApi.post('/lists',{name,color,icon});
   dispatch({type:'create_list', payload:response.data});
   navigate('Drawer');
-}
+};
 const editList = dispatch => async(listId,name,color,icon) => {
   const response = await locationApi.put(`/lists/${listId}`,{name,color,icon});
   dispatch({type:'edit_list', payload:response.data});
@@ -37,4 +38,4 @@ export const {Context, Provider} = createDataContext(
   ListReducer,
   {fetchLists,createList,editList},
   []//empty array of lists
-)
+);

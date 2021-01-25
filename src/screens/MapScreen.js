@@ -1,48 +1,82 @@
-import React,{useEffect,useState,useRef} from 'react';
+import React,{useEffect,useState,useRef,useContext} from 'react';
 import MapView,{Marker,Callout} from 'react-native-maps';
 import { StyleSheet, Text, View, Dimensions, Button, Alert} from 'react-native';
 import * as Permissions from 'expo-permissions';
 import Location,{reverseGeocodeAsync} from 'expo-location';
 import CustomCallout from './CustomCallout';
 import {navigate} from '../navigationRef'
-
+import {Context as ListContext} from '../context/ListContext';
+import {Context as LocationContext} from '../context/LocationContext';
 
 const MapScreen = ({navigation})=>{
 
-  const [markerOpacity, setMarkerOpacity] = useState(0);
-  const [showMarker, setShowMarker] = useState(true)
+  const {fetchLists} = useContext(ListContext);
+  const {fetchLocs} = useContext(LocationContext);
+  const [markerState,setMarkerState] = useState({
+    show:true,
+    coords:{latitude:37.42459028327157, longitude:-122.08799198269844},
+    opacity:0,
+    addressShort:'',
+    address:''
+  })
   const [editMap,setEditMap] = useState(false);//workaround for bug: mapview not showing controls
-  const [markerCoords,setMarkerCoords] = useState({latitude:37.42459028327157, longitude:-122.08799198269844});//there must be inital coords for markerRef to be defined. will have 0 opacity initially anyway
   const markerRef = useRef();
-  const [address,setAddress] = useState('');
-  const [addressCallout,setAddressCallout] = useState('')
-  const [showSaveButton,setShowSaveButton] =useState(false)
+  const [showSaveButton,setShowSaveButton] = useState(false);
+  // const [hideDrawer,setHideDrawer] = useState(false);
+  // setHideDrawer(navigation.getParam('hideDrawer'));
+  // const [loc,setLoc] = useState(null);
+  const navLoc = navigation.getParam('loc');
+  // console.log(navLoc)
 
   useEffect(()=>{
-    const { status } = Permissions.askAsync(Permissions.LOCATION)
-  });
+    const { status } = Permissions.askAsync(Permissions.LOCATION);
+    fetchLists();
+    fetchLocs();
+  },[]);
+
+  // useEffect(()=>{
+  //   console.log('useEffect ran. new navLoc:',navLoc)
+  //   if(navLoc){
+  //     // setLoc(navLoc);
+  //     navigation.closeDrawer();
+  //     if (showMarker===false) setShowMarker(true);
+  //     if (showMarker===true) markerRef.current.hideCallout();
+  //     setMarkerCoords(navLoc.coords);  
+  //     if (markerOpacity === 0) setMarkerOpacity(1); 
+  //     // setAddress(navLoc.address);
+  //     setAddressCallout(navLoc.address);
+  //     if (showMarker===true) markerRef.current.showCallout();
+  //     // setShowSaveButton(true);
+  //   }
+  // },[navLoc])
 
   const handleLongPress = async(e)=>{
-    if (showMarker===false) setShowMarker(true);
-    if (showMarker===true) markerRef.current.hideCallout();
-    setMarkerCoords(e.nativeEvent.coordinate);  
-    if (markerOpacity === 0) setMarkerOpacity(1); 
-    const [{name,street,city,region,postalCode,country}] = await reverseGeocodeAsync({
-      ...e.nativeEvent.coordinate
+    console.log('handleLongPress called')
+    const eventCoords = e.nativeEvent.coordinate;
+    // console.log('new coords:',eventCoords)
+    const [{name,street,city,region,postalCode,country}] = await reverseGeocodeAsync({...eventCoords}); 
+    console.log('new address:',name,street,city,region,postalCode,country);
+    setMarkerState({
+      show:true,
+      coords:eventCoords,
+      opacity:1,
+      addressShort:`${name} ${street}, ${city}, ${region} ${postalCode}`,
+      address:`${name} ${street}\n${city}, ${region}\n${postalCode}, ${country}`
     });
-    setAddress(`${name} ${street}\n${city}, ${region}\n${postalCode}, ${country}`);
-    setAddressCallout(`${name} ${street}, ${city}, ${region} ${postalCode}`);
-    markerRef.current.showCallout();
     setShowSaveButton(true);
-    // markerRef.current.redraw();
+  };
+
+  const mapTap = () => {
+    setMarkerState({...markerState,show:false,addressShort:'',address:''});
+    setShowSaveButton(false);
   };
 
   const saveLocation = ()=>{
     const loc = {
       _id:null,
       name:'',
-      address,
-      coords:markerCoords,
+      address:markerState.address,
+      coords:markerState.coords,
       notes:'',
       stars:0,
       tags:'',
@@ -57,17 +91,16 @@ const MapScreen = ({navigation})=>{
         onPress={() => navigation.openDrawer()}
         title="Drawer"
       />
-      {showSaveButton ?
-      <Button
-        onPress={saveLocation}
-        title="Save"
-      /> :
-      null
-      }
-      <MapView style={editMap ? styles.map : {}}         
-        onMapReady={() => {
-          setEditMap(true)
-        }}
+      <Text>{markerState.address}</Text>
+      {showSaveButton//becomes true with mapview's onLongPress
+      ? <Button
+          onPress={saveLocation}
+          title="Save"
+        /> 
+      : null }
+      <MapView showsUserLocation showsMyLocationButton zoomControlEnabled
+        style={editMap ? styles.map : {}}         
+        onMapReady={() => setEditMap(true)}
         initialRegion={{
           "latitude": 37.421997503686995,
           "latitudeDelta": 0.018190238622558752,
@@ -76,44 +109,26 @@ const MapScreen = ({navigation})=>{
         }}
         provider="google"
         mapType="hybrid"
-        showsUserLocation
-        showsMyLocationButton
-        zoomControlEnabled
-        onRegionChangeComplete={(region)=>console.log(region)}
-        // onUserLocationChange={}
         onLongPress={handleLongPress}
-        onPress={()=>{setShowMarker(false);setShowSaveButton(false);}}
+        onPress={mapTap}
       >
-      {showMarker ?//becomes false when onPress mapview
-        <Marker draggable
-          opacity={markerOpacity}//initially 0. Allows markerRef to be defined on first load
+      {markerState.show //becomes false with mapview's onPress (short tap)
+      ? <Marker draggable
+          opacity={markerState.markerOpacity}//initially 0. Allows markerRef to be defined on first load
           ref={markerRef}
           coordinate={{
-            "latitude": markerCoords.latitude,
+            "latitude": markerState.coords.latitude,
             "latitudeDelta": 0.018190238622558752,
-            "longitude": markerCoords.longitude,
+            "longitude": markerState.coords.longitude,
             "longitudeDelta": 0.01765664666889677,
           }}
           pinColor="rgba(0,100,255,1)"
-          title="Address:"
-          description={address}
-        >
-          <Callout tooltip style={styles.customView} onPress={() => Alert.alert('callout pressed')}>
-            <CustomCallout>
-              <Text>{addressCallout}</Text>
-              {/* <Button style={[styles.calloutButton]}
-                title="Save"
-                onPress={() => Alert.alert('button pressed')}
-              /> */}
-            </CustomCallout>
-          </Callout>
-        </Marker> :
-      null}
+        />
+      : null }
       </MapView>
-      
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -125,7 +140,7 @@ const styles = StyleSheet.create({
   map: {
     marginLeft: 0,
     width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height - 150,
+    height: Dimensions.get('window').height - 250,
   },
   customView: {
     width: 140,

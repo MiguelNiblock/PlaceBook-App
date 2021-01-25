@@ -12,9 +12,9 @@ const DrawerContentComponent = (props) => {
 
   const {fetchLists, state:lists} = useContext(ListContext);
 
-  useEffect(()=>{
-    fetchLists();
-  },[])
+  // useEffect(()=>{
+    
+  // },[])
   
   return (
     <ScrollView>

@@ -7,16 +7,11 @@ import {navigate} from '../navigationRef'
 
 const LocationListScreen = ({navigation}) => {
 
-  const {fetchLocs, state:locations} = useContext(LocationContext);
+  const {state:locations} = useContext(LocationContext);
   const {state:lists} = useContext(ListContext);
 
   const listId = navigation.getParam('listId');
   const list = lists.find((item)=>item._id===listId);
-
-  useEffect(()=>{
-    fetchLocs();
-  }, [])
-
 
   return (
     <View>
@@ -27,12 +22,12 @@ const LocationListScreen = ({navigation}) => {
         renderItem={({item})=>{
           return (
             <TouchableOpacity style={{}}
-              // onPress={}
+              onPress={()=>navigate('Map',{hideDrawer:true, loc:item})}
             >
               <ListItem title={item.name} />
               <Button 
                 title="Edit"
-                onPress={()=>navigate('LocationEdit',{loc: item})}
+                onPress={()=>navigate('LocationEdit',{loc:item})}
                 buttonStyle={{width:50}}
               />
             </TouchableOpacity>

@@ -1,6 +1,6 @@
 import createDataContext from './createDataContext';
 import locationApi from '../api/location';
-import {navigate} from '../navigationRef'
+import {navigate} from '../navigationRef';
 
 const LocationReducer = (state,action) => {
   switch (action.type){
@@ -18,16 +18,17 @@ const LocationReducer = (state,action) => {
 };
 
 const fetchLocs = dispatch => async() => {
+  console.log('fetchLocs called')
   const response = await locationApi.get('/locs');
-  dispatch({type:'fetch_locs', payload: response.data})
-  // console.log(response.data)
-}
+  console.log('fetchLocs response:',response.data);
+  dispatch({type:'fetch_locs', payload: response.data});
+};
 const createLocation = dispatch => async(name,address,coords,notes,stars,tags,listId) => {
   const response = await locationApi.post('/locs',{name,address,coords,notes,stars,tags,listId});
-  dispatch({type:'create_loc', payload:response.data})
-  console.log('createLocation ran. response:',response.data)
-  navigate('LocationList',{listId})
-}
+  dispatch({type:'create_loc', payload:response.data});
+  console.log('createLocation ran. response:',response.data);
+  navigate('LocationList',{listId});
+};
 const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tags,listId) => {
   const response = await locationApi.put(`/locs/${locId}`,
     {name,address,coords,notes,stars,tags,listId}
@@ -35,10 +36,10 @@ const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tag
   dispatch({type:'edit_loc', payload:response.data})
   console.log('editLocation ran. response:',response.data)
   navigate('LocationList',{listId})
-}
+};
 
 export const {Context, Provider} = createDataContext(
   LocationReducer,
   {fetchLocs,createLocation,editLocation},
   []//empty array of locations
-)
+);
