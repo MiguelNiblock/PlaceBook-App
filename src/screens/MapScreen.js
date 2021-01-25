@@ -11,7 +11,7 @@ import {Context as LocationContext} from '../context/LocationContext';
 const MapScreen = ({navigation})=>{
 
   const {fetchLists} = useContext(ListContext);
-  const {fetchLocs} = useContext(LocationContext);
+  const {fetchLocs,state:locations} = useContext(LocationContext);
   const [markerState,setMarkerState] = useState({
     show:true,
     coords:{latitude:37.42459028327157, longitude:-122.08799198269844},
@@ -112,6 +112,20 @@ const MapScreen = ({navigation})=>{
           pinColor="rgba(0,100,255,1)"
         />
       : null }
+      {
+        // console.log('locations:',locations)
+        locations.map((item)=>{
+          if (item.coords){
+            return <Marker key={item._id} coordinate={{
+              ...item.coords,
+              // "latitude": item.coords.latitude,
+              "latitudeDelta": 0.018190238622558752,
+              // "longitude": item.coords.longitude,
+              "longitudeDelta": 0.01765664666889677
+            }} />
+          }
+        })
+      }
       </MapView>
     </View>
   );
