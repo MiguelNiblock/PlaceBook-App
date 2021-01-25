@@ -22,9 +22,15 @@ const MapScreen = ({navigation})=>{
   const markerRef = useRef();
   const [editMap,setEditMap] = useState(false);//workaround for bug: mapview not showing controls
   const [showSaveButton,setShowSaveButton] = useState(false);
-  // const [loc,setLoc] = useState(null);
-  const navLoc = navigation.getParam('loc');//marker to focus map. onPress from locationlistscr
-  // console.log(navLoc)
+  const [region,setRegion] = useState({
+    "latitude": 37.421997503686995,
+    "latitudeDelta": 0.018190238622558752,
+    "longitude": -122.08399968221784,
+    "longitudeDelta": 0.01765664666889677,
+  });
+
+  const focusLoc = navigation.getParam('loc');
+  console.log('focusLoc from comp body:',focusLoc)
 
   useEffect(()=>{
     const { status } = Permissions.askAsync(Permissions.LOCATION);
@@ -33,9 +39,21 @@ const MapScreen = ({navigation})=>{
   },[]);
 
   useEffect(()=>{
-    if(navigation.getParam('hideDrawer')){navigation.closeDrawer()};
-    //focus on loc nav param.
-  });
+    console.log('focusLoc useEffect called');
+    let hideDrawer = navigation.getParam('hideDrawer');
+    console.log('hideDrawer:',hideDrawer);
+    if(hideDrawer){navigation.closeDrawer()};
+    if (focusLoc) {
+      console.log('focusLoc from useEffect:',focusLoc);
+      setRegion({...region,...focusLoc.coords})
+    };
+    // set address in text overlay
+    
+    return ()=> { 
+      console.log('cleanup fn called');
+      navigation.setParams({hideDrawer:null,loc:null})
+    };
+  },[focusLoc]);
 
   const handleLongPress = async(e)=>{
     console.log('handleLongPress called')
@@ -88,12 +106,7 @@ const MapScreen = ({navigation})=>{
       <MapView showsUserLocation showsMyLocationButton zoomControlEnabled
         style={editMap ? styles.map : {}}         
         onMapReady={() => setEditMap(true)}
-        initialRegion={{
-          "latitude": 37.421997503686995,
-          "latitudeDelta": 0.018190238622558752,
-          "longitude": -122.08399968221784,
-          "longitudeDelta": 0.01765664666889677,
-        }}
+        region={region}
         provider="google"
         mapType="hybrid"
         onLongPress={handleLongPress}
