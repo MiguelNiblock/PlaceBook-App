@@ -15,10 +15,9 @@ const MapScreen = ({navigation})=>{
   const [markerState,setMarkerState] = useState({
     show:true,
     coords:{latitude:37.42459028327157, longitude:-122.08799198269844},
-    opacity:0,
-    addressShort:'',
-    address:''
+    opacity:0
   })
+  const [addressOverlay, setAddressOverlay] = useState('');
   const markerRef = useRef();
   const [editMap,setEditMap] = useState(false);//workaround for bug: mapview not showing controls
   const [showSaveButton,setShowSaveButton] = useState(false);
@@ -45,9 +44,9 @@ const MapScreen = ({navigation})=>{
     if(hideDrawer){navigation.closeDrawer()};
     if (focusLoc) {
       console.log('focusLoc from useEffect:',focusLoc);
-      setRegion({...region,...focusLoc.coords})
+      setRegion({...region,...focusLoc.coords});
+      setAddressOverlay(focusLoc.address);
     };
-    // set address in text overlay
     
     return ()=> { 
       console.log('cleanup fn called');
@@ -64,23 +63,23 @@ const MapScreen = ({navigation})=>{
     setMarkerState({
       show:true,
       coords:eventCoords,
-      opacity:1,
-      addressShort:`${name} ${street}, ${city}, ${region} ${postalCode}`,
-      address:`${name} ${street}\n${city}, ${region}\n${postalCode}, ${country}`
+      opacity:1
     });
     setShowSaveButton(true);
+    setAddressOverlay(`${name} ${street}, ${city}, ${region} ${postalCode}, ${country}`)
   };
 
   const mapTap = () => {
-    setMarkerState({...markerState,show:false,addressShort:'',address:''});
+    setMarkerState({...markerState,show:false});
     setShowSaveButton(false);
+    setAddressOverlay('')
   };
 
   const saveLocation = ()=>{
     const loc = {
       _id:null,
       name:'',
-      address:markerState.address,
+      address:addressOverlay,
       coords:markerState.coords,
       notes:'',
       stars:0,
@@ -96,7 +95,7 @@ const MapScreen = ({navigation})=>{
         onPress={() => navigation.openDrawer()}
         title="Drawer"
       />
-      <Text>{markerState.address}</Text>
+      <Text>{addressOverlay}</Text>
       {showSaveButton//becomes true with mapview's onLongPress
       ? <Button
           onPress={saveLocation}
