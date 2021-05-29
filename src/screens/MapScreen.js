@@ -12,7 +12,7 @@ const MapScreen = ({navigation})=>{
 
   const {fetchLists} = useContext(ListContext);
   const {fetchLocs,state:locations} = useContext(LocationContext);
-  const [markerState,setMarkerState] = useState({
+  const [explorerMarker,setExplorerMarker] = useState({
     show:true,
     coords:{latitude:37.42459028327157, longitude:-122.08799198269844},
     opacity:0
@@ -60,17 +60,19 @@ const MapScreen = ({navigation})=>{
     // console.log('new coords:',eventCoords)
     const [{name,street,city,region,postalCode,country}] = await reverseGeocodeAsync({...eventCoords}); 
     console.log('new address:',name,street,city,region,postalCode,country);
-    setMarkerState({
+    setExplorerMarker({
       show:true,
       coords:eventCoords,
-      opacity:1
+      opacity:1,
+      address:`${name} ${street}, ${city}, ${region} ${postalCode}, ${country}`
     });
     setShowSaveButton(true);
-    setAddressOverlay(`${name} ${street}, ${city}, ${region} ${postalCode}, ${country}`)
+    setAddressOverlay(explorerMarker.address);
+    setRegion({...region,...eventCoords});
   };
 
   const mapTap = () => {
-    setMarkerState({...markerState,show:false});
+    setExplorerMarker({...explorerMarker,show:false});
     setShowSaveButton(false);
     setAddressOverlay('')
   };
@@ -80,7 +82,7 @@ const MapScreen = ({navigation})=>{
       _id:null,
       name:'',
       address:addressOverlay,
-      coords:markerState.coords,
+      coords:explorerMarker.coords,
       notes:'',
       stars:0,
       tags:'',
@@ -103,38 +105,43 @@ const MapScreen = ({navigation})=>{
         /> 
       : null }
       <MapView showsUserLocation showsMyLocationButton zoomControlEnabled
-        style={editMap ? styles.map : {}}         
-        onMapReady={() => setEditMap(true)}
+        style={editMap ? styles.map : {}}//bug quickfix
+        onMapReady={() => setEditMap(true)}//bug quickfix
         region={region}
         provider="google"
         mapType="hybrid"
         onLongPress={handleLongPress}
         onPress={mapTap}
       >
-      {markerState.show //becomes false with mapview's onPress (short tap)
+      {explorerMarker.show //becomes false with mapview's onPress (short tap)
       ? <Marker draggable
-          opacity={markerState.opacity}//initially 0. Allows markerRef to be defined on first load
+          opacity={explorerMarker.opacity}//initially 0. Allows markerRef to be defined on first load
           ref={markerRef}
           coordinate={{
-            "latitude": markerState.coords.latitude,
+            "latitude": explorerMarker.coords.latitude,
             "latitudeDelta": 0.018190238622558752,
-            "longitude": markerState.coords.longitude,
+            "longitude": explorerMarker.coords.longitude,
             "longitudeDelta": 0.01765664666889677,
           }}
           pinColor="rgba(0,100,255,1)"
+          onPress={()=>{
+            setAddressOverlay(explorerMarker.address);
+            setRegion({...region,...explorerMarker.coords});
+          }}
         />
       : null }
       {
         // console.log('locations:',locations)
         locations.map((item)=>{
           if (item.coords){
-            return <Marker key={item._id} coordinate={{
-              ...item.coords,
-              // "latitude": item.coords.latitude,
-              "latitudeDelta": 0.018190238622558752,
-              // "longitude": item.coords.longitude,
-              "longitudeDelta": 0.01765664666889677
-            }} />
+            console.log('saved marker:',item)
+            return <Marker key={item._id} 
+              coordinate={{...item.coords}}
+              onPress={()=>{
+                setAddressOverlay(item.address);
+                setRegion({...region,...item.coords});
+              }}
+            />
           }
         })
       }
