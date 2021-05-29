@@ -112,6 +112,11 @@ const MapScreen = ({navigation})=>{
         mapType="hybrid"
         onLongPress={handleLongPress}
         onPress={mapTap}
+        // onRegionChange={()=>{console.log('region change')}}
+        onRegionChangeComplete={(region)=>{
+          console.log('regionChangeComplete:',region);
+          setRegion(region);
+        }}
       >
       {explorerMarker.show //becomes false with mapview's onPress (short tap)
       ? <Marker draggable
@@ -134,7 +139,7 @@ const MapScreen = ({navigation})=>{
         // console.log('locations:',locations)
         locations.map((item)=>{
           if (item.coords){
-            console.log('saved marker:',item)
+            // console.log('saved marker:',item)
             return <Marker key={item._id} 
               coordinate={{...item.coords}}
               onPress={()=>{
