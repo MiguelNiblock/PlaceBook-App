@@ -21,7 +21,7 @@ const MapScreen = ({navigation})=>{
   const markerRef = useRef();
   const [editMap,setEditMap] = useState(false);//workaround for bug: mapview not showing controls
   const [showSaveButton,setShowSaveButton] = useState(false);
-  const [region,setRegion] = useState({
+  const [currentRegion,setCurrentRegion] = useState({
     "latitude": 37.421997503686995,
     "latitudeDelta": 0.018190238622558752,
     "longitude": -122.08399968221784,
@@ -44,7 +44,7 @@ const MapScreen = ({navigation})=>{
     if(hideDrawer){navigation.closeDrawer()};
     if (focusLoc) {
       console.log('focusLoc from useEffect:',focusLoc);
-      setRegion({...region,...focusLoc.coords});
+      setCurrentRegion({...currentRegion,...focusLoc.coords});
       setAddressOverlay(focusLoc.address);
     };
     
@@ -55,20 +55,19 @@ const MapScreen = ({navigation})=>{
   },[focusLoc]);
 
   const handleLongPress = async(e)=>{
-    console.log('handleLongPress called')
+    console.log('handleLongPress called');
     const eventCoords = e.nativeEvent.coordinate;
-    // console.log('new coords:',eventCoords)
-    const [{name,street,city,region,postalCode,country}] = await reverseGeocodeAsync({...eventCoords}); 
-    console.log('new address:',name,street,city,region,postalCode,country);
+    const [{name,street,city,region:addressRegion,postalCode,country}] = await reverseGeocodeAsync({...eventCoords}); 
+    const address = `${name} ${street}, ${city}, ${addressRegion} ${postalCode}, ${country}`;
+    console.log('new address:',address);
     setExplorerMarker({
       show:true,
       coords:eventCoords,
       opacity:1,
-      address:`${name} ${street}, ${city}, ${region} ${postalCode}, ${country}`
+      address
     });
     setShowSaveButton(true);
-    setAddressOverlay(explorerMarker.address);
-    setRegion({...region,...eventCoords});
+    setAddressOverlay(address);
   };
 
   const mapTap = () => {
@@ -107,16 +106,13 @@ const MapScreen = ({navigation})=>{
       <MapView showsUserLocation showsMyLocationButton zoomControlEnabled
         style={editMap ? styles.map : {}}//bug quickfix
         onMapReady={() => setEditMap(true)}//bug quickfix
-        region={region}
+        region={currentRegion}
         provider="google"
         mapType="hybrid"
         onLongPress={handleLongPress}
         onPress={mapTap}
         // onRegionChange={()=>{console.log('region change')}}
-        onRegionChangeComplete={(region)=>{
-          console.log('regionChangeComplete:',region);
-          setRegion(region);
-        }}
+        onRegionChangeComplete={(region)=>setCurrentRegion(region)}
       >
       {explorerMarker.show //becomes false with mapview's onPress (short tap)
       ? <Marker draggable
@@ -131,7 +127,7 @@ const MapScreen = ({navigation})=>{
           pinColor="rgba(0,100,255,1)"
           onPress={()=>{
             setAddressOverlay(explorerMarker.address);
-            setRegion({...region,...explorerMarker.coords});
+            setCurrentRegion({...currentRegion,...explorerMarker.coords});
           }}
         />
       : null }
@@ -144,7 +140,7 @@ const MapScreen = ({navigation})=>{
               coordinate={{...item.coords}}
               onPress={()=>{
                 setAddressOverlay(item.address);
-                setRegion({...region,...item.coords});
+                setCurrentRegion({...currentRegion,...item.coords});
               }}
             />
           }
