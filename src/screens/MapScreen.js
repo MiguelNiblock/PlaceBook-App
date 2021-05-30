@@ -28,38 +28,37 @@ const MapScreen = ({navigation})=>{
     "longitudeDelta": 0.01765664666889677,
   });
 
-  const focusLoc = navigation.getParam('loc');
-  console.log('focusLoc from comp body:',focusLoc)
-
   useEffect(()=>{
     const { status } = Permissions.askAsync(Permissions.LOCATION);
     fetchLists();
     fetchLocs();
   },[]);
 
+  const focusLoc = navigation.getParam('loc');
+  // console.log('focusLoc from comp body:',focusLoc)
   useEffect(()=>{
-    console.log('focusLoc useEffect called');
+    // console.log('focusLoc useEffect called');
     let hideDrawer = navigation.getParam('hideDrawer');
-    console.log('hideDrawer:',hideDrawer);
+    // console.log('hideDrawer:',hideDrawer);
     if(hideDrawer){navigation.closeDrawer()};
     if (focusLoc) {
-      console.log('focusLoc from useEffect:',focusLoc);
+      // console.log('focusLoc from useEffect:',focusLoc);
       setCurrentRegion({...currentRegion,...focusLoc.coords});
       setAddressOverlay(focusLoc.address);
     };
     
     return ()=> { 
-      console.log('cleanup fn called');
+      // console.log('cleanup fn called');
       navigation.setParams({hideDrawer:null,loc:null})
     };
   },[focusLoc]);
 
   const handleLongPress = async(e)=>{
-    console.log('handleLongPress called');
+    // console.log('handleLongPress called');
     const eventCoords = e.nativeEvent.coordinate;
     const [{name,street,city,region:addressRegion,postalCode,country}] = await reverseGeocodeAsync({...eventCoords}); 
     const address = `${name} ${street}, ${city}, ${addressRegion} ${postalCode}, ${country}`;
-    console.log('new address:',address);
+    // console.log('new address:',address);
     setExplorerMarker({
       show:true,
       coords:eventCoords,
