@@ -1,7 +1,7 @@
 import React,{useEffect,useContext,useState} from 'react';
 import {View, ScrollView,TextInput, FlatList, TouchableOpacity, StyleSheet, Picker} from 'react-native';
 // import {Context as LocationContext} from '../context/LocationContext';
-import {ListItem, Input, Rating, Text, Button} from 'react-native-elements';
+import {ListItem, Input, Rating, AirbnbRating, Text, Button} from 'react-native-elements';
 import {navigate} from '../navigationRef'
 import {Context as LocationEditContext} from '../context/LocationEditContext';
 import {Context as LocationContext} from '../context/LocationContext';
@@ -38,7 +38,7 @@ const LocationEditScreen = ({navigation}) => {
     <ScrollView>
       <Input label="Place Name" value={name} onChangeText={changeName} multiline={true} />
       <Input style={styles.addressInput} disabled label="Address" value={loc.address} multiline={true} />
-      <Rating startingValue={stars} onFinishRating={changeStars}/>
+      <AirbnbRating ratingCount={5} showRating={true} fractions={0} startingValue={stars} onFinishRating={changeStars}/>
       <Input label="Notes" value={notes} onChangeText={changeNotes} multiline={true} />
       <Input label="Tags" value={tags.join(' ')} onChangeText={changeTags} multiline={true} />
       <Input disabled label="Coordinates" value={[latitude,longitude].join(', ')} multiline={true} />
