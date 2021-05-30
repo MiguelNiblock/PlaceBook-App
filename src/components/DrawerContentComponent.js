@@ -11,6 +11,7 @@ import {navigate} from '../navigationRef';
 const DrawerContentComponent = (props) => {
 
   const {fetchLists, state:lists} = useContext(ListContext);
+  // console.log('lists:',lists);
 
   // useEffect(()=>{
     
@@ -30,7 +31,7 @@ const DrawerContentComponent = (props) => {
             return (
               <>
                 <TouchableOpacity
-                  onPress={()=>navigate('LocationList',{listId: item._id})}
+                  onPress={()=>navigate('LocationList',{listId: item._id,listName:item.name})}
                 >
                   <ListItem title={item.name} />
                 </TouchableOpacity>
