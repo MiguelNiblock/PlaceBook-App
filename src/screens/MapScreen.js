@@ -7,6 +7,7 @@ import CustomCallout from './CustomCallout';
 import {navigate} from '../navigationRef'
 import {Context as ListContext} from '../context/ListContext';
 import {Context as LocationContext} from '../context/LocationContext';
+import {Icon} from 'react-native-elements';
 
 const MapScreen = ({navigation})=>{
 
@@ -124,12 +125,18 @@ const MapScreen = ({navigation})=>{
             "longitude": explorerMarker.coords.longitude,
             "longitudeDelta": 0.01765664666889677,
           }}
-          pinColor="rgba(0,100,255,1)"
           onPress={()=>{
             setAddressOverlay(explorerMarker.address);
             setCurrentRegion({...currentRegion,...explorerMarker.coords});
           }}
-        />
+        >
+          <Icon
+              name='map-marker'
+              type='material-community'
+              color='rgba(0, 255, 255, 1)'
+              size={45}
+          />
+        </Marker>
       : null }
       {
         // console.log('locations:',locations)
