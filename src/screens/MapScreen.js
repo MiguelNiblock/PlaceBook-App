@@ -11,7 +11,7 @@ import {Icon} from 'react-native-elements';
 
 const MapScreen = ({navigation})=>{
 
-  const {fetchLists} = useContext(ListContext);
+  const {fetchLists,state:lists} = useContext(ListContext);
   const {fetchLocs,state:locations} = useContext(LocationContext);
   const [explorerMarker,setExplorerMarker] = useState({
     show:true,
@@ -34,6 +34,8 @@ const MapScreen = ({navigation})=>{
     fetchLists();
     fetchLocs();
   },[]);
+
+  console.log('lists:',lists)
 
   //When a screen navigates here with a 'loc' param, it'll activate the useEffect which focuses on that marker and displays the address.
   const focusLoc = navigation.getParam('loc');
@@ -142,14 +144,25 @@ const MapScreen = ({navigation})=>{
         // console.log('locations:',locations)
         locations.map((item)=>{
           if (item.coords){
+            item.color = lists.find((l)=>l._id === item.listId)?.color
             // console.log('saved marker:',item)
-            return <Marker key={item._id} 
-              coordinate={{...item.coords}}
-              onPress={()=>{
-                setAddressOverlay(item.address);
-                setCurrentRegion({...currentRegion,...item.coords});
-              }}
-            />
+            return (
+              <Marker key={item._id} 
+                coordinate={{...item.coords}}
+                onPress={()=>{
+                  setAddressOverlay(item.address);
+                  setCurrentRegion({...currentRegion,...item.coords});
+                }}
+              >
+                <Icon
+                  name='map-marker'
+                  type='material-community'
+                  color={item.color? item.color : 'rgba(255,0,0,1)'}
+                  // color='rgba(255,0,0,1)'
+                  size={45}
+                />
+              </Marker>
+            )
           }
         })
       }

@@ -20,9 +20,9 @@ const ListEditScreen = ({navigation})=>{
     };
   },[]);
 
-  const saveList = (name,icon,color)=>{
-    if(listId) {editList(listId,name,icon,color)}
-    else {createList(name,icon,color)}
+  const saveList = (name,color,icon)=>{
+    if(listId) {editList(listId,name,color,icon)}
+    else {createList(name,color,icon)}
   };
 
   return (
@@ -30,7 +30,7 @@ const ListEditScreen = ({navigation})=>{
       <Input label="List Name" value={listName} onChangeText={setListName} />
       <Input label="Color" value={listColor} onChangeText={setListColor} />
       <Input label="Icon" value={listIcon} onChangeText={setListIcon} />
-      <Button title="Save" onPress={()=>saveList(listName,listIcon,listColor)} />
+      <Button title="Save" onPress={()=>saveList(listName,listColor,listIcon)} />
     </ScrollView>
   )
 };
