@@ -37,10 +37,10 @@ const MapScreen = ({navigation})=>{
   //When a screen navigates here with a 'loc' param, it'll activate the useEffect which focuses on that marker and displays the address.
   const focusLoc = navigation.getParam('loc');
   // console.log('focusLoc from comp body:',focusLoc)
+  const hideDrawer = navigation.getParam('hideDrawer');
+  // console.log('hideDrawer:',hideDrawer);
   useEffect(()=>{
     // console.log('focusLoc useEffect called');
-    let hideDrawer = navigation.getParam('hideDrawer');
-    // console.log('hideDrawer:',hideDrawer);
     if(hideDrawer){navigation.closeDrawer()};
     if (focusLoc) {
       // console.log('focusLoc from useEffect:',focusLoc);
@@ -52,7 +52,7 @@ const MapScreen = ({navigation})=>{
       // console.log('cleanup fn called');
       navigation.setParams({hideDrawer:null,loc:null})
     };
-  },[focusLoc]);
+  },[focusLoc,hideDrawer]);
 
   const handleLongPress = async(e)=>{
     // console.log('handleLongPress called');

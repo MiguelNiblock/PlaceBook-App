@@ -12,6 +12,11 @@ const LocationListScreen = ({navigation}) => {
 
   const listId = navigation.getParam('listId');
   const list = lists.find((item)=>item._id===listId);
+  const didCreate = navigation.getParam('didCreate');
+
+  useEffect(()=>{
+    navigation.setParams({goToMap: ()=>navigate('Map',{hideDrawer:didCreate})})
+  },[])
 
   return (
     <View>
@@ -38,5 +43,19 @@ const LocationListScreen = ({navigation}) => {
     </View>
   )
 };
+
+LocationListScreen.navigationOptions = ({navigation}) => {
+  const listName = navigation.getParam('listName');
+
+  return {
+    title: 'List: '+listName,
+    headerLeft: () => (
+      <Button 
+        onPress={navigation.getParam('goToMap')}
+        title='Back'
+      />
+    )
+  }
+}
 
 export default LocationListScreen;

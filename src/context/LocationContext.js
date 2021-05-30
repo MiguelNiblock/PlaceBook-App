@@ -27,7 +27,7 @@ const createLocation = dispatch => async(name,address,coords,notes,stars,tags,li
   const response = await locationApi.post('/locs',{name,address,coords,notes,stars,tags,listId});
   dispatch({type:'create_loc', payload:response.data});
   console.log('createLocation ran. response:',response.data);
-  navigate('LocationList',{listId});
+  navigate('LocationList',{listId,didCreate:true});
 };
 const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tags,listId) => {
   const response = await locationApi.put(`/locs/${locId}`,
