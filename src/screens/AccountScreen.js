@@ -23,10 +23,5 @@ const AccountScreen = ()=>{
 
 // const styles = StyleSheet.create({});
 
-AccountScreen.navigationOptions = {
-    title: "Account",
-    tabBarIcon: <FontAwesome name="gear" size={20} />
-}
-
 export default AccountScreen;
 
