@@ -24,9 +24,7 @@ import {FontAwesome} from '@expo/vector-icons';
 
 console.disableYellowBox = true;
 // import { LogBox } from "react-native"
-
 // LogBox.ignoreAllLogs(true)
-
 
 const Drawer = createDrawerNavigator({
   Map: MapScreen,
@@ -50,8 +48,8 @@ const Stack = createStackNavigator({
 const switchNavigator = createSwitchNavigator({
   ResolveAuth: ResolveAuthScreen,
   loginFlow: createStackNavigator({
-    Signup: SignupScreen,
-    Signin: SigninScreen
+    Signin: SigninScreen,
+    Signup: SignupScreen
   }),
   mainFlow: Stack
 });
