@@ -34,8 +34,12 @@ const Drawer = createDrawerNavigator({
   drawerBackgroundColor: 'rgba(100,25,33,33)',
   drawerPosition: 'right',
   drawerType: 'slide',
-  contentComponent: DrawerContentComponent
+  contentComponent: DrawerContentComponent,
 });
+
+Drawer.navigationOptions = {
+  headerShown: false
+}
 
 const Stack = createStackNavigator({
   Drawer,
