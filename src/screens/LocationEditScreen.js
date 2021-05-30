@@ -36,12 +36,12 @@ const LocationEditScreen = ({navigation}) => {
 
   return (
     <ScrollView>
-      <Input label="Place Name" value={name} onChangeText={changeName}/>
-      <Input style={styles.addressInput} disabled label="Address" value={loc.address} />
+      <Input label="Place Name" value={name} onChangeText={changeName} multiline={true} />
+      <Input style={styles.addressInput} disabled label="Address" value={loc.address} multiline={true} />
       <Rating startingValue={stars} onFinishRating={changeStars}/>
-      <Input label="Notes" value={notes} onChangeText={changeNotes}/>
-      <Input label="Tags" value={tags.join(' ')} onChangeText={changeTags}/>
-      <Input disabled label="Coordinates" value={[latitude,longitude].join(', ')} />
+      <Input label="Notes" value={notes} onChangeText={changeNotes} multiline={true} />
+      <Input label="Tags" value={tags.join(' ')} onChangeText={changeTags} multiline={true} />
+      <Input disabled label="Coordinates" value={[latitude,longitude].join(', ')} multiline={true} />
       <Picker
         selectedValue={listId}
         onValueChange={(itemValue)=>changeListId(itemValue)}
