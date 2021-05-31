@@ -10,7 +10,7 @@ import {Context as ListContext} from '../context/ListContext';
 const LocationEditScreen = ({navigation}) => {
 
   const {state:{name,address,coords,notes,stars,tags,listId},changeName,changeAddress,changeCoords,changeStars,changeNotes,changeTags,changeListId} = useContext(LocationEditContext);
-  const {editLocation,createLocation} = useContext(LocationContext);
+  const {editLocation,createLocation,deleteLocation} = useContext(LocationContext);
   const {state:lists} = useContext(ListContext);
 
   const loc = navigation.getParam('loc');
@@ -35,6 +35,11 @@ const LocationEditScreen = ({navigation}) => {
     }
   }
 
+  const handleDeleteLocation = (locId) => {
+    deleteLocation(locId);
+    navigation.goBack();
+  }
+
   return (
     <ScrollView>
       <Input label="Place Name" value={name} onChangeText={changeName} multiline={true} />
@@ -55,9 +60,14 @@ const LocationEditScreen = ({navigation}) => {
         })}
       </Picker>
       <Button title="Save" onPress={()=>saveLocation(loc._id,name,address,coords,notes,stars,tags,listId)}/>
+      <Button onPress={()=>handleDeleteLocation(loc._id)} title='Delete' />
     </ScrollView>
   )
 };
+
+LocationEditScreen.navigationOptions = {
+  title:'Place: '
+}
 
 const styles = StyleSheet.create({
 })

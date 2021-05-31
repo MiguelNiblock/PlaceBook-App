@@ -12,6 +12,8 @@ const LocationReducer = (state,action) => {
       return [...state.map( 
         (item)=>{ if(item._id === action.payload._id) return action.payload; else return item}
       )]
+    case 'delete_loc':
+      return state.filter((item)=>item._id !== action.payload);
     default: 
       return state;
   };
@@ -33,13 +35,18 @@ const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tag
   const response = await locationApi.put(`/locs/${locId}`,
     {name,address,coords,notes,stars,tags,listId}
   );
-  dispatch({type:'edit_loc', payload:response.data})
-  console.log('editLocation ran. response:',response.data)
+  dispatch({type:'edit_loc', payload:response.data});
+  console.log('editLocation ran. response:',response.data);
   navigate('LocationList',{listId})
+};
+const deleteLocation = dispatch => async(locId) => {
+  const response = await locationApi.delete(`/locs/${locId}`);
+  dispatch({type:'delete_loc',payload:locId});
+  console.log('deleteLocation ran. response:',response.data);
 };
 
 export const {Context, Provider} = createDataContext(
   LocationReducer,
-  {fetchLocs,createLocation,editLocation},
+  {fetchLocs,createLocation,editLocation,deleteLocation},
   []//empty array of locations
 );

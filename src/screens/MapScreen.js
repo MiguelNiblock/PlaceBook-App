@@ -35,7 +35,7 @@ const MapScreen = ({navigation})=>{
     fetchLocs();
   },[]);
 
-  console.log('lists:',lists)
+  // console.log('lists:',lists)
 
   //When a screen navigates here with a 'loc' param, it'll activate the useEffect which focuses on that marker and displays the address.
   const focusLoc = navigation.getParam('loc');
@@ -143,9 +143,9 @@ const MapScreen = ({navigation})=>{
       {
         // console.log('locations:',locations)
         locations.map((item)=>{
+          // console.log('saved marker:',item)
           const locList = lists.find((l)=>l._id === item.listId)
           if (locList.shown && item.coords){
-            // console.log('saved marker:',item)
             return (
               <Marker key={item._id} 
                 coordinate={{...item.coords}}
