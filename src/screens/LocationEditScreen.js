@@ -14,6 +14,7 @@ const LocationEditScreen = ({navigation}) => {
   const {state:lists} = useContext(ListContext);
 
   const loc = navigation.getParam('loc');
+  // console.log('loc:',loc)
   const {latitude, longitude} = loc.coords;
 
   useEffect(()=>{
