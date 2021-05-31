@@ -38,9 +38,9 @@ const LocationEditScreen = ({navigation}) => {
     <ScrollView>
       <Input label="Place Name" value={name} onChangeText={changeName} multiline={true} />
       <Input style={styles.addressInput} disabled label="Address" value={loc.address} multiline={true} />
-      <AirbnbRating ratingCount={5} showRating={true} fractions={0} startingValue={stars} onFinishRating={changeStars}/>
+      {/* <AirbnbRating ratingCount={5} showRating={true} fractions={0} startingValue={stars} onFinishRating={changeStars}/> */}
       <Input label="Notes" value={notes} onChangeText={changeNotes} multiline={true} />
-      <Input label="Tags" value={tags.join(' ')} onChangeText={changeTags} multiline={true} />
+      {/* <Input label="Tags" value={tags.join(' ')} onChangeText={changeTags} multiline={true} /> */}
       <Input disabled label="Coordinates" value={[latitude,longitude].join(', ')} multiline={true} />
       <Picker
         selectedValue={listId}
@@ -59,9 +59,6 @@ const LocationEditScreen = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
-  addressInput: {
-    // height: 150
-  }
 })
 
 export default LocationEditScreen;
