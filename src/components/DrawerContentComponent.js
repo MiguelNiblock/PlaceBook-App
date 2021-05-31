@@ -5,17 +5,13 @@ import SafeAreaView from 'react-native-safe-area-view';
 import { DrawerItems } from 'react-navigation-drawer';
 import locationApi from '../api/location';
 import {Context as ListContext} from '../context/ListContext';
-import {ListItem,Button} from 'react-native-elements';
+import {ListItem,Button,CheckBox} from 'react-native-elements';
 import {navigate} from '../navigationRef';
 
 const DrawerContentComponent = (props) => {
 
-  const {fetchLists, state:lists} = useContext(ListContext);
+  const {fetchLists,editList,state:lists} = useContext(ListContext);
   // console.log('lists:',lists);
-
-  // useEffect(()=>{
-    
-  // },[])
   
   return (
     <ScrollView>
@@ -40,6 +36,7 @@ const DrawerContentComponent = (props) => {
                   onPress={()=>navigate('ListEdit',{listId: item._id})}
                   buttonStyle={{width:50}}
                 />
+                <CheckBox title='Shown' checked={item.shown} onPress={()=>editList(item._id,item.name,item.color,item.icon,!item.shown)} />
               </>
             )
           }}

@@ -143,8 +143,8 @@ const MapScreen = ({navigation})=>{
       {
         // console.log('locations:',locations)
         locations.map((item)=>{
-          if (item.coords){
-            item.color = lists.find((l)=>l._id === item.listId)?.color
+          const locList = lists.find((l)=>l._id === item.listId)
+          if (locList.shown && item.coords){
             // console.log('saved marker:',item)
             return (
               <Marker key={item._id} 
@@ -156,8 +156,9 @@ const MapScreen = ({navigation})=>{
               >
                 <Icon
                   name='map-marker'
+                  // name={locList.icon}
                   type='material-community'
-                  color={item.color? item.color : 'rgba(255,0,0,1)'}
+                  color={locList.color? locList.color : 'rgba(255,0,0,1)'}
                   // color='rgba(255,0,0,1)'
                   size={45}
                 />

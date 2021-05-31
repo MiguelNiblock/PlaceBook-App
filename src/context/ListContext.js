@@ -23,13 +23,13 @@ const fetchLists = dispatch => async() => {
   console.log('fetchLists resp received');
   dispatch({type:'fetch_lists', payload:response.data});
 };
-const createList = dispatch => async(name,color,icon) => {
-  const response = await locationApi.post('/lists',{name,color,icon});
+const createList = dispatch => async(name,color,icon,shown) => {
+  const response = await locationApi.post('/lists',{name,color,icon,shown});
   dispatch({type:'create_list', payload:response.data});
   navigate('Drawer');
 };
-const editList = dispatch => async(listId,name,color,icon) => {
-  const response = await locationApi.put(`/lists/${listId}`,{name,color,icon});
+const editList = dispatch => async(listId,name,color,icon,shown) => {
+  const response = await locationApi.put(`/lists/${listId}`,{name,color,icon,shown});
   dispatch({type:'edit_list', payload:response.data});
   navigate('Drawer');
 };
