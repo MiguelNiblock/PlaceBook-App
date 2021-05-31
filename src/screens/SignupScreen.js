@@ -1,5 +1,5 @@
 import React, {useContext,useEffect} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, ScrollView} from 'react-native';
 import {Context as AuthContext} from '../context/AuthContext';
 import AuthForm from '../components/AuthForm';
 import NavLink from '../components/NavLink';
@@ -12,10 +12,11 @@ const SignupScreen = ({navigation})=>{
         tryLocalSignin();
     },[])
     return (
+    <ScrollView>
     <View style={styles.container}>
     <NavigationEvents onWillFocus={clearErrorMessage}/>
     <AuthForm
-        headerText="Sign Up for Tracker"
+        headerText="Sign Up for PlaceBook"
         errorMessage={state.errorMessage}
         submitButtonText="Sign Up"
         onSubmit={signup}
@@ -25,6 +26,7 @@ const SignupScreen = ({navigation})=>{
         text="Already have an account? Sign in instead"
     />
     </View> 
+    </ScrollView>
     );
 };
 
