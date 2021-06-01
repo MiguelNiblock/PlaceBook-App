@@ -4,11 +4,12 @@ import {ListItem, Input, Text, Button, CheckBox} from 'react-native-elements';
 import {Context as ListContext} from '../context/ListContext';
 
 const ListEditScreen = ({navigation})=>{
+
   const [listName,setListName] = useState('');
   const [listColor,setListColor] = useState('');
   const [listIcon,setListIcon] = useState('');
   const [shown,setShown] = useState(true);
-  const {createList,editList,state:lists} = useContext(ListContext);
+  const {createList,editList,deleteList,state:lists} = useContext(ListContext);
 
   const listId = navigation.getParam('listId');
 
@@ -28,6 +29,11 @@ const ListEditScreen = ({navigation})=>{
     else {createList(name,color,icon,shown)}
   };
 
+  const handleDeleteList = (listId) => {
+    deleteList(listId);
+    navigation.goBack();
+  };
+
   return (
     <ScrollView>
       <Input label="List Name" value={listName} onChangeText={setListName} />
@@ -35,6 +41,7 @@ const ListEditScreen = ({navigation})=>{
       <Input label="Icon" value={listIcon} onChangeText={setListIcon} />
       <CheckBox title='Shown' checked={shown} onPress={()=>setShown(!shown)} />
       <Button title="Save" onPress={()=>saveList(listId,listName,listColor,listIcon,shown)} />
+      {listId && <Button onPress={()=>handleDeleteList(listId)} title='Delete' />} 
     </ScrollView>
   )
 };
