@@ -60,7 +60,7 @@ const LocationEditScreen = ({navigation}) => {
         })}
       </Picker>
       <Button title="Save" onPress={()=>saveLocation(loc._id,name,address,coords,notes,stars,tags,listId)}/>
-      <Button onPress={()=>handleDeleteLocation(loc._id)} title='Delete' />
+      {loc._id && <Button onPress={()=>handleDeleteLocation(loc._id)} title='Delete' />} 
     </ScrollView>
   )
 };
