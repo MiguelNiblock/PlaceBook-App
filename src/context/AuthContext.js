@@ -64,7 +64,7 @@ const tryLocalSignin = dispatch => async() => {
         dispatch({type:'signin',payload:token});
         navigate('mainFlow');
     } else {
-        console.log('navigating to loginFlow')
+        // console.log('navigating to loginFlow')
         navigate('loginFlow');
     }
 }
