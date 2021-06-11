@@ -99,7 +99,7 @@ const MapScreen = ({navigation})=>{
         onPress={() => navigation.openDrawer()}
         title="Drawer"
       />
-      <Text>{addressOverlay}</Text>
+      <Text selectable>{addressOverlay}</Text>
       {showSaveButton//becomes true with mapview's onLongPress
       ? <Button
           onPress={saveLocation}
