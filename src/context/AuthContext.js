@@ -59,10 +59,12 @@ const clearErrorMessage = (dispatch) => () => {
 
 const tryLocalSignin = dispatch => async() => {
     const token = await AsyncStorage.getItem('token');
+    // let token = null;
     if(token) {
         dispatch({type:'signin',payload:token});
         navigate('mainFlow');
     } else {
+        console.log('navigating to loginFlow')
         navigate('loginFlow');
     }
 }
