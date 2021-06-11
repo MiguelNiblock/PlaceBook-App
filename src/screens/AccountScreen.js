@@ -19,6 +19,7 @@ const AccountScreen = ()=>{
     <Spacer>
         <Text>Username:</Text>
         <Text>Date joined:</Text>
+        {/* <Text>Map style:</Text> */}
     </Spacer>
     <Spacer>
         <Button title="Sign Out" onPress={signout}/>
