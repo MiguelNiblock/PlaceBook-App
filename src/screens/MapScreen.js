@@ -145,7 +145,7 @@ const MapScreen = ({navigation})=>{
         locations.map((item)=>{
           // console.log('saved marker:',item)
           const locList = lists.find((l)=>l._id === item.listId)
-          if (locList.shown && item.coords){
+          if (locList && locList.shown && item.coords){
             return (
               <Marker key={item._id} 
                 coordinate={{...item.coords}}
