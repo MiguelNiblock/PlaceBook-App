@@ -19,7 +19,7 @@ const DrawerContentComponent = (props) => {
         style={{flex: 1}}
         forceInset={{ top: 'always', horizontal: 'never' }}
       >
-        
+        <Button title="Settings" onPress={()=>navigate('Account')}/>
         <Button title="Create List" onPress={()=>navigate('ListEdit',{listId:null})}/>
         <FlatList
           data={lists}

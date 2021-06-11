@@ -20,7 +20,6 @@ import {Provider as LocationProvider} from './src/context/LocationContext';
 import {Provider as LocationEditProvider} from './src/context/LocationEditContext'
 import {setNavigator}  from './src/navigationRef';
 import ResolveAuthScreen from './src/screens/ResolveAuthScreen'
-import {FontAwesome} from '@expo/vector-icons';
 
 console.disableYellowBox = true;
 // import { LogBox } from "react-native"
@@ -28,10 +27,8 @@ console.disableYellowBox = true;
 
 const Drawer = createDrawerNavigator({
   Map: MapScreen,
-  Account: AccountScreen,
-  Callouts,
 },{
-  drawerBackgroundColor: 'rgba(100,25,33,33)',
+  // drawerBackgroundColor: 'rgba(100,25,33,33)',
   drawerPosition: 'right',
   drawerType: 'slide',
   contentComponent: DrawerContentComponent,
@@ -45,7 +42,8 @@ const Stack = createStackNavigator({
   Drawer,
   LocationList: LocationListScreen,
   LocationEdit: LocationEditScreen,
-  ListEdit: ListEditScreen
+  ListEdit: ListEditScreen,
+  Account: AccountScreen
 })
 
 

@@ -13,7 +13,13 @@ const AccountScreen = ()=>{
 
     return (
     <SafeAreaView forceInset={{ top: 'always' }}>
-    <Text h2>Account</Text>
+    <Spacer> 
+        <Text h2>Account</Text> 
+    </Spacer>
+    <Spacer>
+        <Text>Username:</Text>
+        <Text>Date joined:</Text>
+    </Spacer>
     <Spacer>
         <Button title="Sign Out" onPress={signout}/>
     </Spacer>
