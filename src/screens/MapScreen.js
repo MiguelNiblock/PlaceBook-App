@@ -1,9 +1,9 @@
 import React,{useEffect,useState,useRef,useContext} from 'react';
 import MapView,{Marker,Callout} from 'react-native-maps';
 import { StyleSheet, Text, View, Dimensions, Button, Alert} from 'react-native';
-import * as Permissions from 'expo-permissions';
-import Location,{reverseGeocodeAsync} from 'expo-location';
-import CustomCallout from './CustomCallout';
+// import * as Permissions from 'expo-permissions';
+import * as Location from 'expo-location';
+import {reverseGeocodeAsync} from 'expo-location';
 import {navigate} from '../navigationRef'
 import {Context as ListContext} from '../context/ListContext';
 import {Context as LocationContext} from '../context/LocationContext';
@@ -15,24 +15,37 @@ const MapScreen = ({navigation})=>{
   const {fetchLocs,state:locations} = useContext(LocationContext);
   const [explorerMarker,setExplorerMarker] = useState({
     show:true,
-    coords:{latitude:37.42459028327157, longitude:-122.08799198269844},
+    coords:{longitude: -93.35577942430973, latitude: 23.47555745333057},//dummy region in the sea
     opacity:0
   })
   const [addressOverlay, setAddressOverlay] = useState('');
   const markerRef = useRef();
-  const [editMap,setEditMap] = useState(false);//workaround for bug: mapview not showing controls
+  const [editMap,setEditMap] = useState(false);//quickfix for bug: mapview not showing controls on load
   const [showSaveButton,setShowSaveButton] = useState(false);
-  const [currentRegion,setCurrentRegion] = useState({
-    "latitude": 37.421997503686995,
-    "latitudeDelta": 0.018190238622558752,
-    "longitude": -122.08399968221784,
-    "longitudeDelta": 0.01765664666889677,
+  const [currentRegion,setCurrentRegion] = useState({ //default to north america
+    longitudeDelta: 86.15907199680805, latitudeDelta: 75.92358466231565, longitude: -92.3610382899642, latitude: 24.193727440390386
   });
+  const [location, setLocation] = useState(null);
 
   useEffect(()=>{
-    const { status } = Permissions.askAsync(Permissions.LOCATION);
     fetchLists();
     fetchLocs();
+
+    (async()=>{
+      let { status } = await Location.requestPermissionsAsync();
+      console.log('permission status:',status);
+      if(status==='granted'){
+        setTimeout(async function(){
+          let location = await Location.getCurrentPositionAsync({});
+          console.log('location:',location)
+          // setLocation(location);
+          setCurrentRegion({longitudeDelta: 0.0154498592018939, latitudeDelta: 0.013360640311354643,latitude:location.coords.latitude,longitude:location.coords.longitude});
+        },2000);
+      };
+    })()
+
+
+    
   },[]);
 
   // console.log('lists:',lists)
@@ -45,7 +58,7 @@ const MapScreen = ({navigation})=>{
   useEffect(()=>{
     // console.log('focusLoc useEffect called');
     if(hideDrawer){navigation.closeDrawer()};
-    if (focusLoc) {
+    if(focusLoc) {
       // console.log('focusLoc from useEffect:',focusLoc);
       setCurrentRegion({...currentRegion,...focusLoc.coords});
       setAddressOverlay(focusLoc.address);
@@ -60,6 +73,7 @@ const MapScreen = ({navigation})=>{
   const handleLongPress = async(e)=>{
     // console.log('handleLongPress called');
     const eventCoords = e.nativeEvent.coordinate;
+    // console.log('marker coords:',eventCoords)
     const [{name,street,city,region:addressRegion,postalCode,country}] = await reverseGeocodeAsync({...eventCoords}); 
     const address = `${name} ${street}, ${city}, ${addressRegion} ${postalCode}, ${country}`;
     // console.log('new address:',address);
@@ -107,25 +121,26 @@ const MapScreen = ({navigation})=>{
         /> 
       : null }
       <MapView showsUserLocation showsMyLocationButton zoomControlEnabled
-        style={editMap ? styles.map : {}}//bug quickfix
-        onMapReady={() => setEditMap(true)}//bug quickfix
+        style={editMap ? styles.map : {}}//bug quickfix. shows controls on map load
+        // style={styles.map} // this doesn't show controls on map load
+        onMapReady={() =>{ setEditMap(true);console.log('map ready')}}//bug quickfix
         region={currentRegion}
         provider="google"
-        mapType="hybrid"
+        mapType="standard"
         onLongPress={handleLongPress}
         onPress={mapTap}
-        // onRegionChange={()=>{console.log('region change')}}
-        onRegionChangeComplete={(region)=>setCurrentRegion(region)}
+        // onRegionChange={(region)=>{console.log('new region:',region)}}
+        onRegionChangeComplete={(region)=>{setCurrentRegion(region);
+          // console.log(region)
+        }}
       >
       {explorerMarker.show //becomes false with mapview's onPress (short tap)
-      ? <Marker draggable
+      ? <Marker
           opacity={explorerMarker.opacity}//initially 0. Allows markerRef to be defined on first load
           ref={markerRef}
           coordinate={{
             "latitude": explorerMarker.coords.latitude,
-            "latitudeDelta": 0.018190238622558752,
             "longitude": explorerMarker.coords.longitude,
-            "longitudeDelta": 0.01765664666889677,
           }}
           onPress={()=>{
             setAddressOverlay(explorerMarker.address);
@@ -180,9 +195,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   map: {
-    marginLeft: 0,
     width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height - 250,
+    height: Dimensions.get('window').height - 200,
   },
   customView: {
     width: 140,
