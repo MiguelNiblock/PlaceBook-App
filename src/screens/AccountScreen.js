@@ -4,7 +4,7 @@ import {Button} from 'react-native-elements';
 import {Context as AuthContext} from '../context/AuthContext'
 import Spacer from '../components/Spacer';
 import {SafeAreaView} from 'react-navigation';
-import {FontAwesome} from '@expo/vector-icons';
+// import {FontAwesome} from '@expo/vector-icons';
 import {Text} from 'react-native-elements';
 import locationApi from '../api/location';
 
