@@ -15,6 +15,7 @@ const AccountScreen = ()=>{
     
     const getUser = async()=>{
         const {data: {email, datetimeCreated}} = await locationApi.get('/users');
+        // console.log('data:',email,datetimeCreated);
         const date = new Date(datetimeCreated);
         setUserEmail(email); setDatetimeCreated(date.toLocaleString());
     };
