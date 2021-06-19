@@ -31,21 +31,21 @@ const MapScreen = ({navigation})=>{
     fetchLists();
     fetchLocs();
 
-    (async()=>{
+    (async()=>{ //gets device location and sets it as map region
       let { status } = await Location.requestPermissionsAsync();
       console.log('permission status:',status);
       if(status==='granted'){
         setTimeout(async function(){
-          let location = await Location.getCurrentPositionAsync({});
-          console.log('location:',location)
-          // setLocation(location);
-          setCurrentRegion({longitudeDelta: 0.0154498592018939, latitudeDelta: 0.013360640311354643,latitude:location.coords.latitude,longitude:location.coords.longitude});
+          let {coords:{latitude,longitude}} = await Location.getCurrentPositionAsync({});
+          // console.log('coords:',latitude,longitude)
+          setCurrentRegion({longitudeDelta: 0.0154498592018939, latitudeDelta: 0.013360640311354643,latitude,longitude});
+          const coords = {latitude,longitude};
+          handleLongPress({coords});
+          setLocation(coords);
         },2000);
       };
     })()
 
-
-    
   },[]);
 
   // console.log('lists:',lists)
@@ -70,16 +70,14 @@ const MapScreen = ({navigation})=>{
     };
   },[focusLoc,hideDrawer]);
 
-  const handleLongPress = async(e)=>{
-    // console.log('handleLongPress called');
-    const eventCoords = e.nativeEvent.coordinate;
-    // console.log('marker coords:',eventCoords)
-    const [{name,street,city,region:addressRegion,postalCode,country}] = await reverseGeocodeAsync({...eventCoords}); 
+  const handleLongPress = async({nativeEvent,coords})=>{
+    coords ??= nativeEvent?.coordinate
+    const [{name,street,city,region:addressRegion,postalCode,country}] = await reverseGeocodeAsync({...coords}); 
     const address = `${name} ${street}, ${city}, ${addressRegion} ${postalCode}, ${country}`;
     // console.log('new address:',address);
     setExplorerMarker({
       show:true,
-      coords:eventCoords,
+      coords:coords,
       opacity:1,
       address
     });
