@@ -37,9 +37,9 @@ const MapScreen = ({navigation})=>{
       if(status==='granted'){
         setTimeout(async function(){
           let {coords:{latitude,longitude}} = await Location.getCurrentPositionAsync({});
-          // console.log('coords:',latitude,longitude)
-          setCurrentRegion({longitudeDelta: 0.0154498592018939, latitudeDelta: 0.013360640311354643,latitude,longitude});
           const coords = {latitude,longitude};
+          // console.log('coords:',latitude,longitude)
+          setCurrentRegion({longitudeDelta: 0.0154498592018939, latitudeDelta: 0.013360640311354643, ...coords});
           handleLongPress({coords});
           setLocation(coords);
         },2000);
