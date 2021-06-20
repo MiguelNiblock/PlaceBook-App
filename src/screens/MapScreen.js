@@ -1,13 +1,14 @@
-import React,{useEffect,useState,useRef,useContext} from 'react';
+import React,{useEffect,useState,useRef,useContext,useMemo,useCallback} from 'react';
 import MapView,{Marker,Callout} from 'react-native-maps';
-import { StyleSheet, Text, View, Dimensions, Button, Alert, SafeAreaView, StatusBar, TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Alert, SafeAreaView, StatusBar, TouchableOpacity} from 'react-native';
 // import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
 import {reverseGeocodeAsync} from 'expo-location';
 import {navigate} from '../navigationRef'
 import {Context as ListContext} from '../context/ListContext';
 import {Context as LocationContext} from '../context/LocationContext';
-import {Icon} from 'react-native-elements';
+import {Icon, Button} from 'react-native-elements';
+import BottomSheet, {TouchableOpacity as ModalTouchable} from '@gorhom/bottom-sheet';
 
 const MapScreen = ({navigation})=>{
 
@@ -26,6 +27,12 @@ const MapScreen = ({navigation})=>{
     longitudeDelta: 86.15907199680805, latitudeDelta: 75.92358466231565, longitude: -92.3610382899642, latitude: 24.193727440390386
   });
   const [location, setLocation] = useState(null);
+  //bottom modal
+  const bottomSheetRef = useRef(null);
+  const snapPoints = useMemo(() => ['7%','25%'], []);
+  const handleSheetChanges = useCallback((index) => {
+    // console.log('handleSheetChanges', index);
+  }, []);
 
   useEffect(()=>{
     fetchLists();
@@ -83,15 +90,18 @@ const MapScreen = ({navigation})=>{
     });
     setShowSaveButton(true);
     setAddressOverlay(address);
+    bottomSheetRef.current.snapTo(1);
   };
 
   const mapTap = () => {
     setExplorerMarker({...explorerMarker,show:false});
     setShowSaveButton(false);
-    setAddressOverlay('')
+    setAddressOverlay('');
+    bottomSheetRef.current.close();
   };
 
   const saveLocation = ()=>{
+    // console.log('saveLocation called')
     const loc = {
       _id:null,
       name:'',
@@ -137,10 +147,10 @@ const MapScreen = ({navigation})=>{
           }}
         >
           <Icon
-              name='map-marker'
-              type='material-community'
-              color='rgba(0, 255, 255, 1)'
-              size={45}
+            name='map-marker'
+            type='material-community'
+            color='rgba(0, 255, 255, 1)'
+            size={45}
           />
         </Marker>
       : null }
@@ -172,16 +182,23 @@ const MapScreen = ({navigation})=>{
         })
       }
       </MapView>
-      {showSaveButton//becomes true with mapview's onLongPress
-      ? <TouchableOpacity
+     
+      
+      <BottomSheet
+        style={styles.bottomSheet}
+        ref={bottomSheetRef}
+        index={0}
+        snapPoints={snapPoints}
+        onChange={handleSheetChanges}
+      >
+        <Text selectable style={styles.addressOverlay}>{addressOverlay}</Text>
+        <ModalTouchable
           style={styles.saveButton}
           onPress={saveLocation}
-          title="Save"
-        /> 
-      : null }
-      {addressOverlay
-      ? <Text selectable style={styles.addressOverlay}>{addressOverlay}</Text> 
-      : null }
+        >
+          <Button title='Save' type='solid' />
+        </ModalTouchable>
+      </BottomSheet>
 
       <TouchableOpacity style={styles.drawerButton}
         onPress={() => navigation.openDrawer()}
@@ -197,8 +214,6 @@ const MapScreen = ({navigation})=>{
         />
       </TouchableOpacity>
       
-      
-      
     </SafeAreaView>
   );
 };
@@ -207,24 +222,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-    // paddingTop: 0,
-    // backgroundColor: '#fff',
-    // alignItems: 'center',
-    // justifyContent: 'center',
   },
   map: {
     position: 'absolute',
     top: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     width: Dimensions.get('window').width,
     height: Platform.OS === "android" ? Dimensions.get('window').height - StatusBar.currentHeight : Dimensions.get('window').height ,
-    // zIndex:2
   },
   drawerButton: {
     position: 'absolute',
     bottom: '20%',
     right: '3%',
-    // top: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-    // top: 200,
     backgroundColor:'white',
     // width: 42,
     // height: 42,
@@ -233,33 +241,29 @@ const styles = StyleSheet.create({
     opacity: 0.6
   },
   drawerIcon: {
-    // position: 'relative',
     opacity: 1,
     flex: 1,
     alignSelf: 'center'
-    // padding: 0,
-    // margin: 0,
+  },
+  bottomSheet: {
+    width: '80%',
+    marginLeft: '2%',
+    paddingLeft: '2%',
+    paddingRight: '2%',
+    justifyContent: 'flex-end'
   },
   addressOverlay: {
-    position:'absolute',
-    top: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     width: '80%',
-    backgroundColor: 'white',
     padding: 5,
-    margin: 5
-    // zIndex:1,
-    // elevation: 1,
+    margin: 5,
+    alignSelf: 'center',
+    fontSize: 15,
+    fontWeight: 'bold'
   },  
   saveButton:{
-    position: 'absolute',
-    // top: Platform.OS === "android" ? StatusBar.currentHeight : 0
-    top: 100,
-    backgroundColor: 'green',
-    width: 100,
-    height: 100,
-    elevation:1
+    alignSelf: 'center',
+    width: '50%'
   },
-
   calloutButton: {
     width: 'auto',
     backgroundColor: 'rgba(255,255,255,0.7)',
