@@ -1,6 +1,6 @@
 import React,{useEffect,useState,useRef,useContext} from 'react';
 import MapView,{Marker,Callout} from 'react-native-maps';
-import { StyleSheet, Text, View, Dimensions, Button, Alert} from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Button, Alert, SafeAreaView, StatusBar, TouchableOpacity} from 'react-native';
 // import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
 import {reverseGeocodeAsync} from 'expo-location';
@@ -106,19 +106,10 @@ const MapScreen = ({navigation})=>{
   };
 
   return (
-    <View style={styles.container}>
-      <Button
-        onPress={() => navigation.openDrawer()}
-        title="Drawer"
-      />
-      <Text selectable>{addressOverlay}</Text>
-      {showSaveButton//becomes true with mapview's onLongPress
-      ? <Button
-          onPress={saveLocation}
-          title="Save"
-        /> 
-      : null }
-      <MapView showsUserLocation showsMyLocationButton zoomControlEnabled
+    <SafeAreaView style={styles.container}>
+      
+      <MapView showsUserLocation showsMyLocationButton zoomControlEnabled 
+      // loadingEnabled
         style={editMap ? styles.map : {}}//bug quickfix. shows controls on map load
         // style={styles.map} // this doesn't show controls on map load
         onMapReady={() =>{ setEditMap(true);console.log('map ready')}}//bug quickfix
@@ -181,25 +172,94 @@ const MapScreen = ({navigation})=>{
         })
       }
       </MapView>
-    </View>
+      {showSaveButton//becomes true with mapview's onLongPress
+      ? <TouchableOpacity
+          style={styles.saveButton}
+          onPress={saveLocation}
+          title="Save"
+        /> 
+      : null }
+      {addressOverlay
+      ? <Text selectable style={styles.addressOverlay}>{addressOverlay}</Text> 
+      : null }
+
+      <TouchableOpacity style={styles.drawerButton}
+        onPress={() => navigation.openDrawer()}
+        title="Drawer"
+      >
+        <Icon
+          containerStyle={{opacity: 1}}
+          style={styles.drawerIcon}
+          name='forwardburger'
+          type='material-community'
+          color='black'
+          size={40}
+        />
+      </TouchableOpacity>
+      
+      
+      
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    // paddingTop: 0,
+    // backgroundColor: '#fff',
+    // alignItems: 'center',
+    // justifyContent: 'center',
   },
   map: {
+    position: 'absolute',
+    top: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height - 200,
+    height: Platform.OS === "android" ? Dimensions.get('window').height - StatusBar.currentHeight : Dimensions.get('window').height ,
+    // zIndex:2
   },
-  customView: {
-    width: 140,
+  drawerButton: {
+    position: 'absolute',
+    bottom: '20%',
+    right: '3%',
+    // top: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    // top: 200,
+    backgroundColor:'white',
+    // width: 42,
+    // height: 42,
+    alignItems: 'center',
+    alignContent: 'center',
+    opacity: 0.6
+  },
+  drawerIcon: {
+    // position: 'relative',
+    opacity: 1,
+    flex: 1,
+    alignSelf: 'center'
+    // padding: 0,
+    // margin: 0,
+  },
+  addressOverlay: {
+    position:'absolute',
+    top: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    width: '80%',
+    backgroundColor: 'white',
+    padding: 5,
+    margin: 5
+    // zIndex:1,
+    // elevation: 1,
+  },  
+  saveButton:{
+    position: 'absolute',
+    // top: Platform.OS === "android" ? StatusBar.currentHeight : 0
+    top: 100,
+    backgroundColor: 'green',
+    width: 100,
     height: 100,
+    elevation:1
   },
+
   calloutButton: {
     width: 'auto',
     backgroundColor: 'rgba(255,255,255,0.7)',
