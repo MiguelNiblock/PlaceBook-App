@@ -9,6 +9,7 @@ import {Context as ListContext} from '../context/ListContext';
 import {Context as LocationContext} from '../context/LocationContext';
 import {Icon, Button} from 'react-native-elements';
 import BottomSheet, {TouchableOpacity as ModalTouchable} from '@gorhom/bottom-sheet';
+import api from '../api/location';
 
 const MapScreen = ({navigation})=>{
 
@@ -33,6 +34,7 @@ const MapScreen = ({navigation})=>{
   const handleSheetChanges = useCallback((index) => {
     // console.log('handleSheetChanges', index);
   }, []);
+
 
   useEffect(()=>{
     fetchLists();
@@ -69,6 +71,8 @@ const MapScreen = ({navigation})=>{
       // console.log('focusLoc from useEffect:',focusLoc);
       setCurrentRegion({...currentRegion,...focusLoc.coords});
       setAddressOverlay(focusLoc.address);
+      setShowSaveButton(false);
+      bottomSheetRef.current.snapTo(1);
     };
     
     return ()=> { 
@@ -165,6 +169,8 @@ const MapScreen = ({navigation})=>{
                 coordinate={{...item.coords}}
                 onPress={()=>{
                   setAddressOverlay(item.address);
+                  setShowSaveButton(false);
+                  bottomSheetRef.current.snapTo(1);
                   setCurrentRegion({...currentRegion,...item.coords});
                 }}
               >
@@ -192,12 +198,9 @@ const MapScreen = ({navigation})=>{
         onChange={handleSheetChanges}
       >
         <Text selectable style={styles.addressOverlay}>{addressOverlay}</Text>
-        <ModalTouchable
-          style={styles.saveButton}
-          onPress={saveLocation}
-        >
+        {showSaveButton && <ModalTouchable style={styles.saveButton} onPress={saveLocation} >
           <Button title='Save' type='solid' />
-        </ModalTouchable>
+        </ModalTouchable>}
       </BottomSheet>
 
       <TouchableOpacity style={styles.drawerButton}
@@ -234,8 +237,6 @@ const styles = StyleSheet.create({
     bottom: '20%',
     right: '3%',
     backgroundColor:'white',
-    // width: 42,
-    // height: 42,
     alignItems: 'center',
     alignContent: 'center',
     opacity: 0.6
@@ -250,7 +251,9 @@ const styles = StyleSheet.create({
     marginLeft: '2%',
     paddingLeft: '2%',
     paddingRight: '2%',
-    justifyContent: 'flex-end'
+    alignContent: 'center',
+    // alignItems: 'center',
+    // justifyContent: 'center'
   },
   addressOverlay: {
     width: '80%',
@@ -258,7 +261,8 @@ const styles = StyleSheet.create({
     margin: 5,
     alignSelf: 'center',
     fontSize: 15,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    textAlign: 'center'
   },  
   saveButton:{
     alignSelf: 'center',

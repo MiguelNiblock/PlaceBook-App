@@ -11,7 +11,6 @@ const ListEditScreen = ({navigation})=>{
   const [listName,setListName] = useState('');
   const [listColor,setListColor] = useState('rgba(0,0,0,1)');
   const [listIcon,setListIcon] = useState('map-marker');
-  const [shown,setShown] = useState(true);
   const {createList,editList,deleteList,state:lists} = useContext(ListContext);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState(false);
@@ -20,18 +19,17 @@ const ListEditScreen = ({navigation})=>{
 
   useEffect(()=>{
     if (listId){
-      const list = lists.find((item)=>item._id===listId)
+      const list = lists.find((item)=>item._id===listId);
       console.log('list:',list)
       setListName(list.name);
       setListColor(list.color);
       setListIcon(list.icon);
-      setShown(list.shown);
     };
   },[]);
 
-  const saveList = (listId,name,color,icon,shown)=>{
-    if(listId) {editList(listId,name,color,icon,shown)}
-    else {createList(name,color,icon,shown)}
+  const saveList = (listId,name,color,icon)=>{
+    if(listId) {editList(listId,name,color,icon,list.shown,list.expanded)}
+    else {createList(name,color,icon)};
   };
 
   const handleDeleteList = (listId) => {
@@ -81,9 +79,8 @@ const ListEditScreen = ({navigation})=>{
         </ScrollView>
       </Overlay>
 
-      <CheckBox title='Shown' checked={shown} onPress={()=>setShown(!shown)} />
-      <Button title="Save" onPress={()=>saveList(listId,listName,listColor,listIcon,shown)} />
-      {listId && <Button onPress={()=>handleDeleteList(listId)} title='Delete' />} 
+      <Button title="Save" onPress={()=>saveList(listId,listName,listColor,listIcon)} />
+      {listId && <Button title='Delete' onPress={()=>handleDeleteList(listId)} />} 
     </ScrollView>
   )
 };

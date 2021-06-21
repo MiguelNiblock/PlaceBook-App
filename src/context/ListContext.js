@@ -14,6 +14,15 @@ const ListReducer = (state,action) => {
       )];
     case 'delete_list':
       return state.filter((item)=>item._id !== action.payload);
+    case 'show_list':
+      return [...state.map( 
+        (item)=>{ if(item._id === action.payload) return {...item, shown:!item.shown}; else return item}
+      )];
+    case 'expand_list':
+      console.log('id reducer:',action.payload);
+      return [...state.map( 
+        (item)=>{ if(item._id === action.payload) return {...item, expanded:!item.expanded}; else return item}
+      )];
     default: 
       return state;
   };
@@ -21,20 +30,25 @@ const ListReducer = (state,action) => {
 
 const fetchLists = dispatch => async() => {
   console.log('fetchLists called');
-  const response = await locationApi.get('/lists');
-  console.log('fetchLists resp received');
+  const response = await locationApi.get('/lists');  
+  // response.data.map(async (list)=>{
+  //   if (!list.expanded){
+  //     res = await locationApi.put(`/lists/${list._id}`,{...list,expanded:true})
+  //   }
+  // })
+  // console.log('lists updated')
   dispatch({type:'fetch_lists',payload:response.data});
 };
 
-const createList = dispatch => async(name,color,icon,shown) => {
-  const response = await locationApi.post('/lists',{name,color,icon,shown});
+const createList = dispatch => async(name,color,icon) => {
+  const response = await locationApi.post('/lists',{name,color,icon});
   dispatch({type:'create_list',payload:response.data});
   console.log('createList ran. response:',response.data);
   navigate('Drawer');
 };
 
-const editList = dispatch => async(listId,name,color,icon,shown) => {
-  const response = await locationApi.put(`/lists/${listId}`,{name,color,icon,shown});
+const editList = dispatch => async(listId,name,color,icon,shown,expanded) => {
+  const response = await locationApi.put(`/lists/${listId}`,{name,color,icon,shown,expanded});
   dispatch({type:'edit_list',payload:response.data});
   navigate('Drawer');
 };
@@ -43,10 +57,27 @@ const deleteList = dispatch => async(listId) => {
   const response = await locationApi.delete(`/lists/${listId}`);
   dispatch({type:'delete_list',payload:listId});
   console.log('deleteList ran. response:',response.data);
-}
+};
+
+const toggleShowList = dispatch => ({_id,name,color,icon,shown,expanded}) => {
+  const toggledShown = !shown;
+  locationApi.put(`/lists/${_id}`,{name,color,icon,shown:toggledShown,expanded});
+  dispatch({type:'show_list',payload: _id});
+  console.log('toggleShowList ran.');
+};
+
+const toggleExpandList = dispatch => ({_id,name,color,icon,shown,expanded}) => {
+  console.log('toggleExpandList called');
+  console.log('expanded:',expanded);
+  console.log('_id',_id)
+  const toggledExpanded = !expanded;
+  locationApi.put(`/lists/${_id}`,{name,color,icon,shown,expanded:toggledExpanded});
+  dispatch({type:'expand_list',payload: _id});
+  console.log('toggleExpandList ran.');
+};
 
 export const {Context, Provider} = createDataContext(
   ListReducer,
-  {fetchLists,createList,editList,deleteList},
+  {fetchLists,createList,editList,deleteList,toggleExpandList,toggleShowList},
   []//empty array of lists
 );
