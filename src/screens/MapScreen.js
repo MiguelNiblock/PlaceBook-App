@@ -69,7 +69,7 @@ const MapScreen = ({navigation})=>{
     if(hideDrawer){navigation.closeDrawer()};
     if(focusLoc) {
       // console.log('focusLoc from useEffect:',focusLoc);
-      setCurrentRegion({...currentRegion,...focusLoc.coords});
+      setCurrentRegion({...currentRegion,...focusLoc.coords,longitudeDelta:0.0154498592018939, latitudeDelta:0.0193603328227141});
       setAddressOverlay(focusLoc.address);
       setShowSaveButton(false);
       bottomSheetRef.current.snapTo(1);
@@ -137,7 +137,7 @@ const MapScreen = ({navigation})=>{
           // console.log(region)
         }}
       >
-      {explorerMarker.show //becomes false with mapview's onPress (short tap)
+      {explorerMarker.show //hides with mapview's onPress (short tap)
       ? <Marker
           opacity={explorerMarker.opacity}//initially 0. Allows markerRef to be defined on first load
           ref={markerRef}
@@ -147,7 +147,7 @@ const MapScreen = ({navigation})=>{
           }}
           onPress={()=>{
             setAddressOverlay(explorerMarker.address);
-            setCurrentRegion({...currentRegion,...explorerMarker.coords});
+            setCurrentRegion({...currentRegion,...explorerMarker.coords,longitudeDelta:0.0154498592018939, latitudeDelta:0.0193603328227141});
           }}
         >
           <Icon
@@ -158,7 +158,8 @@ const MapScreen = ({navigation})=>{
           />
         </Marker>
       : null }
-      {
+
+      {//display markers for all saved places
         // console.log('locations:',locations)
         locations.map((item)=>{
           // console.log('saved marker:',item)
@@ -171,7 +172,7 @@ const MapScreen = ({navigation})=>{
                   setAddressOverlay(item.address);
                   setShowSaveButton(false);
                   bottomSheetRef.current.snapTo(1);
-                  setCurrentRegion({...currentRegion,...item.coords});
+                  setCurrentRegion({...currentRegion,...item.coords,longitudeDelta:0.0154498592018939, latitudeDelta:0.0193603328227141});
                 }}
               >
                 <Icon
