@@ -40,20 +40,22 @@ const LocationEditScreen = ({navigation}) => {
     navigation.goBack();
   }
 
+  const coordsString = [latitude,longitude].join(', ');
+
   return (
     <ScrollView>
 
       <Input label="Place Name" value={name} onChangeText={changeName} multiline={true} leftIcon={{ type:'material-community', name:'map-marker' }} />
 
-      <Input disabled  label="Address" multiline={true} InputComponent={()=>(<Text style={styles.addressInput} selectable >{loc.address}</Text> )} leftIcon={{ type:'material-community', name:'map-legend' }} />
+      <Input label="Notes" value={notes} onChangeText={changeNotes} multiline={true}  leftIcon={{ type:'material-community', name:'text' }} />
+
+      <Input disabled label="Address" InputComponent={()=>(<Text style={styles.disabledInput} selectable numberOfLines={0} >{loc.address}</Text> )} leftIcon={{ type:'material-community', name:'map-legend' }} />
 
       {/* <AirbnbRating ratingCount={5} showRating={true} fractions={0} startingValue={stars} onFinishRating={changeStars}/> */}
 
-      <Input label="Notes" value={notes} onChangeText={changeNotes} multiline={true} leftIcon={{ type:'material-community', name:'text' }} />
-
       {/* <Input label="Tags" value={tags.join(' ')} onChangeText={changeTags} multiline={true} /> */}
 
-      <Input disabled label="Coordinates" multiline={true} InputComponent={()=>(<Text style={styles.addressInput} selectable >{[latitude,longitude].join(', ')}</Text> )} leftIcon={{ type:'material-community', name:'crosshairs-gps' }} />
+      <Input disabled label="Coordinates" InputComponent={()=>(<Text style={styles.disabledInput} selectable numberOfLines={0} >{[latitude,longitude].join(',\n ')}</Text> )} leftIcon={{ type:'material-community', name:'crosshairs-gps' }} />
 
       <Picker
         selectedValue={listId}
@@ -67,7 +69,7 @@ const LocationEditScreen = ({navigation}) => {
         })}
       </Picker>
 
-      <Button title="Save" onPress={()=>saveLocation(loc._id,name,address,coords,notes,stars,tags,listId)}/>
+      <Button title="Save" containerStyle={styles.button} onPress={()=>saveLocation(loc._id,name,address,coords,notes,stars,tags,listId)}/>
       {loc._id && <Button onPress={()=>handleDeleteLocation(loc._id)} title='Delete' />} 
     </ScrollView>
   )
@@ -81,8 +83,14 @@ LocationEditScreen.navigationOptions = ({navigation}) => {
 }
 
 const styles = StyleSheet.create({
-  addressInput: {
-    fontSize: 16
+  disabledInput: {
+    fontSize: 16,
+    padding:'2%'
+  },
+  button: {
+    width: '40%',
+    alignSelf:'center',
+    margin:'5%'
   }
 })
 
