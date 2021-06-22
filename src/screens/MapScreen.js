@@ -89,8 +89,7 @@ const MapScreen = ({navigation})=>{
     setExplorerMarker({
       show:true,
       coords:coords,
-      opacity:1,
-      address
+      opacity:1
     });
     setShowSaveButton(true);
     setAddressOverlay(address);
@@ -148,6 +147,7 @@ const MapScreen = ({navigation})=>{
           onPress={()=>{
             setAddressOverlay(explorerMarker.address);
             setCurrentRegion({...currentRegion,...explorerMarker.coords,longitudeDelta:0.0154498592018939, latitudeDelta:0.0193603328227141});
+            bottomSheetRef.current.snapTo(1);
           }}
         >
           <Icon
