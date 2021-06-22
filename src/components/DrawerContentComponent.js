@@ -43,7 +43,7 @@ const DrawerContentComponent = (props) => {
                     <ListItem.Content numberOfLines={1} >
                       <ListItem.Title>{list.name}</ListItem.Title>
                     </ListItem.Content>
-                    <ListItem.Chevron name='playlist-edit' type='material-community' size={25} />
+                    <ListItem.Chevron name='playlist-edit' type='material-community' size={25} onPress={()=>navigate('ListEdit',{listId: list._id})} />
                   </>
                 }
               >
@@ -53,7 +53,7 @@ const DrawerContentComponent = (props) => {
                       <ListItem.Title numberOfLines={1} >{place.name}</ListItem.Title>
                       <ListItem.Subtitle numberOfLines={1} style={styles.subtitle} >{place.address}</ListItem.Subtitle>
                     </ListItem.Content>
-                    <ListItem.Chevron name='playlist-edit' type='material-community' size={23} />
+                    <ListItem.Chevron name='playlist-edit' type='material-community' size={23} onPress={()=>navigate('LocationEdit',{loc:place})} />
                   </ListItem>
                 ))}
               </ListItem.Accordion>
