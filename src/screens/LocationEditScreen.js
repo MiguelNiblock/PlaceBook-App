@@ -1,7 +1,7 @@
 import React,{useEffect,useContext,useState} from 'react';
 import {View, ScrollView,TextInput, FlatList, TouchableOpacity, StyleSheet, Picker} from 'react-native';
 // import {Context as LocationContext} from '../context/LocationContext';
-import {ListItem, Input, Rating, AirbnbRating, Text, Button} from 'react-native-elements';
+import {ListItem, Input, Rating, AirbnbRating, Text, Button, Icon} from 'react-native-elements';
 import {navigate} from '../navigationRef'
 import {Context as LocationEditContext} from '../context/LocationEditContext';
 import {Context as LocationContext} from '../context/LocationContext';
@@ -70,6 +70,7 @@ const LocationEditScreen = ({navigation}) => {
       </Picker>
 
       <Button title="Save" containerStyle={styles.button} onPress={()=>saveLocation(loc._id,name,address,coords,notes,stars,tags,listId)}/>
+
       {loc._id && <Button onPress={()=>handleDeleteLocation(loc._id)} title='Delete' />} 
     </ScrollView>
   )
@@ -79,6 +80,8 @@ LocationEditScreen.navigationOptions = ({navigation}) => {
   const placeName = navigation.getParam('placeName');
   return {
     title: placeName,
+    headerRight: ()=><View style={{paddingRight:20}} ><Icon name='trash-can-outline' type='material-community' size={30} color='rgb(184, 3, 14)' /></View>,
+    // headerRightContainerStyle: {paddingRight:'30%',width:'20%'}
   }
 }
 
