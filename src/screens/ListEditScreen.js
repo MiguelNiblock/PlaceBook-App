@@ -20,7 +20,7 @@ const ListEditScreen = ({navigation})=>{
   useEffect(()=>{
     if (listId){
       const list = lists.find((item)=>item._id===listId);
-      console.log('list:',list)
+      // console.log('list:',list)
       setListName(list.name);
       setListColor(list.color);
       setListIcon(list.icon);

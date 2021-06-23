@@ -12,7 +12,7 @@ const DrawerContentComponent = (props) => {
 
   const {toggleExpandList,toggleShowList,state:lists} = useContext(ListContext);
   const {state:places} = useContext(PlacesContext);
-  console.log('lists:',lists);
+  // console.log('lists:',lists);
   // console.log('places:',places);
   
   return (

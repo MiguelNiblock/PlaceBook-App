@@ -19,7 +19,6 @@ const ListReducer = (state,action) => {
         (item)=>{ if(item._id === action.payload) return {...item, shown:!item.shown}; else return item}
       )];
     case 'expand_list':
-      console.log('id reducer:',action.payload);
       return [...state.map( 
         (item)=>{ if(item._id === action.payload) return {...item, expanded:!item.expanded}; else return item}
       )];
@@ -60,20 +59,17 @@ const deleteList = dispatch => async(listId) => {
 };
 
 const toggleShowList = dispatch => ({_id,name,color,icon,shown,expanded}) => {
+  console.log('toggleShowList called');
   const toggledShown = !shown;
   locationApi.put(`/lists/${_id}`,{name,color,icon,shown:toggledShown,expanded});
   dispatch({type:'show_list',payload: _id});
-  console.log('toggleShowList ran.');
 };
 
 const toggleExpandList = dispatch => ({_id,name,color,icon,shown,expanded}) => {
-  console.log('toggleExpandList called');
-  console.log('expanded:',expanded);
-  console.log('_id',_id)
+  // console.log('toggleExpandList called');
   const toggledExpanded = !expanded;
   locationApi.put(`/lists/${_id}`,{name,color,icon,shown,expanded:toggledExpanded});
   dispatch({type:'expand_list',payload: _id});
-  console.log('toggleExpandList ran.');
 };
 
 export const {Context, Provider} = createDataContext(
