@@ -72,7 +72,6 @@ const LocationEditScreen = ({navigation}) => {
 
       <Button title="Save" containerStyle={styles.button} onPress={()=>saveLocation(loc._id,name,address,coords,notes,stars,tags,listId)}/>
 
-      {loc._id && <Button onPress={()=>handleDeleteLocation(loc._id)} title='Delete' />} 
     </ScrollView>
   )
 };
