@@ -25,6 +25,7 @@ const LocationEditScreen = ({navigation}) => {
     changeStars(loc.stars)
     changeTags(loc.tags)
     changeListId(loc.listId)
+    navigation.setParams({handleDeleteLocation})
   },[])
 
   const saveLocation = (locId,name,address,coords,notes,stars,tags,listId) => {
@@ -78,9 +79,13 @@ const LocationEditScreen = ({navigation}) => {
 
 LocationEditScreen.navigationOptions = ({navigation}) => {
   const placeName = navigation.getParam('placeName');
+  const loc = navigation.getParam('loc');
+  const handleDeleteLocation = navigation.getParam('handleDeleteLocation')
   return {
     title: placeName,
-    headerRight: ()=><View style={{paddingRight:20}} ><Icon name='trash-can-outline' type='material-community' size={30} color='rgb(184, 3, 14)' /></View>,
+    headerRight: ()=>(
+      loc._id && <View style={{paddingRight:20}} ><Icon name='trash-can-outline' type='material-community' size={30} color='rgb(184, 3, 14)' onPress={()=>handleDeleteLocation(loc._id)} /></View>
+    ) ,
     // headerRightContainerStyle: {paddingRight:'30%',width:'20%'}
   }
 }
