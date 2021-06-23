@@ -1,7 +1,7 @@
 import React,{useEffect,useContext,useState} from 'react';
-import {View, ScrollView,TextInput, FlatList, TouchableOpacity, StyleSheet, Picker} from 'react-native';
+import {View, ScrollView,TextInput, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
 // import {Context as LocationContext} from '../context/LocationContext';
-import {ListItem, Input, Rating, AirbnbRating, Text, Button, Icon} from 'react-native-elements';
+import {ListItem, Input, Rating, AirbnbRating, Text, Button, Icon, BottomSheet} from 'react-native-elements';
 import {navigate} from '../navigationRef'
 import {Context as LocationEditContext} from '../context/LocationEditContext';
 import {Context as LocationContext} from '../context/LocationContext';
@@ -12,6 +12,7 @@ const LocationEditScreen = ({navigation}) => {
   const {state:{name,address,coords,notes,stars,tags,listId},changeName,changeAddress,changeCoords,changeStars,changeNotes,changeTags,changeListId} = useContext(LocationEditContext);
   const {editLocation,createLocation,deleteLocation} = useContext(LocationContext);
   const {state:lists} = useContext(ListContext);
+  const [showBottomSheet,setshowBottomSheet] = useState(false);
 
   const loc = navigation.getParam('loc');
   // console.log('loc:',loc)
@@ -22,8 +23,8 @@ const LocationEditScreen = ({navigation}) => {
     changeAddress(loc.address)
     changeCoords(loc.coords)
     changeNotes(loc.notes)
-    changeStars(loc.stars)
-    changeTags(loc.tags)
+    // changeStars(loc.stars)
+    // changeTags(loc.tags)
     changeListId(loc.listId)
     navigation.setParams({handleDeleteLocation})
   },[])
@@ -41,7 +42,9 @@ const LocationEditScreen = ({navigation}) => {
     navigation.goBack();
   }
 
-  const coordsString = [latitude,longitude].join(', ');
+  const list = lists.find((item)=>item._id === listId);
+
+  const selectList = (l)=>{changeListId(l._id);setshowBottomSheet(false)}
 
   return (
     <ScrollView>
@@ -56,19 +59,43 @@ const LocationEditScreen = ({navigation}) => {
 
       {/* <Input label="Tags" value={tags.join(' ')} onChangeText={changeTags} multiline={true} /> */}
 
-      <Input disabled label="Coordinates" InputComponent={()=>(<Text style={styles.disabledInput} selectable numberOfLines={0} >{[latitude,longitude].join(',\n ')}</Text> )} leftIcon={{ type:'material-community', name:'crosshairs-gps' }} />
+      <Input disabled label="Coordinates" InputComponent={()=>(<Text style={styles.disabledInput} selectable numberOfLines={0} >{[latitude,longitude].join(', ')}</Text> )} leftIcon={{ type:'material-community', name:'crosshairs-gps' }} />
 
-      <Picker
-        selectedValue={listId}
-        onValueChange={(itemValue)=>changeListId(itemValue)}
-        mode="dropdown"
-        prompt="Lists of Places"
-      >
-        <Picker.Item label="Select a List" value={null} />
-        {lists.map((item)=>{
-          return <Picker.Item label={item.name} value={item._id} />
-        })}
-      </Picker>
+      <TouchableOpacity onPress={()=>setshowBottomSheet(true)} >
+      <Input disabled label="List" 
+        InputComponent={()=>(
+          <Text style={styles.disabledInput} >
+            {list?.name || 'Choose a list'}
+          </Text>
+        )}
+        leftIcon={{ type:'material-community', name:'format-list-bulleted-type' }} />
+      </TouchableOpacity>
+
+      <BottomSheet isVisible={showBottomSheet} >
+        {lists.map(
+          (item)=>(
+            <ListItem key={item._id} bottomDivider onPress={()=>selectList(item)} activeOpacity={.9} >
+              <ListItem.CheckBox checked={item._id===listId} onPress={()=>selectList(item)} />
+              <Icon
+                name={item.icon}
+                type='material-community'
+                color={item.color}
+                size={30}
+              />
+              <ListItem.Content>
+                <ListItem.Title>{item.name}</ListItem.Title>
+              </ListItem.Content>
+              <ListItem.Chevron />
+            </ListItem>
+          )
+        )}
+        <ListItem key={'cancel'} onPress={()=>setshowBottomSheet(false)} containerStyle={{ backgroundColor: 'red' }} >
+          <ListItem.Content>
+            <ListItem.Title style={{color:'white'}} >Cancel</ListItem.Title>
+          </ListItem.Content>
+          <ListItem.Chevron />
+        </ListItem>
+      </BottomSheet>
 
       <Button title="Save" containerStyle={styles.button} onPress={()=>saveLocation(loc._id,name,address,coords,notes,stars,tags,listId)}/>
 
