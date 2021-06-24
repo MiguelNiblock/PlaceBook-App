@@ -71,7 +71,7 @@ const LocationEditScreen = ({navigation}) => {
             {list?.name || 'Choose a list'}
           </Text>
         )}
-        leftIcon={{ type:'material-community', name:'format-list-bulleted-type' }} />
+        leftIcon={{ type:'material-community', name: list?.icon || 'format-list-bulleted-type', color: list?.color || 'black' }} />
       </TouchableOpacity>
 
       <BottomSheet isVisible={showBottomSheet} >
