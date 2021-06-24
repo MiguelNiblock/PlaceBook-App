@@ -9,7 +9,7 @@ import {Context as ListContext} from '../context/ListContext';
 import {Context as LocationContext} from '../context/LocationContext';
 import {Icon, Button} from 'react-native-elements';
 import BottomSheet, {TouchableOpacity as ModalTouchable} from '@gorhom/bottom-sheet';
-import api from '../api/location';
+// import api from '../api/location';
 
 const MapScreen = ({navigation})=>{
 
@@ -21,13 +21,14 @@ const MapScreen = ({navigation})=>{
     opacity:0
   })
   const [addressOverlay, setAddressOverlay] = useState('');
+  const [currentSavedMarker, setCurrentSavedMarker] = useState({});
   const markerRef = useRef();
   const [editMap,setEditMap] = useState(false);//quickfix for bug: mapview not showing controls on load
   const [showSaveButton,setShowSaveButton] = useState(false);
+  const [showEditButton,setShowEditButton] = useState(false);
   const [currentRegion,setCurrentRegion] = useState({ //default to north america
     longitudeDelta: 86.15907199680805, latitudeDelta: 75.92358466231565, longitude: -92.3610382899642, latitude: 24.193727440390386
   });
-  const [location, setLocation] = useState(null);
   //bottom modal
   const bottomSheetRef = useRef(null);
   const snapPoints = useMemo(() => ['7%','25%'], []);
@@ -50,7 +51,6 @@ const MapScreen = ({navigation})=>{
           // console.log('coords:',latitude,longitude)
           setCurrentRegion({longitudeDelta: 0.0154498592018939, latitudeDelta: 0.013360640311354643, ...coords});
           handleLongPress({coords});
-          setLocation(coords);
         },2000);
       };
     })()
@@ -72,6 +72,7 @@ const MapScreen = ({navigation})=>{
       setCurrentRegion({...currentRegion,...focusLoc.coords,longitudeDelta:0.0154498592018939, latitudeDelta:0.0193603328227141});
       setAddressOverlay(focusLoc.address);
       setShowSaveButton(false);
+      setShowEditButton(true);
       bottomSheetRef.current.snapTo(1);
     };
     
@@ -89,9 +90,11 @@ const MapScreen = ({navigation})=>{
     setExplorerMarker({
       show:true,
       coords:coords,
-      opacity:1
+      opacity:1,
+      address
     });
     setShowSaveButton(true);
+    setShowEditButton(false);
     setAddressOverlay(address);
     bottomSheetRef.current.snapTo(1);
   };
@@ -99,6 +102,7 @@ const MapScreen = ({navigation})=>{
   const mapTap = () => {
     setExplorerMarker({...explorerMarker,show:false});
     setShowSaveButton(false);
+    setShowEditButton(false);
     setAddressOverlay('');
     bottomSheetRef.current.close();
   };
@@ -118,6 +122,11 @@ const MapScreen = ({navigation})=>{
     navigate('LocationEdit',{loc})
   };
 
+  const editLocation = ()=>{
+    console.log('editLocation called')
+    navigate('LocationEdit',{loc:currentSavedMarker, placeName:currentSavedMarker.name})
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       
@@ -136,8 +145,8 @@ const MapScreen = ({navigation})=>{
           // console.log(region)
         }}
       >
-      {explorerMarker.show //hides with mapview's onPress (short tap)
-      ? <Marker
+      {explorerMarker.show && //hides with mapview's onPress (short tap)
+        <Marker
           opacity={explorerMarker.opacity}//initially 0. Allows markerRef to be defined on first load
           ref={markerRef}
           coordinate={{
@@ -146,6 +155,8 @@ const MapScreen = ({navigation})=>{
           }}
           onPress={()=>{
             setAddressOverlay(explorerMarker.address);
+            setShowEditButton(false);
+            setShowSaveButton(true);
             setCurrentRegion({...currentRegion,...explorerMarker.coords,longitudeDelta:0.0154498592018939, latitudeDelta:0.0193603328227141});
             bottomSheetRef.current.snapTo(1);
           }}
@@ -157,7 +168,7 @@ const MapScreen = ({navigation})=>{
             size={45}
           />
         </Marker>
-      : null }
+      }
 
       {//display markers for all saved places
         // console.log('locations:',locations)
@@ -170,7 +181,9 @@ const MapScreen = ({navigation})=>{
                 coordinate={{...item.coords}}
                 onPress={()=>{
                   setAddressOverlay(item.address);
+                  setCurrentSavedMarker(item);
                   setShowSaveButton(false);
+                  setShowEditButton(true);
                   bottomSheetRef.current.snapTo(1);
                   setCurrentRegion({...currentRegion,...item.coords,longitudeDelta:0.0154498592018939, latitudeDelta:0.0193603328227141});
                 }}
@@ -199,9 +212,14 @@ const MapScreen = ({navigation})=>{
         onChange={handleSheetChanges}
       >
         <Text selectable style={styles.addressOverlay}>{addressOverlay}</Text>
-        {showSaveButton && <ModalTouchable style={styles.saveButton} onPress={saveLocation} >
+        {showSaveButton && 
+        <ModalTouchable style={styles.modalButton} onPress={saveLocation} >
           <Button title='Save' type='solid' />
         </ModalTouchable>}
+        {showEditButton &&
+        <ModalTouchable style={styles.modalButton} onPress={editLocation} >
+        <Button title='Edit' type='solid' />
+      </ModalTouchable>}
       </BottomSheet>
 
       <TouchableOpacity style={styles.drawerButton}
@@ -265,7 +283,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center'
   },  
-  saveButton:{
+  modalButton:{
     alignSelf: 'center',
     width: '50%'
   },
