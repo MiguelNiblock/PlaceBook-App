@@ -64,11 +64,15 @@ const MapScreen = ({navigation})=>{
   // console.log('focusLoc from comp body:',focusLoc)
   const hideDrawer = navigation.getParam('hideDrawer');
   // console.log('hideDrawer:',hideDrawer);
+  const hideExplorerMarker = navigation.getParam('hideExplorerMarker');
+  // console.log('hideExplorerMarker:',hideExplorerMarker);
   useEffect(()=>{
     // console.log('focusLoc useEffect called');
     if(hideDrawer){navigation.closeDrawer()};
+    if(hideExplorerMarker){setExplorerMarker({...explorerMarker,show:false})};
     if(focusLoc) {
       // console.log('focusLoc from useEffect:',focusLoc);
+      setCurrentSavedMarker(focusLoc);
       setCurrentRegion({...currentRegion,...focusLoc.coords,longitudeDelta:0.0154498592018939, latitudeDelta:0.0193603328227141});
       setAddressOverlay(focusLoc.address);
       setShowSaveButton(false);
@@ -80,7 +84,7 @@ const MapScreen = ({navigation})=>{
       // console.log('cleanup fn called');
       navigation.setParams({hideDrawer:null,loc:null})
     };
-  },[focusLoc,hideDrawer]);
+  },[focusLoc,hideDrawer,hideExplorerMarker]);
 
   const handleLongPress = async({nativeEvent,coords})=>{
     coords ??= nativeEvent?.coordinate

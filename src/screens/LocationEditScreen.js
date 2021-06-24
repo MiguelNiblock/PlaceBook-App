@@ -29,11 +29,13 @@ const LocationEditScreen = ({navigation}) => {
     navigation.setParams({handleDeleteLocation})
   },[])
 
-  const saveLocation = (locId,name,address,coords,notes,stars,tags,listId) => {
+  const saveLocation = async (locId,name,address,coords,notes,stars,tags,listId) => {
     if (locId){//if location exists...
       editLocation(locId,name,address,coords,notes,stars,tags,listId);
     } else {
-      createLocation(name,address,coords,notes,stars,tags,listId);
+      const createdLoc = await createLocation(name,address,coords,notes,stars,tags,listId);
+      // console.log('createdLoc from locEdit scr:',createdLoc);
+      navigate('Map',{loc:createdLoc,hideDrawer:true,hideExplorerMarker:true});
     }
   }
 
