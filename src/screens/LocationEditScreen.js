@@ -29,9 +29,10 @@ const LocationEditScreen = ({navigation}) => {
     navigation.setParams({handleDeleteLocation})
   },[])
 
-  const saveLocation = async (locId,name,address,coords,notes,stars,tags,listId) => {
+  const saveLocation = async(locId,name,address,coords,notes,stars,tags,listId) => {
     if (locId){//if location exists...
-      editLocation(locId,name,address,coords,notes,stars,tags,listId);
+      const editedLoc = await editLocation(locId,name,address,coords,notes,stars,tags,listId);
+      navigate('Map',{loc:editedLoc,hideDrawer:true,hideExplorerMarker:true});
     } else {
       const createdLoc = await createLocation(name,address,coords,notes,stars,tags,listId);
       // console.log('createdLoc from locEdit scr:',createdLoc);

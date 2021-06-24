@@ -32,17 +32,15 @@ const createLocation = dispatch => async(name,address,coords,notes,stars,tags,li
   return response.data;
 };
 const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tags,listId) => {
-  const response = await locationApi.put(`/locs/${locId}`,
-    {name,address,coords,notes,stars,tags,listId}
-  );
+  const response = await locationApi.put(`/locs/${locId}`,{name,address,coords,notes,stars,tags,listId});
   dispatch({type:'edit_loc', payload:response.data});
-  console.log('editLocation ran. response:',response.data);
-  navigate('LocationList',{listId})
+  // console.log('editLocation ran. response:',response.data);
+  return response.data;
 };
 const deleteLocation = dispatch => async(locId) => {
   const response = await locationApi.delete(`/locs/${locId}`);
   dispatch({type:'delete_loc',payload:locId});
-  console.log('deleteLocation ran. response:',response.data);
+  // console.log('deleteLocation ran. response:',response.data);
 };
 
 export const {Context, Provider} = createDataContext(
