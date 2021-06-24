@@ -14,25 +14,26 @@ const ListEditScreen = ({navigation})=>{
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState(false);
 
-  const listId = navigation.getParam('listId');
+  const list = navigation.getParam('list');
 
   useEffect(()=>{
-    if (listId){
-      const list = lists.find((item)=>item._id===listId);
-      // console.log('list:',list)
+    navigation.setParams({handleDeleteList});
+    if (list?._id){
+      // console.log('list in useEffect:',list);
       setListName(list.name);
       setListColor(list.color);
       setListIcon(list.icon);
     };
   },[]);
 
-  const saveList = (listId,name,color,icon)=>{
-    if(listId) {editList(listId,name,color,icon,list.shown,list.expanded)}
+  const saveList = (name,color,icon)=>{
+    // console.log('list in saveList before ifListId:',list);
+    if(list?._id) {editList({...list,name,color,icon})}
     else {createList(name,color,icon)};
   };
 
-  const handleDeleteList = (listId) => {
-    deleteList(listId);
+  const handleDeleteList = () => {
+    deleteList(list?._id);
     navigation.goBack();
   };
 
@@ -55,7 +56,7 @@ const ListEditScreen = ({navigation})=>{
               type:'material-community'
             }}
           />
-          <Chip title='Icon' type='outline' containerStyle={styles.chipBox} buttonStyle={styles.chipButton}
+          <Chip title='Icon' type='outline' containerStyle={styles.chipBox} buttonStyle={styles.chipButton} onPress={toggleIconPicker}
             icon={{
               name:'map-marker-plus',
               type:'material-community'
@@ -85,30 +86,49 @@ const ListEditScreen = ({navigation})=>{
       /> */}
       {/* <Input label="Icon" value={listIcon} onChangeText={setListIcon} /> */}
       {/* <Button title="Choose List Icon" onPress={toggleIconPicker} /> */}
-      <Overlay isVisible={showIconPicker} onBackdropPress={toggleIconPicker} style={{}} >
-        <ScrollView style={{width: 100}}>
+      <Overlay isVisible={showIconPicker} onBackdropPress={toggleIconPicker} overlayStyle={styles.iconPickerOverlay} >
+        <ScrollView contentContainerStyle={styles.iconPickerScrollContent} horizontal={true} >
           {iconNames.map((iconName)=>{
             return (
-              <TouchableOpacity onPress={()=>{setListIcon(iconName);toggleIconPicker()}} >
                 <Icon
                   name={iconName}
                   type='material-community'
                   color={listColor}
                   size={45}
+                  onPress={()=>{setListIcon(iconName);toggleIconPicker()}}
+                  containerStyle={styles.iconPickerIcons}
                 />
-              </TouchableOpacity>
             )
           })}
         </ScrollView>
       </Overlay>
 
       {/* <Button title="Save" onPress={()=>saveList(listId,listName,listColor,listIcon)} /> */}
+      <Button title="Save" containerStyle={styles.button} onPress={()=>saveList(listName,listColor,listIcon)} />
       {/* {listId && <Button title='Delete' onPress={()=>handleDeleteList(listId)} />}  */}
     </ScrollView>
   )
 };
 
+ListEditScreen.navigationOptions = ({navigation}) => {
+  const listName = navigation.getParam('listName');
+  const list = navigation.getParam('list');
+  const handleDeleteList = navigation.getParam('handleDeleteList')
+  return {
+    title: listName,
+    headerRight: ()=>(
+      list?._id && <View style={{paddingRight:20}} ><Icon name='trash-can-outline' type='material-community' size={30} color='rgb(184, 3, 14)' onPress={()=>handleDeleteList(list?._id)} /></View>
+    ) ,
+    // headerRightContainerStyle: {paddingRight:'30%',width:'20%'}
+  }
+}
+
 const styles = StyleSheet.create({
+  button: {
+    width: '40%',
+    alignSelf:'center',
+    margin:'5%'
+  },
   markerIconBox:{
     // flex:1,
     // alignContent:'center',
@@ -132,7 +152,19 @@ const styles = StyleSheet.create({
   },
   colorPickerBox:{
     height:Dimensions.get('window').height*.6, 
-    width: Dimensions.get('window').width*.8}
+    width: Dimensions.get('window').width*.8
+  },
+  iconPickerOverlay: {
+    width: '70%',
+    height: '70%',
+  },
+  iconPickerScrollContent:{
+    flexDirection: 'column',
+    flexWrap: 'wrap',
+  },
+  iconPickerIcons: {
+    margin: 5,
+  }
 })
 
 export default ListEditScreen;

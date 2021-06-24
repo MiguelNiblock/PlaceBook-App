@@ -43,7 +43,7 @@ const DrawerContentComponent = (props) => {
                     <ListItem.Content numberOfLines={1} >
                       <ListItem.Title>{list.name}</ListItem.Title>
                     </ListItem.Content>
-                    <ListItem.Chevron name='playlist-edit' type='material-community' size={25} onPress={()=>navigate('ListEdit',{listId: list._id})} />
+                    <ListItem.Chevron name='playlist-edit' type='material-community' size={25} onPress={()=>navigate('ListEdit',{list,listName:list.name})} />
                   </>
                 }
               >

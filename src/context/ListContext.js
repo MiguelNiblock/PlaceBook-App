@@ -46,10 +46,12 @@ const createList = dispatch => async(name,color,icon) => {
   navigate('Drawer');
 };
 
-const editList = dispatch => async(listId,name,color,icon,shown,expanded) => {
-  const response = await locationApi.put(`/lists/${listId}`,{name,color,icon,shown,expanded});
+const editList = dispatch => async({_id,name,color,icon,shown,expanded}) => {
+  // console.log('editList:',_id,name,color,icon,shown,expanded);
+  const response = await locationApi.put(`/lists/${_id}`,{name,color,icon,shown,expanded});
+  // console.log('response:',response.data);
   dispatch({type:'edit_list',payload:response.data});
-  navigate('Drawer');
+  navigate('Map');
 };
 
 const deleteList = dispatch => async(listId) => {
