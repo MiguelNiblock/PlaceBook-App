@@ -30,6 +30,7 @@ const ListReducer = (state,action) => {
 const fetchLists = dispatch => async() => {
   console.log('fetchLists called');
   const response = await locationApi.get('/lists');  
+  console.log('fetchLists response received');
   // response.data.map(async (list)=>{
   //   if (!list.expanded){
   //     res = await locationApi.put(`/lists/${list._id}`,{...list,expanded:true})

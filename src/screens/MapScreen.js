@@ -87,7 +87,8 @@ const MapScreen = ({navigation})=>{
   },[focusLoc,hideDrawer,hideExplorerMarker]);
 
   const handleLongPress = async({nativeEvent,coords})=>{
-    coords ??= nativeEvent?.coordinate
+    // coords ??= nativeEvent?.coordinate
+    if(!coords){coords = nativeEvent?.coordinate};
     const [{name,street,city,region:addressRegion,postalCode,country}] = await reverseGeocodeAsync({...coords}); 
     const address = `${name} ${street}, ${city}, ${addressRegion} ${postalCode}, ${country}`;
     // console.log('new address:',address);
