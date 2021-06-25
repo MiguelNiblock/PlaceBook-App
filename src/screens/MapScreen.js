@@ -1,6 +1,6 @@
 import React,{useEffect,useState,useRef,useContext,useMemo,useCallback} from 'react';
 import MapView,{Marker,Callout} from 'react-native-maps';
-import { StyleSheet, Text, View, Dimensions, Alert, SafeAreaView, StatusBar, TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Alert, SafeAreaView, StatusBar, TouchableOpacity, Platform} from 'react-native';
 // import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
 import {reverseGeocodeAsync} from 'expo-location';

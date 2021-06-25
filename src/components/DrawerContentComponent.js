@@ -1,6 +1,6 @@
 //custom drawer content component. by default only the routes are shown as links
 import React,{useEffect,useContext,useState} from 'react';
-import {ScrollView, FlatList, TouchableOpacity, Text, View,SafeAreaView,StyleSheet,StatusBar} from 'react-native';
+import {ScrollView, FlatList, TouchableOpacity, Text, View,SafeAreaView,StyleSheet,StatusBar,Platform} from 'react-native';
 import { DrawerItems } from 'react-navigation-drawer';
 import locationApi from '../api/location';
 import {Context as ListContext} from '../context/ListContext';
