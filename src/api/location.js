@@ -2,8 +2,8 @@ import axios from 'axios';
 import {AsyncStorage} from 'react-native';
 
 const instance = axios.create({
-    // baseURL: 'https://fierce-depths-47546.herokuapp.com/'
-    baseURL: 'http://192.168.0.158:3000'
+    baseURL: 'https://fierce-depths-47546.herokuapp.com/'
+    // baseURL: 'http://172.16.16.67:3000'
 })
 
 instance.interceptors.request.use(
