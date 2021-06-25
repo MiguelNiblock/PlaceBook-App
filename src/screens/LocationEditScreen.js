@@ -9,7 +9,7 @@ import {Context as ListContext} from '../context/ListContext';
 
 const LocationEditScreen = ({navigation}) => {
 
-  const {state:{name,address,coords,notes,listId},changeName,changeAddress,changeCoords,changeNotes,changeListId} = useContext(LocationEditContext);
+  const {state:{name,address,coords,notes,stars,tags,listId},changeName,changeAddress,changeCoords,changeNotes,changeStars,changeTags,changeListId} = useContext(LocationEditContext);
   const {editLocation,createLocation,deleteLocation} = useContext(LocationContext);
   const {state:lists} = useContext(ListContext);
   const [showBottomSheet,setshowBottomSheet] = useState(false);
@@ -23,8 +23,8 @@ const LocationEditScreen = ({navigation}) => {
     changeAddress(loc.address)
     changeCoords(loc.coords)
     changeNotes(loc.notes)
-    // changeStars(loc.stars)
-    // changeTags(loc.tags)
+    changeStars(loc.stars)
+    changeTags(loc.tags)
     changeListId(loc.listId)
     navigation.setParams({handleDeleteLocation})
   },[])
