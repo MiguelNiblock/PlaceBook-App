@@ -8,7 +8,6 @@ import {setLocalData} from '../hooks/safeAsync'
 const ListReducer = (state,action) => {
   switch (action.type){
     case 'set_lists':
-      setLocalData('lists',action.payload);
       return action.payload;
     case 'create_list':
       setLocalData('lists',[...state, action.payload])
@@ -26,8 +25,8 @@ const ListReducer = (state,action) => {
     }
     case 'delete_list': {
       const newState = state.filter((item)=>item._id !== action.payload);
-      setLocalData('lists',newState)
-      return newState
+      setLocalData('lists',newState);
+      return newState;
     }
     case 'show_list': {
       const newState = [...state.map( 
@@ -49,6 +48,7 @@ const ListReducer = (state,action) => {
 };
 
 const loadLocalLists = dispatch => async() => {
+  console.log('loadLocalLists called')
   if(await SecureStore.isAvailableAsync()){
     let lists = await SecureStore.getItemAsync('lists')
     if (lists) {
@@ -77,7 +77,7 @@ const fetchLists = dispatch => async() => {
     //resolve conflicts with local queues
     ////////////////////////////////////////////////////////////
     dispatch({type:'set_lists',payload:response.data});
-    console.log('fetchLists ran')
+    //set to localState...
   }
 };
 
@@ -119,9 +119,9 @@ const deleteList = dispatch => async(listId) => {
   console.log('deleteList called')
   if (await SecureStore.getItemAsync('token')){
     console.log('trying to DELETE list on backend')
-    const response = await locationApi.delete(`/lists/${listId}`);
+    const {data} = await locationApi.delete(`/lists/${listId}`);
     dispatch({type:'delete_list',payload:listId});
-    console.log('deleteList ran. response:',response.data);
+    console.log('deleteList ran. response:',data);
   } else {
     console.log('deleting list locally')
     dispatch({type:'delete_list',payload:listId});

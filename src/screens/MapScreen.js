@@ -15,7 +15,7 @@ import * as SecureStore from 'expo-secure-store';
 const MapScreen = ({navigation})=>{
 
   const {loadLocalLists,fetchLists,deleteList,createList,editList,state:lists} = useContext(ListContext);
-  const {fetchLocs,state:locations} = useContext(LocationContext);
+  const {loadLocalLocs,fetchLocs,createLocation,state:locations} = useContext(LocationContext);
   const [explorerMarker,setExplorerMarker] = useState({
     show:true,
     coords:{longitude: -93.35577942430973, latitude: 23.47555745333057},//dummy region in the sea
@@ -39,25 +39,28 @@ const MapScreen = ({navigation})=>{
 
 
   useEffect(()=>{
-    
-    (async()=>{
+
+    (()=>{
+      console.log('first async called');
       // await SecureStore.deleteItemAsync('token')
-      await loadLocalLists();
-      await fetchLists();
-      // createList('b','green','map-marker')
-      // editList({_id: "12868360-04a6-4d3f-af84-4d5b5d4fca27",
-      //   color: "green",
-      //   expanded: true,
-      //   icon: "map-marker",
-      //   name: "c",
-      //   shown: true})
-      // deleteList("12868360-04a6-4d3f-af84-4d5b5d4fca27")
-    })()
-    fetchLocs();
+
+      (async()=>{
+        console.log('lists async called');
+        await loadLocalLists();
+        await fetchLists();
+      })();
+      
+      (async()=>{
+        console.log('locs async called');
+        await loadLocalLocs();
+        await fetchLocs();
+      })();
+
+    })();
 
     (async()=>{ //gets device location and sets it as map region
       let { status } = await Location.requestPermissionsAsync();
-      console.log('permission status:',status);
+      console.log('location permission:',status);
       if(status==='granted'){
         setTimeout(async function(){
           let {coords:{latitude,longitude}} = await Location.getCurrentPositionAsync({});
@@ -67,7 +70,7 @@ const MapScreen = ({navigation})=>{
           handleLongPress({coords});
         },2000);
       };
-    })()
+    })();
 
   },[]);
 
@@ -141,7 +144,7 @@ const MapScreen = ({navigation})=>{
   };
 
   const editLocation = ()=>{
-    console.log('editLocation called')
+    console.log('editLocation button pressed')
     navigate('LocationEdit',{loc:currentSavedMarker, placeName:currentSavedMarker.name})
   }
 
