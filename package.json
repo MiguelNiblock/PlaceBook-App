@@ -10,7 +10,6 @@
   "dependencies": {
     "@gorhom/bottom-sheet": "^2",
     "@react-native-community/masked-view": "0.1.10",
-    "@react-native-picker/picker": "1.9.11",
     "axios": "^0.21.1",
     "expo": "^41.0.0",
     "expo-location": "~12.0.4",
@@ -25,6 +24,7 @@
     "react-native-reanimated": "~2.1.0",
     "react-native-safe-area-context": "3.2.0",
     "react-native-screens": "~3.0.0",
+    "react-native-vector-icons": "^8.1.0",
     "react-navigation": "^4.3.9",
     "react-navigation-drawer": "^2.6.0",
     "react-navigation-stack": "^2.7.0",

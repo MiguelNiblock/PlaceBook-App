@@ -48,16 +48,15 @@ const Stack = createStackNavigator({
 
 
 const switchNavigator = createSwitchNavigator({
+  mainFlow: Stack,
   ResolveAuth: ResolveAuthScreen,
   loginFlow: createStackNavigator({
     Signin: SigninScreen,
     Signup: SignupScreen
-  }),
-  mainFlow: Stack
+  })
 });
 
 const App = createAppContainer(switchNavigator);
-
 
 export default () => {
   return (
