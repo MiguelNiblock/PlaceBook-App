@@ -1,6 +1,6 @@
 import createDataContext from './createDataContext';
 import locationApi from '../api/location';
-import {AsyncStorage} from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 import {navigate} from '../navigationRef';
 
 //REDUCER
@@ -27,7 +27,7 @@ const signup = (dispatch) => async ({email,password}) => {
         //make api req to sign up with that email and passwd
         const response = await locationApi.post('/signup',{email,password});
         //save token in phone storage
-        await AsyncStorage.setItem('token',response.data.token);
+        await SecureStore.setItemAsync('token',response.data.token);
         //update state.
         dispatch({type:'signin',payload:response.data.token});
         //navigate to main flow
@@ -43,7 +43,7 @@ const signin = (dispatch) => async({email,password}) => {
         //http request to signin route
         const response = await locationApi.post('/signin',{email,password});
         //save token in phone storage
-        await AsyncStorage.setItem('token',response.data.token);
+        await SecureStore.setItemAsync('token',response.data.token);
         //update state
         dispatch({type:'signin',payload:response.data.token});
         //navigate to main flow
@@ -58,7 +58,7 @@ const clearErrorMessage = (dispatch) => () => {
 }
 
 const tryLocalSignin = dispatch => async() => {
-    const token = await AsyncStorage.getItem('token');
+    const token = await SecureStore.getItemAsync('token');
     // let token = null;
     if(token) {
         dispatch({type:'signin',payload:token});
@@ -70,7 +70,7 @@ const tryLocalSignin = dispatch => async() => {
 }
 
 const signout = (dispatch) => async () => {
-    await AsyncStorage.removeItem('token');
+    await SecureStore.deleteItemAsync('token');
     dispatch({type:'signout'});
     navigate('Signin');
 }
