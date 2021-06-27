@@ -9,11 +9,12 @@ import {Context as ListContext} from '../context/ListContext';
 import {Context as LocationContext} from '../context/LocationContext';
 import {Icon, Button} from 'react-native-elements';
 import BottomSheet, {TouchableOpacity as ModalTouchable} from '@gorhom/bottom-sheet';
+import * as SecureStore from 'expo-secure-store';
 // import api from '../api/location';
 
 const MapScreen = ({navigation})=>{
 
-  const {fetchLists,state:lists} = useContext(ListContext);
+  const {loadLocalLists,fetchLists,deleteList,createList,editList,state:lists} = useContext(ListContext);
   const {fetchLocs,state:locations} = useContext(LocationContext);
   const [explorerMarker,setExplorerMarker] = useState({
     show:true,
@@ -38,7 +39,20 @@ const MapScreen = ({navigation})=>{
 
 
   useEffect(()=>{
-    fetchLists();
+    
+    (async()=>{
+      // await SecureStore.deleteItemAsync('token')
+      await loadLocalLists();
+      await fetchLists();
+      // createList('b','green','map-marker')
+      // editList({_id: "12868360-04a6-4d3f-af84-4d5b5d4fca27",
+      //   color: "green",
+      //   expanded: true,
+      //   icon: "map-marker",
+      //   name: "c",
+      //   shown: true})
+      // deleteList("12868360-04a6-4d3f-af84-4d5b5d4fca27")
+    })()
     fetchLocs();
 
     (async()=>{ //gets device location and sets it as map region
@@ -79,7 +93,6 @@ const MapScreen = ({navigation})=>{
       setShowEditButton(true);
       bottomSheetRef.current.snapTo(1);
     };
-    
     return ()=> { 
       // console.log('cleanup fn called');
       navigation.setParams({hideDrawer:null,loc:null})
