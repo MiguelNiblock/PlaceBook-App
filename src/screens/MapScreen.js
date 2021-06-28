@@ -7,6 +7,7 @@ import {reverseGeocodeAsync} from 'expo-location';
 import {navigate} from '../navigationRef'
 import {Context as ListContext} from '../context/ListContext';
 import {Context as LocationContext} from '../context/LocationContext';
+import {Context as AuthContext} from '../context/AuthContext';
 import {Icon, Button} from 'react-native-elements';
 import BottomSheet, {TouchableOpacity as ModalTouchable} from '@gorhom/bottom-sheet';
 import * as SecureStore from 'expo-secure-store';
@@ -16,6 +17,7 @@ const MapScreen = ({navigation})=>{
 
   const {loadLocalLists,fetchLists,deleteList,createList,editList,state:lists} = useContext(ListContext);
   const {loadLocalLocs,fetchLocs,createLocation,state:locations} = useContext(LocationContext);
+  const {tryLocalSignin,state:{token}} = useContext(AuthContext);
   const [explorerMarker,setExplorerMarker] = useState({
     show:true,
     coords:{longitude: -93.35577942430973, latitude: 23.47555745333057},//dummy region in the sea
@@ -40,22 +42,11 @@ const MapScreen = ({navigation})=>{
 
   useEffect(()=>{
 
-    (()=>{
-      console.log('first async called');
-      // await SecureStore.deleteItemAsync('token')
-
-      (async()=>{
-        console.log('lists async called');
-        await loadLocalLists();
-        await fetchLists();
-      })();
-      
-      (async()=>{
-        console.log('locs async called');
-        await loadLocalLocs();
-        await fetchLocs();
-      })();
-
+    (async()=>{ //first wait for local data to load
+      console.log('local async called');
+      await loadLocalLists();
+      await loadLocalLocs();
+      await tryLocalSignin(); //wait to get the token in context
     })();
 
     (async()=>{ //gets device location and sets it as map region
@@ -73,6 +64,14 @@ const MapScreen = ({navigation})=>{
     })();
 
   },[]);
+
+  useEffect(()=>{
+    console.log('remote async called');
+    if(token){
+      fetchLists(token);
+      fetchLocs(token);
+    }
+  },[token]);
 
   // console.log('lists:',lists)
 

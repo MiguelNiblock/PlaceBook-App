@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {AsyncStorage} from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 
 const instance = axios.create({
     baseURL: 'https://fierce-depths-47546.herokuapp.com/'
@@ -9,7 +9,7 @@ const instance = axios.create({
 instance.interceptors.request.use(
     //fn for success
     async (config) => {
-        const token = await AsyncStorage.getItem('token');
+        const token = await SecureStore.getItemAsync('token');
         if(token){
             config.headers.Authorization = `Bearer ${token}`;
         };

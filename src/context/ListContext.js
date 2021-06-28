@@ -60,9 +60,9 @@ const loadLocalLists = dispatch => async() => {
   console.log('loadLocalLists ran')
 }
 
-const fetchLists = dispatch => async() => {
+const fetchLists = dispatch => async(token) => {
   console.log('fetchLists called');
-  if (await SecureStore.getItemAsync('token')){
+  if (token){
     const {data} = await locationApi.get('/lists');  
     console.log('fetchLists response received');
     ///////////////////////////////////////////////////////////
@@ -76,7 +76,7 @@ const fetchLists = dispatch => async() => {
     ////////////////////////////////////////////////////////////
     //resolve conflicts with local queues
     ////////////////////////////////////////////////////////////
-    dispatch({type:'set_lists',payload:response.data});
+    dispatch({type:'set_lists',payload:data});
     //set to localState...
   }
 };

@@ -4,7 +4,7 @@ import { Text, Button, Input} from 'react-native-elements';
 import Spacer from './Spacer';
 
 const AuthForm = ({ headerText, errorMessage, onSubmit, submitButtonText }) => {
-  const [email,setEmail] = useState('');
+  const [username,setUsername] = useState('');
   const [password,setPassword] = useState('');
 
   return (
@@ -14,12 +14,11 @@ const AuthForm = ({ headerText, errorMessage, onSubmit, submitButtonText }) => {
     </Spacer>
     
     <Input
-      label="Email" 
-      value={email} 
-      onChangeText={setEmail}
+      label="Username" 
+      value={username} 
+      onChangeText={setUsername}
       autoCapitalize="none"
       autoCorrect={false}/>
-    {/* <Spacer /> */}
     <Input 
       label="Password" 
       value={password} 

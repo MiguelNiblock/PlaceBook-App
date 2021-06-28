@@ -2,6 +2,7 @@ import createDataContext from './createDataContext';
 import locationApi from '../api/location';
 import * as SecureStore from 'expo-secure-store';
 import {navigate} from '../navigationRef';
+import {setLocalData} from '../hooks/safeAsync';
 
 //REDUCER
 //////////
@@ -10,10 +11,12 @@ const authReducer = (state, action) => {
         case 'add_error':
             return {...state, errorMessage: action.payload};
         case 'signin'://covers both signup & signin
+            setLocalData('token',action.payload);
             return {errorMessage: '', token: action.payload};
         case 'clear_error_message':
             return {...state, errorMessage: ''};
         case 'signout':
+            setLocalData('token',null);
             return {token: null, errorMessage: ''};
         default:
             return state;
@@ -22,16 +25,14 @@ const authReducer = (state, action) => {
 
 //ACTIONS
 ///////////
-const signup = (dispatch) => async ({email,password}) => {
+const signup = (dispatch) => async ({username,password}) => {
     try {
         //make api req to sign up with that email and passwd
-        const response = await locationApi.post('/signup',{email,password});
-        //save token in phone storage
-        await SecureStore.setItemAsync('token',response.data.token);
+        const {data} = await locationApi.post('/signup',{username,password});
         //update state.
-        dispatch({type:'signin',payload:response.data.token});
+        dispatch({type:'signin',payload:data.token});
         //navigate to main flow
-        navigate('mainFlow');
+        navigate('Map');
     } catch (err) {
         console.log(err.response.data);
         dispatch({type:'add_error',payload:'Something went wrong with signup.'});
@@ -41,11 +42,9 @@ const signup = (dispatch) => async ({email,password}) => {
 const signin = (dispatch) => async({email,password}) => {
     try {
         //http request to signin route
-        const response = await locationApi.post('/signin',{email,password});
-        //save token in phone storage
-        await SecureStore.setItemAsync('token',response.data.token);
+        const {data} = await locationApi.post('/signin',{email,password});
         //update state
-        dispatch({type:'signin',payload:response.data.token});
+        dispatch({type:'signin',payload:data.token});
         //navigate to main flow
         navigate('mainFlow');
     } catch (err) {
@@ -58,21 +57,17 @@ const clearErrorMessage = (dispatch) => () => {
 }
 
 const tryLocalSignin = dispatch => async() => {
+    console.log('tryLocalSignin called')
     const token = await SecureStore.getItemAsync('token');
     // let token = null;
     if(token) {
         dispatch({type:'signin',payload:token});
-        navigate('mainFlow');
-    } else {
-        // console.log('navigating to loginFlow')
-        navigate('loginFlow');
     }
 }
 
 const signout = (dispatch) => async () => {
-    await SecureStore.deleteItemAsync('token');
     dispatch({type:'signout'});
-    navigate('Signin');
+    // navigate('Signin');
 }
 
 //EXPORT

@@ -49,9 +49,9 @@ const loadLocalLocs = dispatch => async() => {
   console.log('loadLocalLocs ran')
 }
 
-const fetchLocs = dispatch => async() => {
+const fetchLocs = dispatch => async(token) => {
   console.log('fetchLocs called')
-  if (await SecureStore.getItemAsync('token')){
+  if (token){
     const {data} = await locationApi.get('/locs');
     console.log('fetchLocs response received');
     dispatch({type:'set_locs', payload:data});

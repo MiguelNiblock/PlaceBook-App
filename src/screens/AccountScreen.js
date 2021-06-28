@@ -2,14 +2,15 @@ import React,{useContext,useEffect, useState} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Button} from 'react-native-elements';
 import {Context as AuthContext} from '../context/AuthContext'
-import Spacer from '../components/Spacer';
 import {SafeAreaView} from 'react-navigation';
-// import {FontAwesome} from '@expo/vector-icons';
 import {Text} from 'react-native-elements';
 import locationApi from '../api/location';
+import AuthForm from '../components/AuthForm';
+import * as SecureStore from 'expo-secure-store';
 
 const AccountScreen = ()=>{
 
+    const {signout,signup,state:{token,errorMessage}} = useContext(AuthContext);
     const [userEmail,setUserEmail] = useState('');
     const [userDatetimeCreated,setDatetimeCreated] = useState('');
     
@@ -22,24 +23,26 @@ const AccountScreen = ()=>{
 
     useEffect(() => {
         console.log('accountScreen useEffect called');
-        getUser(); 
+        token && getUser();
     },[]);
-
-    const {signout} = useContext(AuthContext);
 
     return (
     <SafeAreaView forceInset={{ top: 'always' }}>
-    <Spacer> 
-        <Text h2>Account</Text> 
-    </Spacer>
-    <Spacer>
+    
+    {token && <> 
         <Text style={{fontWeight:'bold'}} >Username: </Text><Text>{userEmail}</Text>
         <Text style={{fontWeight:'bold'}} >Date joined: </Text><Text>{userDatetimeCreated}</Text>
-        {/* <Text>Map style:</Text> */}
-    </Spacer>
-    <Spacer>
-        <Button title="Sign Out" onPress={signout}/>
-    </Spacer>
+        <Button title="Sign Out" onPress={signout}/> 
+    </>}
+    {!token && <>
+        <AuthForm
+            headerText="Sign Up"
+            errorMessage={errorMessage}
+            submitButtonText="Sign Up"
+            onSubmit={signup}
+        />
+    </>}
+
     </SafeAreaView>
     )
 };

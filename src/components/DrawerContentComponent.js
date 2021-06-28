@@ -1,11 +1,11 @@
 //custom drawer content component. by default only the routes are shown as links
 import React,{useEffect,useContext,useState} from 'react';
-import {ScrollView, FlatList, TouchableOpacity, Text, View,SafeAreaView,StyleSheet,StatusBar,Platform} from 'react-native';
+import {ScrollView, FlatList, TouchableOpacity, Text, View,SafeAreaView,StyleSheet,StatusBar,Platform,Dimensions} from 'react-native';
 import { DrawerItems } from 'react-navigation-drawer';
 import locationApi from '../api/location';
 import {Context as ListContext} from '../context/ListContext';
 import {Context as PlacesContext} from '../context/LocationContext';
-import {ListItem,Button,CheckBox,Icon} from 'react-native-elements';
+import {ListItem,Button,CheckBox,Icon,FAB} from 'react-native-elements';
 import {navigate} from '../navigationRef';
 
 const DrawerContentComponent = (props) => {
@@ -21,7 +21,25 @@ const DrawerContentComponent = (props) => {
       >
       <ScrollView>
       
-        <Button title="New List" onPress={()=>navigate('ListEdit',{listId:null})} type='solid' icon={ {name:'playlist-plus', type:'material-community', color:'white'} } />
+        <View style={styles.topButtonsView} > 
+          <Button 
+            title="New List"
+            containerStyle={styles.buttonContainer}
+            buttonStyle={styles.button}
+            onPress={()=>navigate('ListEdit',{listId:null})}
+            type='solid' 
+            icon={{name:'playlist-plus', type:'material-community', color:'white'}}
+          />
+          <Button 
+            title="Settings" 
+            containerStyle={styles.buttonContainer} 
+            buttonStyle={[styles.button,{backgroundColor:'#8f8399'}]}
+            onPress={()=>navigate('Account')}
+            type='solid'
+            icon={{name:'cog',type:'material-community',color:'white'}}
+          />
+        </View>
+
         <FlatList
           data={lists}
           keyExtractor={item=>item._id}
@@ -76,7 +94,6 @@ const DrawerContentComponent = (props) => {
           
         />
         {/* <DrawerItems {...props} /> */}
-        <Button title="Settings" onPress={()=>navigate('Account')}/>
       
       </ScrollView>
       </SafeAreaView>
@@ -98,6 +115,16 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 12,
   },
+  topButtonsView: {
+    flexDirection:'row'
+  },
+  buttonContainer: {
+    width:'50%',
+  },
+  button:{
+    borderRadius: 20,
+    
+  }
 });
 
 export default DrawerContentComponent;
