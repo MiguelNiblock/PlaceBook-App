@@ -3,7 +3,8 @@ import locationApi from '../api/location';
 import {navigate} from '../navigationRef';
 import * as SecureStore from 'expo-secure-store';
 import uuid from 'react-native-uuid';
-import {setLocalData} from '../hooks/safeAsync'
+import {setLocalData} from '../hooks/safeAsync';
+import {mergeWithQueue} from '../hooks/mergeWithQueue';
 
 const ListReducer = (state,action) => {
   switch (action.type){
@@ -60,7 +61,7 @@ const loadLocalLists = dispatch => async() => {
   console.log('loadLocalLists ran')
 }
 
-const fetchLists = dispatch => async(token) => {
+const fetchLists = dispatch => async(token,listQueue) => {
   console.log('fetchLists called');
   if (token){
     const {data} = await locationApi.get('/lists');  
@@ -75,13 +76,14 @@ const fetchLists = dispatch => async(token) => {
     // console.log('lists updated')
     ////////////////////////////////////////////////////////////
     //resolve conflicts with local queues
+    const result = mergeWithQueue(data,listQueue);
     ////////////////////////////////////////////////////////////
-    dispatch({type:'set_lists',payload:data});
+    dispatch({type:'set_lists',payload:result});
     //set to localState...
   }
 };
 
-const createList = dispatch => async(name,color,icon) => {
+const createList = dispatch => async(name,color,icon,queue) => {
   console.log('createList called')
   if (await SecureStore.getItemAsync('token')){
     console.log('trying to post list')
@@ -92,13 +94,14 @@ const createList = dispatch => async(name,color,icon) => {
     console.log('creating list locally')
     const timeStamp = new Date().toISOString();
     const newList = {_id:uuid.v4(),name,color,icon,shown:true,expanded:true,datetimeCreated:timeStamp,datetimeModified:timeStamp}
-    // console.log('list created locally:',list)
+    console.log('list created locally:',newList);
+    queue(newList);
     dispatch({type:'create_list',payload:newList});
   }
   navigate('Drawer');
 };
 
-const editList = dispatch => async({_id,name,color,icon,shown,expanded}) => {
+const editList = dispatch => async({_id,name,color,icon,shown,expanded},queue) => {
   console.log('editList called')
   const datetimeModified = new Date().toISOString()
   if (await SecureStore.getItemAsync('token')){
@@ -109,13 +112,14 @@ const editList = dispatch => async({_id,name,color,icon,shown,expanded}) => {
     dispatch({type:'edit_list',payload:data});
   }else{
     console.log('updating list locally')
-    const updatedList = {_id,name,color,icon,shown,expanded,datetimeModified}
+    const updatedList = {_id,name,color,icon,shown,expanded,datetimeModified};
+    queue(updatedList);
     dispatch({type:'edit_list',payload:updatedList});
   }
   navigate('Map');
 };
 
-const deleteList = dispatch => async(listId) => {
+const deleteList = dispatch => async(listId,queue) => {
   console.log('deleteList called')
   if (await SecureStore.getItemAsync('token')){
     console.log('trying to DELETE list on backend')
@@ -124,6 +128,7 @@ const deleteList = dispatch => async(listId) => {
     console.log('deleteList ran. response:',data);
   } else {
     console.log('deleting list locally')
+    queue(listId);
     dispatch({type:'delete_list',payload:listId});
   }
 };

@@ -18,6 +18,7 @@ import {Provider as AuthProvider} from './src/context/AuthContext';
 import {Provider as ListProvider} from './src/context/ListContext';
 import {Provider as LocationProvider} from './src/context/LocationContext';
 import {Provider as LocationEditProvider} from './src/context/LocationEditContext'
+import {Provider as ListQueueProvider} from './src/context/ListQueueContext';
 import {setNavigator}  from './src/navigationRef';
 import ResolveAuthScreen from './src/screens/ResolveAuthScreen'
 
@@ -60,14 +61,16 @@ const App = createAppContainer(switchNavigator);
 
 export default () => {
   return (
-    <LocationEditProvider>
-      <LocationProvider>
-        <ListProvider>
-          <AuthProvider>
-            <App ref={ (navigator)=>{ setNavigator(navigator) }}/>
-          </AuthProvider>
+    <AuthProvider>
+      <ListQueueProvider>
+        <ListProvider>    
+          <LocationProvider>
+            <LocationEditProvider>              
+              <App ref={ (navigator)=>{ setNavigator(navigator) }}/>
+            </LocationEditProvider>
+          </LocationProvider>
         </ListProvider>
-      </LocationProvider>
-    </LocationEditProvider>
+      </ListQueueProvider>
+    </AuthProvider>
   )
 }

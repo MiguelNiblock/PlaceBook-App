@@ -3,16 +3,19 @@ import {ScrollView, View, TouchableOpacity,StyleSheet,Dimensions} from 'react-na
 import {ListItem, Input, Text, Button, CheckBox, Overlay, Chip, Icon} from 'react-native-elements';
 import { TriangleColorPicker, toHsv, fromHsv } from 'react-native-color-picker'
 import {Context as ListContext} from '../context/ListContext';
+import {Context as ListQueueContext} from '../context/ListQueueContext';
 import iconNames from '../hooks/iconNames';
 
 const ListEditScreen = ({navigation})=>{
 
+  const {createList,editList,deleteList,state:lists} = useContext(ListContext);
+  const {listCreateQueue,listUpdateQueue,listDeleteQueue} = useContext(ListQueueContext);
+
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showIconPicker, setShowIconPicker] = useState(false);
   const [listName,setListName] = useState('');
   const [listColor,setListColor] = useState('rgba(0,0,0,1)');
   const [listIcon,setListIcon] = useState('map-marker');
-  const {createList,editList,deleteList,state:lists} = useContext(ListContext);
-  const [showColorPicker, setShowColorPicker] = useState(false);
-  const [showIconPicker, setShowIconPicker] = useState(false);
 
   const list = navigation.getParam('list');
 
@@ -28,12 +31,12 @@ const ListEditScreen = ({navigation})=>{
 
   const saveList = (name,color,icon)=>{
     // console.log('list in saveList before ifListId:',list);
-    if(list?._id) {editList({...list,name,color,icon})}
-    else {createList(name,color,icon)};
+    if(list?._id) { editList( {...list,name,color,icon}, listUpdateQueue ) }
+    else {createList(name,color,icon,listCreateQueue)};
   };
 
   const handleDeleteList = () => {
-    deleteList(list?._id);
+    deleteList(list?._id,listDeleteQueue);
     navigation.goBack();
   };
 

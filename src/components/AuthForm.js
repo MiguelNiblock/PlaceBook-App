@@ -1,11 +1,19 @@
-import React, {useState} from 'react';
+import React, {useState,useContext} from 'react';
 import {View, StyleSheet} from 'react-native';
 import { Text, Button, Input} from 'react-native-elements';
 import Spacer from './Spacer';
+import {Context as ListQueueContext} from '../context/ListQueueContext';
 
 const AuthForm = ({ headerText, errorMessage, onSubmit, submitButtonText }) => {
   const [username,setUsername] = useState('');
   const [password,setPassword] = useState('');
+  const {state:listQueue} = useContext(ListQueueContext);
+  // console.log(listQueue);
+
+  const queues = {
+    lists: listQueue.create,
+    // places: placesQueue.create
+  }
 
   return (
     <>
@@ -29,8 +37,9 @@ const AuthForm = ({ headerText, errorMessage, onSubmit, submitButtonText }) => {
         />
     {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
     <Spacer>
-      <Button title={submitButtonText} onPress={()=>onSubmit({email,password})}/>
+      <Button title={submitButtonText} onPress={()=>onSubmit({email,password,queues})}/>
     </Spacer>
+    {/* {listQueue.create.map( (item)=> <Text>{item.name}</Text> )}  */}
     </>
   )
 

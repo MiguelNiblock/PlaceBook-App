@@ -25,10 +25,10 @@ const authReducer = (state, action) => {
 
 //ACTIONS
 ///////////
-const signup = (dispatch) => async ({username,password}) => {
+const signup = (dispatch) => async ({username,password,queues}) => {
     try {
         //make api req to sign up with that email and passwd
-        const {data} = await locationApi.post('/signup',{username,password});
+        const {data} = await locationApi.post('/signup',{username,password,queues});
         //update state.
         dispatch({type:'signin',payload:data.token});
         //navigate to main flow

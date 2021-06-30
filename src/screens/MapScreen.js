@@ -8,6 +8,7 @@ import {navigate} from '../navigationRef'
 import {Context as ListContext} from '../context/ListContext';
 import {Context as LocationContext} from '../context/LocationContext';
 import {Context as AuthContext} from '../context/AuthContext';
+import {Context as ListQueueContext} from '../context/ListQueueContext';
 import {Icon, Button} from 'react-native-elements';
 import BottomSheet, {TouchableOpacity as ModalTouchable} from '@gorhom/bottom-sheet';
 import * as SecureStore from 'expo-secure-store';
@@ -18,6 +19,8 @@ const MapScreen = ({navigation})=>{
   const {loadLocalLists,fetchLists,deleteList,createList,editList,state:lists} = useContext(ListContext);
   const {loadLocalLocs,fetchLocs,createLocation,state:locations} = useContext(LocationContext);
   const {tryLocalSignin,state:{token}} = useContext(AuthContext);
+  const {loadLocalListQueue,state:listQueue} = useContext(ListQueueContext);
+
   const [explorerMarker,setExplorerMarker] = useState({
     show:true,
     coords:{longitude: -93.35577942430973, latitude: 23.47555745333057},//dummy region in the sea
@@ -46,6 +49,7 @@ const MapScreen = ({navigation})=>{
       console.log('local async called');
       await loadLocalLists();
       await loadLocalLocs();
+      await loadLocalListQueue();
       await tryLocalSignin(); //wait to get the token in context
     })();
 
@@ -68,7 +72,7 @@ const MapScreen = ({navigation})=>{
   useEffect(()=>{
     console.log('remote async called');
     if(token){
-      fetchLists(token);
+      fetchLists(token,listQueue);
       fetchLocs(token);
     }
   },[token]);
