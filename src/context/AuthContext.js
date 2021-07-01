@@ -27,12 +27,14 @@ const authReducer = (state, action) => {
 ///////////
 const signup = (dispatch) => async ({username,password,queues}) => {
     try {
+        // console.log('signup action input:',username,password,queues);
         //make api req to sign up with that email and passwd
         const {data} = await locationApi.post('/signup',{username,password,queues});
+        console.log('response:',data);
         //update state.
-        dispatch({type:'signin',payload:data.token});
+        // dispatch({type:'signin',payload:data.token});
         //navigate to main flow
-        navigate('Map');
+        // navigate('Map');
     } catch (err) {
         console.log(err.response.data);
         dispatch({type:'add_error',payload:'Something went wrong with signup.'});

@@ -9,18 +9,18 @@ const Reducer = (state,{type,payload}) => {
       return payload;
     case 'create':
       state.create.push(payload);
-      console.log('new state:',state);
+      console.log('new queue state:',state);
       setLocalData('listQueue',state);
       return state;
     case 'update':
       const existingItemIx = state.create.findIndex( ({_id})=>_id === payload._id );
       // console.log(existingItemIx);
       if( existingItemIx !== -1 ){
-        state.create.splice(existingItemIx,1,payload);
+        state.create.splice(existingItemIx,1,{...state.create[existingItemIx] ,...payload});
       } else {
         state.update.push(payload);
       }
-      console.log('new state:',state);
+      console.log('new queue state:',state);
       setLocalData('listQueue',state);
       return state;
     case 'delete':
@@ -33,7 +33,7 @@ const Reducer = (state,{type,payload}) => {
       } else {
         state.delete.push(payload);
       }
-      console.log('new state:',state);
+      console.log('new queue state:',state);
       setLocalData('listQueue',state);
       return state;
     default: 

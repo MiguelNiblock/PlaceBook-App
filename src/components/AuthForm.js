@@ -11,8 +11,8 @@ const AuthForm = ({ headerText, errorMessage, onSubmit, submitButtonText }) => {
   // console.log(listQueue);
 
   const queues = {
-    lists: listQueue.create,
-    // places: placesQueue.create
+    lists: listQueue,
+    // places: placesQueue
   }
 
   return (
@@ -37,7 +37,7 @@ const AuthForm = ({ headerText, errorMessage, onSubmit, submitButtonText }) => {
         />
     {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
     <Spacer>
-      <Button title={submitButtonText} onPress={()=>onSubmit({email,password,queues})}/>
+      <Button title={submitButtonText} onPress={()=>onSubmit({username,password,queues})}/>
     </Spacer>
     {/* {listQueue.create.map( (item)=> <Text>{item.name}</Text> )}  */}
     </>

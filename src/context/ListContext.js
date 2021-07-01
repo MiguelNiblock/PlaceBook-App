@@ -17,10 +17,12 @@ const ListReducer = (state,action) => {
       const newState = [...state.map( 
         (item)=>{ 
           if(item._id === action.payload._id) {
+            // console.log('item found:',item);
             return { ...item, ...action.payload}
           } else return item
         }
       )];
+      // console.log('newState:',newState);
       setLocalData('lists',newState);
       return newState
     }
