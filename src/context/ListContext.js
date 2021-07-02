@@ -64,54 +64,59 @@ const loadLocalLists = dispatch => async() => {
 }
 
 const fetchLists = dispatch => async(token,listQueue) => {
-  console.log('fetchLists called');
+  console.log('fetchLists called. token:',token,'queue:',listQueue);
   if (token){
-    const {data} = await locationApi.get('/lists');  
-    console.log('fetchLists response received');
-    ///////////////////////////////////////////////////////////
-    //Utility fn for when the model is changed, and new fields are expected
-    // response.data.map(async (list)=>{
-    //   if (!list.expanded){
-    //     res = await locationApi.put(`/lists/${list._id}`,{...list,expanded:true})
-    //   }
-    // })
-    // console.log('lists updated')
-    ////////////////////////////////////////////////////////////
-    //resolve conflicts with local queues
-    const result = mergeWithQueue(data,listQueue);
-    ////////////////////////////////////////////////////////////
-    dispatch({type:'set_lists',payload:result});
-    //set to localState...
+    try {
+      const {data} = await locationApi.get('/lists');  
+      console.log('fetchLists response:',data);
+      ///////////////////////////////////////////////////////////
+      //Utility fn for when the model is changed, and new fields are expected
+      // response.data.map(async (list)=>{
+      //   if (!list.expanded){
+      //     res = await locationApi.put(`/lists/${list._id}`,{...list,expanded:true})
+      //   }
+      // })
+      // console.log('lists updated')
+      ////////////////////////////////////////////////////////////
+      //resolve conflicts with local queues
+      const result = mergeWithQueue(data,listQueue);
+      ////////////////////////////////////////////////////////////
+      dispatch({type:'set_lists',payload:result});
+      //set to localState...
+    } catch(error){console.error(error)}
   }
 };
 
-const createList = dispatch => async(name,color,icon,queue) => {
+const createList = dispatch => async(name,color,icon,queueCreate,token) => {
   console.log('createList called')
-  if (await SecureStore.getItemAsync('token')){
-    console.log('trying to post list')
-    const {data} = await locationApi.post('/lists',{name,color,icon});
-    dispatch({type:'create_list',payload:data});
-    console.log('createList ran. response:',data);
+  if (token){
+    try{
+      console.log('trying to post list')
+      const {data} = await locationApi.post('/lists',{name,color,icon});
+      dispatch({type:'create_list',payload:data});
+      console.log('createList ran. response:',data);
+    } catch(error){console.error(error)}
   } else {
     console.log('creating list locally')
     const timeStamp = new Date().toISOString();
     const newList = {_id:uuid.v4(),name,color,icon,shown:true,expanded:true,datetimeCreated:timeStamp,datetimeModified:timeStamp}
     console.log('list created locally:',newList);
-    queue(newList);
+    queueCreate(newList);
     dispatch({type:'create_list',payload:newList});
   }
   navigate('Drawer');
 };
 
-const editList = dispatch => async({_id,name,color,icon,shown,expanded},queue) => {
+const editList = dispatch => async({_id,name,color,icon,shown,expanded},queue,token) => {
   console.log('editList called')
   const datetimeModified = new Date().toISOString()
-  if (await SecureStore.getItemAsync('token')){
-    console.log('trying to PUT list')
-    // console.log('editList:',_id,name,color,icon,shown,expanded);
-    const {data} = await locationApi.put(`/lists/${_id}`,{name,color,icon,shown,expanded,datetimeModified});
-    // console.log('response:',response.data);
-    dispatch({type:'edit_list',payload:data});
+  if (token){
+    try{
+      console.log('trying to PUT list:',_id,name,color,icon,shown,expanded)
+      const {data} = await locationApi.put(`/lists/${_id}`,{name,color,icon,shown,expanded,datetimeModified});
+      console.log('response:',data);
+      dispatch({type:'edit_list',payload:data});
+    } catch (error){console.error(error)}
   }else{
     console.log('updating list locally')
     const updatedList = {_id,name,color,icon,shown,expanded,datetimeModified};
@@ -121,13 +126,15 @@ const editList = dispatch => async({_id,name,color,icon,shown,expanded},queue) =
   navigate('Map');
 };
 
-const deleteList = dispatch => async(listId,queue) => {
+const deleteList = dispatch => async(listId,queue,token) => {
   console.log('deleteList called')
-  if (await SecureStore.getItemAsync('token')){
-    console.log('trying to DELETE list on backend')
-    const {data} = await locationApi.delete(`/lists/${listId}`);
-    dispatch({type:'delete_list',payload:listId});
-    console.log('deleteList ran. response:',data);
+  if (token){
+    try{
+      console.log('trying to DELETE list on backend')
+      const {data} = await locationApi.delete(`/lists/${listId}`);
+      dispatch({type:'delete_list',payload:listId});
+      console.log('deleteList ran. response:',data);
+    } catch(error){console.error(error)}
   } else {
     console.log('deleting list locally')
     queue(listId);

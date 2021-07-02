@@ -24,7 +24,10 @@ const Reducer = (state,{type,payload}) => {
       setLocalData('listQueue',state);
       return state;
     case 'delete':
-      const existsCreateIx = state.create.findIndex( ({_id})=>_id===payload );
+      const existsCreateIx = state.create.findIndex( ({_id})=>{
+        // console.log('id:',_id);
+        return _id===payload
+      } );
       const existsUpdateIx = state.update.findIndex( ({_id})=>_id===payload );
       if(existsCreateIx !== -1){
         state.create.splice(existsCreateIx,1);
@@ -36,6 +39,9 @@ const Reducer = (state,{type,payload}) => {
       console.log('new queue state:',state);
       setLocalData('listQueue',state);
       return state;
+    case 'reset':
+      setLocalData('listQueue',{create:[], update:[], delete:[]});
+      return {create:[], update:[], delete:[]}  
     default: 
       return state;
   };
@@ -55,17 +61,17 @@ const loadLocalListQueue = dispatch => async()=> {
 }
 
 const listCreateQueue = dispatch => async(item) => {
-  console.log('new item:',item)
+  console.log('queue create item:',item)
   dispatch({type:'create',payload:item})
 }
 
 const listUpdateQueue = dispatch => async(item)=> {
-  console.log('updated item:',item)
+  console.log('queue update item:',item)
   dispatch({type:'update',payload:item})
 }
 
 const listDeleteQueue = dispatch => async(id)=>{
-  console.log('deleteListQueue called');
+  console.log('queue delete item:',id);
   dispatch({type:'delete',payload:id})
 }
 

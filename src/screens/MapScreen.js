@@ -18,8 +18,8 @@ const MapScreen = ({navigation})=>{
 
   const {loadLocalLists,fetchLists,deleteList,createList,editList,state:lists} = useContext(ListContext);
   const {loadLocalLocs,fetchLocs,createLocation,state:locations} = useContext(LocationContext);
-  const {tryLocalSignin,state:{token}} = useContext(AuthContext);
-  const {loadLocalListQueue,state:listQueue} = useContext(ListQueueContext);
+  const {tryLocalSignin,signout,state:{token}} = useContext(AuthContext);
+  const {loadLocalListQueue,resetListQueue,listCreateQueue,state:listQueue} = useContext(ListQueueContext);
 
   const [explorerMarker,setExplorerMarker] = useState({
     show:true,
@@ -44,6 +44,9 @@ const MapScreen = ({navigation})=>{
 
 
   useEffect(()=>{
+    // signout();
+    console.log('token mapscreen:',token);
+    // resetListQueue();
 
     (async()=>{ //first wait for local data to load
       console.log('local async called');
@@ -70,12 +73,19 @@ const MapScreen = ({navigation})=>{
   },[]);
 
   useEffect(()=>{
-    console.log('remote async called');
+    console.log('fetch async called. token:',token);
     if(token){
       fetchLists(token,listQueue);
       fetchLocs(token);
     }
   },[token]);
+
+  // useEffect(()=>{
+  //   if(lists.length===0){
+  //     console.log('creating default list');
+  //     createList('MyList','black','map-marker',listCreateQueue);
+  //   }
+  // },[lists]);
 
   // console.log('lists:',lists)
 

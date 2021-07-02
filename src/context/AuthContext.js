@@ -6,18 +6,19 @@ import {setLocalData} from '../hooks/safeAsync';
 
 //REDUCER
 //////////
-const authReducer = (state, action) => {
-    switch (action.type) {
+const authReducer = (state, {type,payload}) => {
+    switch (type) {
         case 'add_error':
-            return {...state, errorMessage: action.payload};
+            return {...state, errorMessage:payload};
         case 'signin'://covers both signup & signin
-            setLocalData('token',action.payload);
-            return {errorMessage: '', token: action.payload};
+            console.log('signup payload:',payload);
+            if(!payload.local){ SecureStore.setItemAsync('token',payload.token) };
+            return {errorMessage:'', token:payload.token};
         case 'clear_error_message':
-            return {...state, errorMessage: ''};
+            return {...state, errorMessage:''};
         case 'signout':
-            setLocalData('token',null);
-            return {token: null, errorMessage: ''};
+            SecureStore.deleteItemAsync('token');
+            return {token:null, errorMessage:''};
         default:
             return state;
     }
@@ -25,28 +26,40 @@ const authReducer = (state, action) => {
 
 //ACTIONS
 ///////////
-const signup = (dispatch) => async ({username,password,queues}) => {
+const tryLocalSignin = dispatch => async() => {
+    console.log('tryLocalSignin called')
+    // let token = null;
+    const token = await SecureStore.getItemAsync('token');
+    console.log('local token:',token);
+    if(token) {
+        dispatch({type:'signin', payload:{ token, local:true }});
+    }
+}
+
+const signup = (dispatch) => async ({username,password,queues,resetQueues}) => {
     try {
-        // console.log('signup action input:',username,password,queues);
+        console.log('signup action input:',username,password,queues);
         //make api req to sign up with that email and passwd
         const {data} = await locationApi.post('/signup',{username,password,queues});
         console.log('response:',data);
-        //update state.
-        // dispatch({type:'signin',payload:data.token});
+        //clear queues
+        await resetQueues();
+        //update state to signed-in, with token
+        dispatch({ type:'signin', payload:{ token:data.token, local:false} });
         //navigate to main flow
-        // navigate('Map');
+        navigate('Map');
     } catch (err) {
         console.log(err.response.data);
         dispatch({type:'add_error',payload:'Something went wrong with signup.'});
     }
 };    
 
-const signin = (dispatch) => async({email,password}) => {
+const signin = (dispatch) => async({username,password}) => {
     try {
         //http request to signin route
-        const {data} = await locationApi.post('/signin',{email,password});
+        const {data} = await locationApi.post('/signin',{username,password});
         //update state
-        dispatch({type:'signin',payload:data.token});
+        dispatch({type:'signin', payload:{ token:data.token, local:false } });
         //navigate to main flow
         navigate('mainFlow');
     } catch (err) {
@@ -56,15 +69,6 @@ const signin = (dispatch) => async({email,password}) => {
 
 const clearErrorMessage = (dispatch) => () => {
     dispatch({type:'clear_error_message'});
-}
-
-const tryLocalSignin = dispatch => async() => {
-    console.log('tryLocalSignin called')
-    const token = await SecureStore.getItemAsync('token');
-    // let token = null;
-    if(token) {
-        dispatch({type:'signin',payload:token});
-    }
 }
 
 const signout = (dispatch) => async () => {

@@ -4,12 +4,14 @@ import {ListItem, Input, Text, Button, CheckBox, Overlay, Chip, Icon} from 'reac
 import { TriangleColorPicker, toHsv, fromHsv } from 'react-native-color-picker'
 import {Context as ListContext} from '../context/ListContext';
 import {Context as ListQueueContext} from '../context/ListQueueContext';
+import {Context as AuthContext} from '../context/AuthContext';
 import iconNames from '../hooks/iconNames';
 
 const ListEditScreen = ({navigation})=>{
 
   const {createList,editList,deleteList,state:lists} = useContext(ListContext);
   const {listCreateQueue,listUpdateQueue,listDeleteQueue} = useContext(ListQueueContext);
+  const {state:{token}} = useContext(AuthContext);
 
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState(false);
@@ -31,12 +33,12 @@ const ListEditScreen = ({navigation})=>{
 
   const saveList = (name,color,icon)=>{
     // console.log('list in saveList before ifListId:',list);
-    if(list?._id) { editList( {...list,name,color,icon}, listUpdateQueue ) }
-    else {createList(name,color,icon,listCreateQueue)};
+    if(list?._id) { editList( {...list,name,color,icon}, listUpdateQueue,token ) }
+    else {createList(name,color,icon,listCreateQueue,token)};
   };
 
   const handleDeleteList = () => {
-    deleteList(list?._id,listDeleteQueue);
+    deleteList(list?._id,listDeleteQueue,token);
     navigation.goBack();
   };
 
