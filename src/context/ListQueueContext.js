@@ -57,7 +57,8 @@ const loadLocalListQueue = dispatch => async()=> {
       dispatch({type:'set_queue',payload:queue});
     }
   }
-  console.log('loadLocalListQueue ran')
+  console.log('loadLocalListQueue ran');
+  return true
 }
 
 const listCreateQueue = dispatch => async(item) => {

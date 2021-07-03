@@ -11,7 +11,7 @@ const authReducer = (state, {type,payload}) => {
         case 'add_error':
             return {...state, errorMessage:payload};
         case 'signin'://covers both signup & signin
-            console.log('signup payload:',payload);
+            console.log('signin payload:',payload);
             if(!payload.local){ SecureStore.setItemAsync('token',payload.token) };
             return {errorMessage:'', token:payload.token};
         case 'clear_error_message':
@@ -34,6 +34,7 @@ const tryLocalSignin = dispatch => async() => {
     if(token) {
         dispatch({type:'signin', payload:{ token, local:true }});
     }
+    return true
 }
 
 const signup = (dispatch) => async ({username,password,queues,resetQueues}) => {

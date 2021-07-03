@@ -11,7 +11,7 @@ const ListEditScreen = ({navigation})=>{
 
   const {createList,editList,deleteList,state:lists} = useContext(ListContext);
   const {listCreateQueue,listUpdateQueue,listDeleteQueue} = useContext(ListQueueContext);
-  const {state:{token}} = useContext(AuthContext);
+  // const {state:{token}} = useContext(AuthContext);
 
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState(false);
@@ -33,12 +33,12 @@ const ListEditScreen = ({navigation})=>{
 
   const saveList = (name,color,icon)=>{
     // console.log('list in saveList before ifListId:',list);
-    if(list?._id) { editList( {...list,name,color,icon}, listUpdateQueue,token ) }
-    else {createList(name,color,icon,listCreateQueue,token)};
+    if(list?._id) { editList( {...list,name,color,icon}, listUpdateQueue ) }
+    else {createList(name,color,icon,listCreateQueue)};
   };
 
   const handleDeleteList = () => {
-    deleteList(list?._id,listDeleteQueue,token);
+    deleteList(list?._id,listDeleteQueue);
     navigation.goBack();
   };
 
@@ -102,6 +102,7 @@ const ListEditScreen = ({navigation})=>{
                   size={45}
                   onPress={()=>{setListIcon(iconName);toggleIconPicker()}}
                   containerStyle={styles.iconPickerIcons}
+                  key={iconName}
                 />
             )
           })}

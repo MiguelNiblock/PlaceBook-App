@@ -12,6 +12,7 @@ import {Context as ListQueueContext} from '../context/ListQueueContext';
 import {Icon, Button} from 'react-native-elements';
 import BottomSheet, {TouchableOpacity as ModalTouchable} from '@gorhom/bottom-sheet';
 import * as SecureStore from 'expo-secure-store';
+import { setLocalData } from '../hooks/safeAsync';
 // import api from '../api/location';
 
 const MapScreen = ({navigation})=>{
@@ -41,24 +42,33 @@ const MapScreen = ({navigation})=>{
   const handleSheetChanges = useCallback((index) => {
     // console.log('handleSheetChanges', index);
   }, []);
-
+  const [readyToFetch, setReadyToFetch] = useState(false);
+  const [readyToCheckNumLists, setReadyToCheckNumLists] = useState(false);
 
   useEffect(()=>{
     // signout();
-    console.log('token mapscreen:',token);
+    // console.log('token mapscreen:',token);
     // resetListQueue();
 
     (async()=>{ //first wait for local data to load
-      console.log('local async called');
-      await loadLocalLists();
-      await loadLocalLocs();
-      await loadLocalListQueue();
-      await tryLocalSignin(); //wait to get the token in context
+      const loadedLocals = await (async()=>{
+        console.log('local async called');
+        const loadedLocalLists = loadLocalLists();
+        const loadedLocalLocs = loadLocalLocs();
+        const loadedLocalListQueue = loadLocalListQueue();
+        const signedInLocally = tryLocalSignin(); //wait to get the token in context
+        return [loadedLocalLists,loadedLocalLocs,loadedLocalListQueue,signedInLocally]
+      })();
+      Promise.all(loadedLocals).then((result)=>{
+        // console.log(result);
+        setReadyToFetch(true)
+        setReadyToCheckNumLists(true)
+      })
     })();
 
     (async()=>{ //gets device location and sets it as map region
       let { status } = await Location.requestPermissionsAsync();
-      console.log('location permission:',status);
+      // console.log('location permission:',status);
       if(status==='granted'){
         setTimeout(async function(){
           let {coords:{latitude,longitude}} = await Location.getCurrentPositionAsync({});
@@ -72,20 +82,29 @@ const MapScreen = ({navigation})=>{
 
   },[]);
 
-  useEffect(()=>{
-    console.log('fetch async called. token:',token);
-    if(token){
+  useEffect(()=>{ //once local data is loaded, fetch remote data
+    if(token && readyToFetch){
+      console.log('fetch async called. readyToFetch:',readyToFetch);
       fetchLists(token,listQueue);
       fetchLocs(token);
     }
-  },[token]);
+    // return ()=>{
+    //   console.log('cleanup fetch async');
+    //   setReadyToFetch(false);
+    // }
+  },[readyToFetch]);
 
-  // useEffect(()=>{
-  //   if(lists.length===0){
-  //     console.log('creating default list');
-  //     createList('MyList','black','map-marker',listCreateQueue);
-  //   }
-  // },[lists]);
+  useEffect(()=>{ //make sure there's always at least one default list
+    console.log('lists:',lists.length,'readyToCheck:',readyToCheckNumLists);
+    if(readyToCheckNumLists && lists.length===0){
+      console.log('creating default list');
+      createList('MyList','black','map-marker',listCreateQueue);
+    }
+    // return ()=>{
+    //   console.log('cleanup create default list');
+    //   setReadyToCheckNumLists(false);
+    // }
+  },[lists]);
 
   // console.log('lists:',lists)
 

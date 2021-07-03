@@ -47,6 +47,7 @@ const loadLocalLocs = dispatch => async() => {
     }
   }
   console.log('loadLocalLocs ran')
+  return true
 }
 
 const fetchLocs = dispatch => async(token) => {

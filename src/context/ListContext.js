@@ -56,11 +56,12 @@ const loadLocalLists = dispatch => async() => {
     let lists = await SecureStore.getItemAsync('lists')
     if (lists) {
       lists = JSON.parse(lists);
-      // console.log('lists from local storage:',lists)
+      console.log('lists from local storage:',lists)
       dispatch({type:'set_lists',payload:lists});
     }
   }
-  console.log('loadLocalLists ran')
+  console.log('loadLocalLists ran');
+  return true
 }
 
 const fetchLists = dispatch => async(token,listQueue) => {
@@ -87,17 +88,14 @@ const fetchLists = dispatch => async(token,listQueue) => {
   }
 };
 
-const createList = dispatch => async(name,color,icon,queueCreate,token) => {
-  console.log('createList called')
-  if (token){
-    try{
-      console.log('trying to post list')
-      const {data} = await locationApi.post('/lists',{name,color,icon});
-      dispatch({type:'create_list',payload:data});
-      console.log('createList ran. response:',data);
-    } catch(error){console.error(error)}
-  } else {
-    console.log('creating list locally')
+const createList = dispatch => async(name,color,icon,queueCreate) => {
+  console.log('trying to POST list')
+  try {
+    const {data} = await locationApi.post('/lists',{name,color,icon});
+    console.log('response:',data);
+    dispatch({type:'create_list',payload:data});
+  } catch(error){
+    console.error(error);
     const timeStamp = new Date().toISOString();
     const newList = {_id:uuid.v4(),name,color,icon,shown:true,expanded:true,datetimeCreated:timeStamp,datetimeModified:timeStamp}
     console.log('list created locally:',newList);
@@ -107,37 +105,33 @@ const createList = dispatch => async(name,color,icon,queueCreate,token) => {
   navigate('Drawer');
 };
 
-const editList = dispatch => async({_id,name,color,icon,shown,expanded},queue,token) => {
-  console.log('editList called')
+const editList = dispatch => async({_id,name,color,icon,shown,expanded},queueEdit) => {
   const datetimeModified = new Date().toISOString()
-  if (token){
-    try{
-      console.log('trying to PUT list:',_id,name,color,icon,shown,expanded)
-      const {data} = await locationApi.put(`/lists/${_id}`,{name,color,icon,shown,expanded,datetimeModified});
-      console.log('response:',data);
-      dispatch({type:'edit_list',payload:data});
-    } catch (error){console.error(error)}
-  }else{
-    console.log('updating list locally')
+  try{
+    console.log('trying to PUT list:',_id,name,color,icon,shown,expanded)
+    const {data} = await locationApi.put(`/lists/${_id}`,{name,color,icon,shown,expanded,datetimeModified});
+    console.log('response:',data);
+    dispatch({type:'edit_list',payload:data});
+  } catch (error){
+    console.error(error)
     const updatedList = {_id,name,color,icon,shown,expanded,datetimeModified};
-    queue(updatedList);
+    console.log('updating list locally:',updatedList);
+    queueEdit(updatedList);
     dispatch({type:'edit_list',payload:updatedList});
   }
   navigate('Map');
 };
 
-const deleteList = dispatch => async(listId,queue,token) => {
-  console.log('deleteList called')
-  if (token){
-    try{
-      console.log('trying to DELETE list on backend')
-      const {data} = await locationApi.delete(`/lists/${listId}`);
-      dispatch({type:'delete_list',payload:listId});
-      console.log('deleteList ran. response:',data);
-    } catch(error){console.error(error)}
-  } else {
+const deleteList = dispatch => async(listId,queueDelete) => {
+  try{
+    console.log('trying to DELETE on backend:',listId);
+    const {data} = await locationApi.delete(`/lists/${listId}`);
+    console.log('response:',data);
+    dispatch({type:'delete_list',payload:listId});
+  } catch(error){
+    console.error(error)
     console.log('deleting list locally')
-    queue(listId);
+    queueDelete(listId);
     dispatch({type:'delete_list',payload:listId});
   }
 };
