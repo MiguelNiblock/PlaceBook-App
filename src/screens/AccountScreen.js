@@ -11,14 +11,14 @@ import * as SecureStore from 'expo-secure-store';
 const AccountScreen = ()=>{
 
     const {signout,signup,state:{token,errorMessage}} = useContext(AuthContext);
-    const [userEmail,setUserEmail] = useState('');
+    const [username,setUsername] = useState('');
     const [userDatetimeCreated,setDatetimeCreated] = useState('');
     
     const getUser = async()=>{
-        const {data: {email, datetimeCreated}} = await locationApi.get('/users');
-        // console.log('data:',email,datetimeCreated);
+        const {data: {username, datetimeCreated}} = await locationApi.get('/users');
+        // console.log('data:',username,datetimeCreated);
         const date = new Date(datetimeCreated);
-        setUserEmail(email); setDatetimeCreated(date.toLocaleString());
+        setUsername(username); setDatetimeCreated(date.toLocaleString());
     };
 
     useEffect(() => {
@@ -30,7 +30,7 @@ const AccountScreen = ()=>{
     <SafeAreaView forceInset={{ top: 'always' }}>
     
     {token && <> 
-        <Text style={{fontWeight:'bold'}} >Username: </Text><Text>{userEmail}</Text>
+        <Text style={{fontWeight:'bold'}} >Username: </Text><Text>{username}</Text>
         <Text style={{fontWeight:'bold'}} >Date joined: </Text><Text>{userDatetimeCreated}</Text>
         <Button title="Sign Out" onPress={signout}/> 
     </>}

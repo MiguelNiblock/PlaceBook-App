@@ -50,15 +50,17 @@ const loadLocalLocs = dispatch => async() => {
   return true
 }
 
-const fetchLocs = dispatch => async(token) => {
+const fetchLocs = dispatch => async() => {
   console.log('fetchLocs called')
-  if (token){
+  try{
     const {data} = await locationApi.get('/locs');
-    console.log('fetchLocs response received');
+    console.log('fetchLocs response:',data);
     dispatch({type:'set_locs', payload:data});
-    //set to localState...
-  }
+    //set to localState... must be done here, so when loading local lists, the reducer doesn't have to set em to local store again
+    return true
+  } catch(error){console.error(error)}
 };
+
 const createLocation = dispatch => async(name,address,coords,notes,stars,tags,listId) => {
   console.log('createLoc called')
   if (await SecureStore.getItemAsync('token')){
@@ -75,6 +77,7 @@ const createLocation = dispatch => async(name,address,coords,notes,stars,tags,li
     return newLoc;
   }
 };
+
 const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tags,listId) => {
   console.log('editLoc called');
   const datetimeModified = new Date().toISOString();
@@ -90,6 +93,7 @@ const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tag
     return updatedLoc;
   }
 };
+
 const deleteLocation = dispatch => async(locId) => {
   console.log('deleteLoc called');
   if (await SecureStore.getItemAsync('token')){

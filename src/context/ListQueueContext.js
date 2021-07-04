@@ -9,7 +9,7 @@ const Reducer = (state,{type,payload}) => {
       return payload;
     case 'create':
       state.create.push(payload);
-      console.log('new queue state:',state);
+      console.log('new list queue:',state);
       setLocalData('listQueue',state);
       return state;
     case 'update':
@@ -20,7 +20,7 @@ const Reducer = (state,{type,payload}) => {
       } else {
         state.update.push(payload);
       }
-      console.log('new queue state:',state);
+      console.log('new list queue:',state);
       setLocalData('listQueue',state);
       return state;
     case 'delete':
@@ -36,9 +36,15 @@ const Reducer = (state,{type,payload}) => {
       } else {
         state.delete.push(payload);
       }
-      console.log('new queue state:',state);
+      console.log('new list queue:',state);
       setLocalData('listQueue',state);
       return state;
+    case 'remove_create':{
+      state.create = state.create.filter(({_id})=>_id !== payload);
+      console.log('new list queue:',state);
+      setLocalData('listQueue',state);
+      return state;
+    }
     case 'reset':
       setLocalData('listQueue',{create:[], update:[], delete:[]});
       return {create:[], update:[], delete:[]}  
@@ -55,15 +61,19 @@ const loadLocalListQueue = dispatch => async()=> {
       queue = JSON.parse(queue);
       console.log('list queue from local storage:',queue)
       dispatch({type:'set_queue',payload:queue});
+      console.log('loadLocalListQueue ran');
+      return queue
     }
   }
-  console.log('loadLocalListQueue ran');
-  return true
 }
 
 const listCreateQueue = dispatch => async(item) => {
   console.log('queue create item:',item)
   dispatch({type:'create',payload:item})
+}
+const listCreateQueueRemove = dispatch => (id)=>{
+  console.log('removing item from listCreateQueue:',id)
+  dispatch({type:'remove_create', payload:id})
 }
 
 const listUpdateQueue = dispatch => async(item)=> {
@@ -80,7 +90,7 @@ const resetListQueue = dispatch => async()=>{dispatch({type:'reset'})}
 
 export const {Context, Provider} = createDataContext(
   Reducer,
-  {loadLocalListQueue,listCreateQueue,listUpdateQueue,listDeleteQueue,resetListQueue},
+  {loadLocalListQueue,listCreateQueue,listUpdateQueue,listDeleteQueue,resetListQueue,listCreateQueueRemove},
   {
     create:[], update:[], delete:[]
   }//initial state

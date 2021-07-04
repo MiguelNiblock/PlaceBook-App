@@ -13,14 +13,15 @@ import {Icon, Button} from 'react-native-elements';
 import BottomSheet, {TouchableOpacity as ModalTouchable} from '@gorhom/bottom-sheet';
 import * as SecureStore from 'expo-secure-store';
 import { setLocalData } from '../hooks/safeAsync';
+import {updateDB} from '../hooks/mergeWithQueue';
 // import api from '../api/location';
 
 const MapScreen = ({navigation})=>{
 
-  const {loadLocalLists,fetchLists,deleteList,createList,editList,state:lists} = useContext(ListContext);
+  const {loadLocalLists,fetchLists,createList,state:lists} = useContext(ListContext);
   const {loadLocalLocs,fetchLocs,createLocation,state:locations} = useContext(LocationContext);
   const {tryLocalSignin,signout,state:{token}} = useContext(AuthContext);
-  const {loadLocalListQueue,resetListQueue,listCreateQueue,state:listQueue} = useContext(ListQueueContext);
+  const {loadLocalListQueue,resetListQueue,listCreateQueue,listCreateQueueRemove,state:listQueue} = useContext(ListQueueContext);
 
   const [explorerMarker,setExplorerMarker] = useState({
     show:true,
@@ -42,30 +43,37 @@ const MapScreen = ({navigation})=>{
   const handleSheetChanges = useCallback((index) => {
     // console.log('handleSheetChanges', index);
   }, []);
-  const [readyToFetch, setReadyToFetch] = useState(false);
   const [readyToCheckNumLists, setReadyToCheckNumLists] = useState(false);
 
   useEffect(()=>{
     // signout();
     // console.log('token mapscreen:',token);
     // resetListQueue();
-
-    (async()=>{ //first wait for local data to load
+    ////////////////////////////////////////////////////////////
+    //Load data in stages
+    (async()=>{ //wait for local data to load
       const loadedLocals = await (async()=>{
         console.log('local async called');
         const loadedLocalLists = loadLocalLists();
         const loadedLocalLocs = loadLocalLocs();
         const loadedLocalListQueue = loadLocalListQueue();
         const signedInLocally = tryLocalSignin(); //wait to get the token in context
-        return [loadedLocalLists,loadedLocalLocs,loadedLocalListQueue,signedInLocally]
+        return [loadedLocalListQueue,loadedLocalLists,loadedLocalLocs,signedInLocally]
       })();
-      Promise.all(loadedLocals).then((result)=>{
-        // console.log(result);
-        setReadyToFetch(true)
-        setReadyToCheckNumLists(true)
+      Promise.all(loadedLocals) // then load remote data
+      .then(([listQueue])=>{ console.log('fetching...');
+        const fetchedLists = fetchLists(listQueue);
+        const fetchedLocs = fetchLocs(); 
+        return new Promise.all([listQueue,fetchedLists,fetchedLocs])
+      })
+      .then(([listQueue])=>{ // finally allow listCheck to run
+          console.log('listCheck ready');
+          setReadyToCheckNumLists(true);
+          updateDB(listQueue,listCreateQueueRemove);
       })
     })();
-
+    ///////////////////////////////////////
+    //Show current address
     (async()=>{ //gets device location and sets it as map region
       let { status } = await Location.requestPermissionsAsync();
       // console.log('location permission:',status);
@@ -82,32 +90,24 @@ const MapScreen = ({navigation})=>{
 
   },[]);
 
-  useEffect(()=>{ //once local data is loaded, fetch remote data
-    if(token && readyToFetch){
-      console.log('fetch async called. readyToFetch:',readyToFetch);
-      fetchLists(token,listQueue);
-      fetchLocs(token);
-    }
-    // return ()=>{
-    //   console.log('cleanup fetch async');
-    //   setReadyToFetch(false);
-    // }
-  },[readyToFetch]);
-
+  ////////////////////
+  // listcheck
   useEffect(()=>{ //make sure there's always at least one default list
     console.log('lists:',lists.length,'readyToCheck:',readyToCheckNumLists);
     if(readyToCheckNumLists && lists.length===0){
       console.log('creating default list');
       createList('MyList','black','map-marker',listCreateQueue);
     }
-    // return ()=>{
+    // return ()=>{ //only uncomment this cleanup fn during development
     //   console.log('cleanup create default list');
     //   setReadyToCheckNumLists(false);
     // }
-  },[lists]);
-
+  },[lists,readyToCheckNumLists]);
+  
   // console.log('lists:',lists)
 
+  /////////////////////////////////////////////////////////
+  // FocusLoc navigation
   //When a screen navigates here with a 'loc' param, it'll activate the useEffect which focuses on that marker and displays the address.
   const focusLoc = navigation.getParam('loc');
   // console.log('focusLoc from comp body:',focusLoc)

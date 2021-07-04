@@ -64,28 +64,26 @@ const loadLocalLists = dispatch => async() => {
   return true
 }
 
-const fetchLists = dispatch => async(token,listQueue) => {
-  console.log('fetchLists called. token:',token,'queue:',listQueue);
-  if (token){
-    try {
-      const {data} = await locationApi.get('/lists');  
-      console.log('fetchLists response:',data);
-      ///////////////////////////////////////////////////////////
-      //Utility fn for when the model is changed, and new fields are expected
-      // response.data.map(async (list)=>{
-      //   if (!list.expanded){
-      //     res = await locationApi.put(`/lists/${list._id}`,{...list,expanded:true})
-      //   }
-      // })
-      // console.log('lists updated')
-      ////////////////////////////////////////////////////////////
-      //resolve conflicts with local queues
-      const result = mergeWithQueue(data,listQueue);
-      ////////////////////////////////////////////////////////////
-      dispatch({type:'set_lists',payload:result});
-      //set to localState...
-    } catch(error){console.error(error)}
-  }
+const fetchLists = dispatch => async(listQueue) => {
+  console.log('fetchLists called. queue:',listQueue);
+  try {
+    const {data} = await locationApi.get('/lists');  
+    console.log('fetchLists response:',data);
+    ///////////////////////////////////////////////////////////
+    //Utility fn for when the model is changed, and new fields are expected
+    // response.data.map(async (list)=>{
+    //   if (!list.expanded){
+    //     res = await locationApi.put(`/lists/${list._id}`,{...list,expanded:true})
+    //   }
+    // })
+    // console.log('lists updated')
+    ////////////////////////////////////////////////////////////
+    const result = mergeWithQueue(data,listQueue);
+    dispatch({type:'set_lists',payload:result});
+    //set to localState... must be done here, so when loading local lists, the reducer doesn't have to set em to local store again
+    setLocalData('lists',result);
+    return true
+  } catch(error){console.error(error)}
 };
 
 const createList = dispatch => async(name,color,icon,queueCreate) => {
