@@ -75,13 +75,14 @@ const MapScreen = ({navigation})=>{
     ///////////////////////////////////////
     //Show current address
     (async()=>{ //gets device location and sets it as map region
+      console.log('called showCurrentAddress');
       let { status } = await Location.requestPermissionsAsync();
-      // console.log('location permission:',status);
+      console.log('location permission:',status);
       if(status==='granted'){
         setTimeout(async function(){
           let {coords:{latitude,longitude}} = await Location.getCurrentPositionAsync({});
           const coords = {latitude,longitude};
-          // console.log('coords:',latitude,longitude)
+          console.log('coords:',latitude,longitude)
           setCurrentRegion({longitudeDelta: 0.0154498592018939, latitudeDelta: 0.013360640311354643, ...coords});
           handleLongPress({coords});
         },2000);
