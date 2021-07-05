@@ -39,12 +39,6 @@ const Reducer = (state,{type,payload}) => {
       console.log('new list queue:',state);
       setLocalData('listQueue',state);
       return state;
-    case 'remove_create':{
-      state.create = state.create.filter(({_id})=>_id !== payload);
-      console.log('new list queue:',state);
-      setLocalData('listQueue',state);
-      return state;
-    }
     case 'reset':
       setLocalData('listQueue',{create:[], update:[], delete:[]});
       return {create:[], update:[], delete:[]}  
@@ -71,10 +65,6 @@ const listCreateQueue = dispatch => async(item) => {
   console.log('queue create item:',item)
   dispatch({type:'create',payload:item})
 }
-const listCreateQueueRemove = dispatch => (id)=>{
-  console.log('removing item from listCreateQueue:',id)
-  dispatch({type:'remove_create', payload:id})
-}
 
 const listUpdateQueue = dispatch => async(item)=> {
   console.log('queue update item:',item)
@@ -88,9 +78,14 @@ const listDeleteQueue = dispatch => async(id)=>{
 
 const resetListQueue = dispatch => async()=>{dispatch({type:'reset'})}
 
+const setListQueue = dispatch => async (queue)=>{
+  setLocalData('listQueue',queue);
+  dispatch( {type:'set_queue', payload:queue} )
+}
+
 export const {Context, Provider} = createDataContext(
   Reducer,
-  {loadLocalListQueue,listCreateQueue,listUpdateQueue,listDeleteQueue,resetListQueue,listCreateQueueRemove},
+  {loadLocalListQueue,listCreateQueue,listUpdateQueue,listDeleteQueue,resetListQueue,setListQueue},
   {
     create:[], update:[], delete:[]
   }//initial state

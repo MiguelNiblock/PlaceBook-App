@@ -87,15 +87,16 @@ const fetchLists = dispatch => async(listQueue) => {
 };
 
 const createList = dispatch => async(name,color,icon,queueCreate) => {
-  console.log('trying to POST list')
+  const _id = uuid.v4();
   try {
-    const {data} = await locationApi.post('/lists',{name,color,icon});
+    console.log('trying to POST list')
+    const {data} = await locationApi.post('/lists',{item:{_id,name,color,icon}});
     console.log('response:',data);
     dispatch({type:'create_list',payload:data});
   } catch(error){
     console.error(error);
     const timeStamp = new Date().toISOString();
-    const newList = {_id:uuid.v4(),name,color,icon,shown:true,expanded:true,datetimeCreated:timeStamp,datetimeModified:timeStamp}
+    const newList = {_id,name,color,icon,shown:true,expanded:true,datetimeCreated:timeStamp,datetimeModified:timeStamp}
     console.log('list created locally:',newList);
     queueCreate(newList);
     dispatch({type:'create_list',payload:newList});

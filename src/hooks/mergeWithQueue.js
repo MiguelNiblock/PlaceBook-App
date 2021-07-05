@@ -23,12 +23,42 @@ export const mergeWithQueue = (data,queue)=>{
   return syncedData
 }
 
-export const updateDB = async (queue,createQueueRemove)=>{
+const resolveQueueArray = async (endpoint,queueArray)=>{
+  const promises = queueArray.map( async(item) => {
+    try {
+      const {data} = await api.post(endpoint,{item});
+      console.log('response:',data);
+      if (data) {
+        return false
+      } else return true
+    } catch(error){
+      console.error('error:',error);
+      return true
+      }
+  } );
+  const results = await Promise.all(promises);
+  return queueArray.filter( (value,index)=> results[index] )
+}
+
+export const updateDB = async (endpoint,queue,setQueue)=>{
   console.log('updateDB called. current queue:',queue);
-  //for each item in queue, try to update DB. on success, remove from queue
   
+  let newQueue = {create:[],update:[],delete:[]}
+
   //Create queue
-  // const {data} = await api.post('/lists/many',queue);
-  // console.log('data:',data);
-  // data.create && resetCreate()
+  const newCreateQueueP = resolveQueueArray(endpoint, queue.create);
+
+  //Update queue
+
+  //Delete queue 
+
+  //Wait for all queues to finish
+  const [newCreateQueue] = await Promise.all([newCreateQueueP]);
+  newQueue.create = newCreateQueue;
+
+  //Set new queue
+  console.log('new create queue:',newQueue.create);
+  setQueue(newQueue)
+  
+  return true
 }
