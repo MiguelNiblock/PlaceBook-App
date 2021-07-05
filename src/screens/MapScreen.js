@@ -21,7 +21,7 @@ const MapScreen = ({navigation})=>{
   const {loadLocalLists,fetchLists,createList,state:lists} = useContext(ListContext);
   const {loadLocalLocs,fetchLocs,createLocation,state:locations} = useContext(LocationContext);
   const {tryLocalSignin,signout,state:{token}} = useContext(AuthContext);
-  const {loadLocalListQueue,resetListQueue,listCreateQueue,listCreateQueueRemove,state:listQueue} = useContext(ListQueueContext);
+  const {loadLocalListQueue,resetListQueue,listCreateQueue,setListQueue,state:listQueue} = useContext(ListQueueContext);
 
   const [explorerMarker,setExplorerMarker] = useState({
     show:true,
@@ -47,7 +47,6 @@ const MapScreen = ({navigation})=>{
 
   useEffect(()=>{
     // signout();
-    // console.log('token mapscreen:',token);
     // resetListQueue();
     ////////////////////////////////////////////////////////////
     //Load data in stages
@@ -69,7 +68,7 @@ const MapScreen = ({navigation})=>{
       .then(([listQueue])=>{ // finally allow listCheck to run
           console.log('listCheck ready');
           setReadyToCheckNumLists(true);
-          updateDB(listQueue,listCreateQueueRemove);
+          updateDB('/lists',listQueue,setListQueue);
       })
     })();
     ///////////////////////////////////////
