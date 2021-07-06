@@ -23,12 +23,32 @@ export const mergeWithQueue = (data,queue)=>{
   return syncedData
 }
 
-const resolveQueueArray = async (endpoint,queueArray)=>{
+const resolveQueueArray = async (endpoint,queueArray,method,remoteArray)=>{
   const promises = queueArray.map( async(item) => {
     try {
-      const {data} = await api.post(endpoint,{item});
-      console.log('response:',data);
-      if (data) {
+      const result = await ( async()=>{
+        switch(method){
+          case 'post': {
+            const {data} = await api.request(  { url:endpoint, method, data:{item} }  );
+            return data
+          }
+          case 'put': {
+              //check if records still exist remotely
+            const remoteItem = remoteArray.find( ({_id})=>_id===item._id );
+              //check if local updates are newer than remote state
+            const isNewer = remoteItem ? item.datetimeModified > remoteItem.datetimeModified : null;
+              //if all of the above are true, do the update
+            if ( remoteItem && isNewer ) {
+              const {data} = await api.request(  {url:`${endpoint}/${item._id}`, method, data:{...item}}  );
+              return data
+            } else return 'unnecessary'
+          }
+          default: return null
+        }
+      })();
+      
+      console.log('result:',result);
+      if ( result ==='unnecessary' || result._id === item._id ) {
         return false
       } else return true
     } catch(error){
@@ -40,24 +60,26 @@ const resolveQueueArray = async (endpoint,queueArray)=>{
   return queueArray.filter( (value,index)=> results[index] )
 }
 
-export const updateDB = async (endpoint,queue,setQueue)=>{
+export const updateDB = async (endpoint,queue,setQueue,remoteState)=>{
   console.log('updateDB called. current queue:',queue);
   
   let newQueue = {create:[],update:[],delete:[]}
 
   //Create queue
-  const newCreateQueueP = resolveQueueArray(endpoint, queue.create);
+  const newCreateQueueP = resolveQueueArray(endpoint, queue.create, 'post');
 
   //Update queue
+  const newUpdateQueueP = resolveQueueArray(endpoint, queue.update, 'put', remoteState);
 
   //Delete queue 
 
   //Wait for all queues to finish
-  const [newCreateQueue] = await Promise.all([newCreateQueueP]);
+  const [newCreateQueue,newUpdateQueue] = await Promise.all([newCreateQueueP,newUpdateQueueP]);
   newQueue.create = newCreateQueue;
+  newQueue.update = newUpdateQueue;
 
   //Set new queue
-  console.log('new create queue:',newQueue.create);
+  console.log('new queue:',newQueue);
   setQueue(newQueue)
   
   return true

@@ -20,8 +20,8 @@ const MapScreen = ({navigation})=>{
 
   const {loadLocalLists,fetchLists,createList,state:lists} = useContext(ListContext);
   const {loadLocalLocs,fetchLocs,createLocation,state:locations} = useContext(LocationContext);
-  const {tryLocalSignin,signout,state:{token}} = useContext(AuthContext);
-  const {loadLocalListQueue,resetListQueue,listCreateQueue,setListQueue,state:listQueue} = useContext(ListQueueContext);
+  const {tryLocalSignin,signout} = useContext(AuthContext);
+  const {loadLocalListQueue,resetListQueue,listCreateQueue,setListQueue} = useContext(ListQueueContext);
 
   const [explorerMarker,setExplorerMarker] = useState({
     show:true,
@@ -65,10 +65,10 @@ const MapScreen = ({navigation})=>{
         const fetchedLocs = fetchLocs(); 
         return new Promise.all([listQueue,fetchedLists,fetchedLocs])
       })
-      .then(([listQueue])=>{ // finally allow listCheck to run
+      .then(([listQueue,fetchedLists])=>{ // finally allow listCheck to run
           console.log('listCheck ready');
           setReadyToCheckNumLists(true);
-          updateDB('/lists',listQueue,setListQueue);
+          updateDB('/lists',listQueue,setListQueue,fetchedLists);
       })
     })();
     ///////////////////////////////////////

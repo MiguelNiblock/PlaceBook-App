@@ -82,7 +82,7 @@ const fetchLists = dispatch => async(listQueue) => {
     dispatch({type:'set_lists',payload:result});
     //set to localState... must be done here, so when loading local lists, the reducer doesn't have to set em to local store again
     setLocalData('lists',result);
-    return true
+    return data
   } catch(error){console.error(error)}
 };
 
