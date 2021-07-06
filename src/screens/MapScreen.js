@@ -18,7 +18,7 @@ import {updateDB} from '../hooks/mergeWithQueue';
 
 const MapScreen = ({navigation})=>{
 
-  const {loadLocalLists,fetchLists,createList,state:lists} = useContext(ListContext);
+  const {loadLocalLists,fetchLists,createList,resetLists,state:lists} = useContext(ListContext);
   const {loadLocalLocs,fetchLocs,createLocation,state:locations} = useContext(LocationContext);
   const {tryLocalSignin,signout} = useContext(AuthContext);
   const {loadLocalListQueue,resetListQueue,listCreateQueue,setListQueue} = useContext(ListQueueContext);
@@ -46,8 +46,10 @@ const MapScreen = ({navigation})=>{
   const [readyToCheckNumLists, setReadyToCheckNumLists] = useState(false);
 
   useEffect(()=>{
-    // signout();
     // resetListQueue();
+    // resetLists();
+    // signout();
+
     ////////////////////////////////////////////////////////////
     //Load data in stages
     (async()=>{ //wait for local data to load

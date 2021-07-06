@@ -4,8 +4,9 @@ export const mergeWithQueue = (data,queue)=>{
   //apply queued operations to data
 
   //Delete ops
+  const deleteIds = queue.delete.map(item=>item._id);
   let syncedData = data.filter(({_id})=>{
-    return !queue.delete.includes(_id)
+    return !deleteIds.includes(_id)
   })
 
   //Update ops
@@ -43,6 +44,13 @@ const resolveQueueArray = async (endpoint,queueArray,method,remoteArray)=>{
               return data
             } else return 'unnecessary'
           }
+          case 'delete': {
+            const remoteItem = remoteArray.find( ({_id})=>_id===item._id );
+            if (remoteItem){
+              const {data} = await api.request(  {url:`${endpoint}/${item._id}`, method }  );
+              return data
+            } else return 'unnecessary'
+          }
           default: return null
         }
       })();
@@ -72,11 +80,13 @@ export const updateDB = async (endpoint,queue,setQueue,remoteState)=>{
   const newUpdateQueueP = resolveQueueArray(endpoint, queue.update, 'put', remoteState);
 
   //Delete queue 
+  const newDeleteQueueP = resolveQueueArray(endpoint, queue.delete, 'delete', remoteState);
 
-  //Wait for all queues to finish
-  const [newCreateQueue,newUpdateQueue] = await Promise.all([newCreateQueueP,newUpdateQueueP]);
+  //Wait for all queues to finish and set to new queue
+  const [newCreateQueue,newUpdateQueue,newDeleteQueue] = await Promise.all([newCreateQueueP,newUpdateQueueP,newDeleteQueueP]);
   newQueue.create = newCreateQueue;
   newQueue.update = newUpdateQueue;
+  newQueue.delete = newDeleteQueue;
 
   //Set new queue
   console.log('new queue:',newQueue);

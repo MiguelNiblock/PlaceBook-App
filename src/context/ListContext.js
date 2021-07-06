@@ -88,16 +88,16 @@ const fetchLists = dispatch => async(listQueue) => {
 
 const createList = dispatch => async(name,color,icon,queueCreate) => {
   const _id = uuid.v4();
+  const timeStamp = new Date().toISOString();
+  const newList = {_id,name,color,icon,shown:true,expanded:true,datetimeCreated:timeStamp,datetimeModified:timeStamp}
+  console.log('new list:',newList);
   try {
     console.log('trying to POST list')
-    const {data} = await locationApi.post('/lists',{item:{_id,name,color,icon}});
+    const {data} = await locationApi.post('/lists',{item:{...newList}});
     console.log('response:',data);
     dispatch({type:'create_list',payload:data});
   } catch(error){
     console.error(error);
-    const timeStamp = new Date().toISOString();
-    const newList = {_id,name,color,icon,shown:true,expanded:true,datetimeCreated:timeStamp,datetimeModified:timeStamp}
-    console.log('list created locally:',newList);
     queueCreate(newList);
     dispatch({type:'create_list',payload:newList});
   }
@@ -121,17 +121,17 @@ const editList = dispatch => async({_id,name,color,icon,shown,expanded},queueEdi
   navigate('Map');
 };
 
-const deleteList = dispatch => async(listId,queueDelete) => {
+const deleteList = dispatch => async(list,queueDelete) => {
   try{
-    console.log('trying to DELETE on backend:',listId);
-    const {data} = await locationApi.delete(`/lists/${listId}`);
+    console.log('trying to DELETE on backend:',list._id);
+    const {data} = await locationApi.delete(`/lists/${list._id}`);
     console.log('response:',data);
-    dispatch({type:'delete_list',payload:listId});
+    dispatch({type:'delete_list',payload:list._id});
   } catch(error){
     console.error(error)
     console.log('deleting list locally')
-    queueDelete(listId);
-    dispatch({type:'delete_list',payload:listId});
+    queueDelete(list);
+    dispatch({type:'delete_list',payload:list._id});
   }
 };
 
@@ -153,8 +153,13 @@ const toggleExpandList = dispatch => async({_id,name,color,icon,shown,expanded})
   dispatch({type:'expand_list',payload: _id});
 };
 
+const resetLists = dispatch => ()=>{
+  setLocalData('lists',[])
+  dispatch({type:'set_lists', payload:[]})
+}
+
 export const {Context, Provider} = createDataContext(
   ListReducer,
-  {loadLocalLists,fetchLists,createList,editList,deleteList,toggleExpandList,toggleShowList},
+  {loadLocalLists,fetchLists,createList,editList,deleteList,toggleExpandList,toggleShowList,resetLists},
   []//empty array of lists
 );

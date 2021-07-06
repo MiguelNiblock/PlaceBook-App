@@ -26,9 +26,9 @@ const Reducer = (state,{type,payload}) => {
     case 'delete':
       const existsCreateIx = state.create.findIndex( ({_id})=>{
         // console.log('id:',_id);
-        return _id===payload
+        return _id===payload._id
       } );
-      const existsUpdateIx = state.update.findIndex( ({_id})=>_id===payload );
+      const existsUpdateIx = state.update.findIndex( ({_id})=>_id===payload._id );
       if(existsCreateIx !== -1){
         state.create.splice(existsCreateIx,1);
       } else if(existsUpdateIx !== -1){
@@ -71,9 +71,9 @@ const listUpdateQueue = dispatch => async(item)=> {
   dispatch({type:'update',payload:item})
 }
 
-const listDeleteQueue = dispatch => async(id)=>{
-  console.log('queue delete item:',id);
-  dispatch({type:'delete',payload:id})
+const listDeleteQueue = dispatch => async(item)=>{
+  console.log('queue delete item:',item._id);
+  dispatch({type:'delete',payload:item})
 }
 
 const resetListQueue = dispatch => async()=>{dispatch({type:'reset'})}
