@@ -68,7 +68,7 @@ const createLocation = dispatch => async(name,address,coords,notes,stars,tags,li
   console.log('new loc:',newLoc);
   try {
     console.log('trying to POST loc');
-    const {data} = await locationApi.post('/locs',{name,address,coords,notes,stars,tags,listId});
+    const {data} = await locationApi.post('/locs',{item:newLoc});
     console.log('createLoc response:',data);
     dispatch({type:'create_loc', payload:data});
     return newLoc

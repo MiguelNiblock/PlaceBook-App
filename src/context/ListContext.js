@@ -93,7 +93,7 @@ const createList = dispatch => async(name,color,icon,queueCreate) => {
   console.log('new list:',newList);
   try {
     console.log('trying to POST list')
-    const {data} = await locationApi.post('/lists',{item:{...newList}});
+    const {data} = await locationApi.post('/lists',{item:newList});
     console.log('createList response:',data);
     dispatch({type:'create_list',payload:data});
   } catch(error){
