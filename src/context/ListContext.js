@@ -94,10 +94,11 @@ const createList = dispatch => async(name,color,icon,queueCreate) => {
   try {
     console.log('trying to POST list')
     const {data} = await locationApi.post('/lists',{item:{...newList}});
-    console.log('response:',data);
+    console.log('createList response:',data);
     dispatch({type:'create_list',payload:data});
   } catch(error){
     console.error(error);
+    console.log('creating list locally');
     queueCreate(newList);
     dispatch({type:'create_list',payload:newList});
   }
@@ -107,9 +108,9 @@ const createList = dispatch => async(name,color,icon,queueCreate) => {
 const editList = dispatch => async({_id,name,color,icon,shown,expanded},queueEdit) => {
   const datetimeModified = new Date().toISOString()
   try{
-    console.log('trying to PUT list:',_id,name,color,icon,shown,expanded)
+    console.log('trying to PUT list:',_id,name,color,icon,shown,expanded);
     const {data} = await locationApi.put(`/lists/${_id}`,{name,color,icon,shown,expanded,datetimeModified});
-    console.log('response:',data);
+    console.log('editList response:',data);
     dispatch({type:'edit_list',payload:data});
   } catch (error){
     console.error(error)
@@ -123,9 +124,9 @@ const editList = dispatch => async({_id,name,color,icon,shown,expanded},queueEdi
 
 const deleteList = dispatch => async(list,queueDelete) => {
   try{
-    console.log('trying to DELETE on backend:',list._id);
+    console.log('trying to DELETE list:',list._id);
     const {data} = await locationApi.delete(`/lists/${list._id}`);
-    console.log('response:',data);
+    console.log('deleteList response:',data);
     dispatch({type:'delete_list',payload:list._id});
   } catch(error){
     console.error(error)
