@@ -3,19 +3,23 @@ import {View, StyleSheet} from 'react-native';
 import { Text, Button, Input} from 'react-native-elements';
 import Spacer from './Spacer';
 import {Context as ListQueueContext} from '../context/ListQueueContext';
+import {Context as LocationQueueContext} from '../context/LocationQueueContext';
 
 const AuthForm = ({ headerText, errorMessage, onSubmit, submitButtonText }) => {
   const [username,setUsername] = useState('');
   const [password,setPassword] = useState('');
   const {state:listQueue,resetListQueue} = useContext(ListQueueContext);
+  const {state:locQueue,resetLocationQueue} = useContext(LocationQueueContext);
 
   const queues = {
     lists: listQueue,
-    // places: placesQueue
+    locs: locQueue
   }
 
   const resetQueues =async()=>{
-    await resetListQueue();
+    const resetListQP = await resetListQueue();
+    const resetLocQP = await resetLocationQueue();
+    return Promise.all([resetListQP,resetLocQP]).then(console.log('Queues were reset'))
   };
 
   return (
