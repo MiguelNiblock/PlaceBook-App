@@ -4,14 +4,16 @@ import {ListItem, Input, Text, Button, CheckBox, Overlay, Chip, Icon} from 'reac
 import { TriangleColorPicker, toHsv, fromHsv } from 'react-native-color-picker'
 import {Context as ListContext} from '../context/ListContext';
 import {Context as ListQueueContext} from '../context/ListQueueContext';
-import {Context as AuthContext} from '../context/AuthContext';
+import {Context as LocationContext} from '../context/LocationContext';
+import {Context as LocationQueueContext} from '../context/LocationQueueContext';
 import iconNames from '../hooks/iconNames';
 
 const ListEditScreen = ({navigation})=>{
 
   const {createList,editList,deleteList,state:lists} = useContext(ListContext);
   const {listCreateQueue,listUpdateQueue,listDeleteQueue} = useContext(ListQueueContext);
-  // const {state:{token}} = useContext(AuthContext);
+  const {deleteLocation,state:locations} = useContext(LocationContext);
+  const {locationDeleteQueue} = useContext(LocationQueueContext);
 
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState(false);
@@ -37,8 +39,14 @@ const ListEditScreen = ({navigation})=>{
     else {createList(name,color,icon,listCreateQueue)};
   };
 
+  const deleteLocsByListId = (listId,locations,deleteLoc,queueDeletion) => {
+    const locsToDelete = locations.filter((item)=>item.listId === listId);
+    locsToDelete.forEach((item)=>deleteLoc(item,queueDeletion))
+  };
+
   const handleDeleteList = () => {
     deleteList(list,listDeleteQueue);
+    deleteLocsByListId(list._id,locations,deleteLocation,locationDeleteQueue);
     navigation.goBack();
   };
 

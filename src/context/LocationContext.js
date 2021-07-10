@@ -109,8 +109,8 @@ const deleteLocation = dispatch => async(loc,queueDelete) => {
     console.log('deleteLocation response:',data);
     dispatch({type:'delete_loc',payload:loc._id});
   } catch (error) {
-    console.error(error)
-    console.log('deleting loc locally')
+    console.error(error);
+    console.log('deleting loc locally');
     queueDelete(loc);
     dispatch({type:'delete_loc',payload:loc._id});
   }
