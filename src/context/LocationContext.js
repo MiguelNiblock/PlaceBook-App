@@ -4,6 +4,7 @@ import {navigate} from '../navigationRef';
 import * as SecureStore from 'expo-secure-store';
 import {setLocalData} from '../hooks/safeAsync'
 import uuid from 'react-native-uuid';
+import {mergeWithQueue} from '../hooks/mergeWithQueue';
 
 const LocationReducer = (state,action) => {
   switch (action.type){
@@ -50,18 +51,20 @@ const loadLocalLocs = dispatch => async() => {
   return true
 }
 
-const fetchLocs = dispatch => async() => {
-  console.log('fetchLocs called')
+const fetchLocs = dispatch => async(locQueue) => {
+  console.log('fetchLocs called. Queue:',locQueue);
   try{
     const {data} = await locationApi.get('/locs');
     console.log('fetchLocs response:',data);
-    dispatch({type:'set_locs', payload:data});
+    const result = mergeWithQueue(data,locQueue);
+    dispatch({type:'set_locs', payload:result});
     //set to localState... must be done here, so when loading local lists, the reducer doesn't have to set em to local store again
-    return true
+    setLocalData('locs',result);
+    return data
   } catch(error){console.error(error)}
 };
 
-const createLocation = dispatch => async(name,address,coords,notes,stars,tags,listId) => {
+const createLocation = dispatch => async(name,address,coords,notes,stars,tags,listId,queueCreate) => {
   const _id = uuid.v4();
   const timeStamp = new Date().toISOString();
   const newLoc = {_id,name,address,coords,notes,stars,tags,listId,datetimeCreated:timeStamp,datetimeModified:timeStamp}
@@ -75,13 +78,13 @@ const createLocation = dispatch => async(name,address,coords,notes,stars,tags,li
   } catch(error){
     console.error(error);
     console.log('creating loc locally');
-    // queueCreate(newLoc);
+    queueCreate(newLoc);
     dispatch({type:'create_loc', payload:newLoc});
     return newLoc
   }
 };
 
-const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tags,listId) => {
+const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tags,listId,queueEdit) => {
   const datetimeModified = new Date().toISOString();
   try {
     console.log('trying to PUT loc:',locId,name,address,coords,notes,stars,tags,listId);
@@ -93,28 +96,33 @@ const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tag
     console.error(error);
     const updatedLoc = {_id:locId,name,address,coords,notes,stars,tags,listId,datetimeModified};
     console.log('updating loc locally:',updatedLoc);
-    //queueEdit(updatedLoc);
+    queueEdit(updatedLoc);
     dispatch({type:'edit_loc',payload:updatedLoc});    
     return updatedLoc;
   }
 };
 
-const deleteLocation = dispatch => async(locId) => {
+const deleteLocation = dispatch => async(loc,queueDelete) => {
   try {
-    console.log('trying to DELETE loc:',locId);
-    const {data} = await locationApi.delete(`/locs/${locId}`);
+    console.log('trying to DELETE loc:',loc);
+    const {data} = await locationApi.delete(`/locs/${loc._id}`);
     console.log('deleteLocation response:',data);
-    dispatch({type:'delete_loc',payload:locId});
+    dispatch({type:'delete_loc',payload:loc._id});
   } catch (error) {
     console.error(error)
     console.log('deleting loc locally')
-    // queueDelete(locId);
-    dispatch({type:'delete_loc',payload:locId});
+    queueDelete(loc);
+    dispatch({type:'delete_loc',payload:loc._id});
   }
 };
 
+const resetLocations = dispatch => ()=>{
+  setLocalData('locs',[]);
+  dispatch({type:'set_locs', payload:[]});
+}
+
 export const {Context, Provider} = createDataContext(
   LocationReducer,
-  {loadLocalLocs,fetchLocs,createLocation,editLocation,deleteLocation},
+  {loadLocalLocs,fetchLocs,createLocation,editLocation,deleteLocation,resetLocations},
   []//empty array of locations
 );

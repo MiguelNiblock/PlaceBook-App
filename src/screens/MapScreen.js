@@ -1,7 +1,6 @@
 import React,{useEffect,useState,useRef,useContext,useMemo,useCallback} from 'react';
 import MapView,{Marker,Callout} from 'react-native-maps';
 import { StyleSheet, Text, View, Dimensions, Alert, SafeAreaView, StatusBar, TouchableOpacity, Platform} from 'react-native';
-// import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
 import {reverseGeocodeAsync} from 'expo-location';
 import {navigate} from '../navigationRef'
@@ -9,19 +8,18 @@ import {Context as ListContext} from '../context/ListContext';
 import {Context as LocationContext} from '../context/LocationContext';
 import {Context as AuthContext} from '../context/AuthContext';
 import {Context as ListQueueContext} from '../context/ListQueueContext';
+import {Context as LocationQueueContext} from '../context/LocationQueueContext'
 import {Icon, Button} from 'react-native-elements';
 import BottomSheet, {TouchableOpacity as ModalTouchable} from '@gorhom/bottom-sheet';
-import * as SecureStore from 'expo-secure-store';
-import { setLocalData } from '../hooks/safeAsync';
 import {updateDB} from '../hooks/mergeWithQueue';
-// import api from '../api/location';
 
 const MapScreen = ({navigation})=>{
 
   const {loadLocalLists,fetchLists,createList,resetLists,state:lists} = useContext(ListContext);
-  const {loadLocalLocs,fetchLocs,createLocation,state:locations} = useContext(LocationContext);
+  const {loadLocalLocs,fetchLocs,createLocation,resetLocations,state:locations} = useContext(LocationContext);
   const {tryLocalSignin,signout} = useContext(AuthContext);
   const {loadLocalListQueue,resetListQueue,listCreateQueue,setListQueue} = useContext(ListQueueContext);
+  const {loadLocalLocationQueue,resetLocationQueue,setLocationQueue} = useContext(LocationQueueContext);
 
   const [explorerMarker,setExplorerMarker] = useState({
     show:true,
@@ -48,6 +46,8 @@ const MapScreen = ({navigation})=>{
   useEffect(()=>{
     // resetListQueue();
     // resetLists();
+    // resetLocations();
+    // resetLocationQueue();
     // signout();
 
     ////////////////////////////////////////////////////////////
@@ -56,21 +56,23 @@ const MapScreen = ({navigation})=>{
       const loadedLocals = await (async()=>{
         console.log('local async called');
         const loadedLocalLists = loadLocalLists();
-        const loadedLocalLocs = loadLocalLocs();
         const loadedLocalListQueue = loadLocalListQueue();
+        const loadedLocalLocs = loadLocalLocs();
+        const loadedLocalLocationQueue = loadLocalLocationQueue();
         const signedInLocally = tryLocalSignin(); //wait to get the token in context
-        return [loadedLocalListQueue,loadedLocalLists,loadedLocalLocs,signedInLocally]
+        return [loadedLocalListQueue,loadedLocalLocationQueue,loadedLocalLists,loadedLocalLocs,signedInLocally]
       })();
       Promise.all(loadedLocals) // then load remote data
-      .then(([listQueue])=>{ console.log('fetching...');
+      .then(([listQueue,locQueue])=>{ console.log('fetching...');
         const fetchedLists = fetchLists(listQueue);
-        const fetchedLocs = fetchLocs(); 
-        return new Promise.all([listQueue,fetchedLists,fetchedLocs])
+        const fetchedLocs = fetchLocs(locQueue); 
+        return new Promise.all([listQueue,fetchedLists,locQueue,fetchedLocs])
       })
-      .then(([listQueue,fetchedLists])=>{ // finally allow listCheck to run
+      .then(([listQueue,fetchedLists,locQueue,fetchedLocs])=>{ // finally allow listCheck to run
           console.log('listCheck ready');
           setReadyToCheckNumLists(true);
           updateDB('/lists',listQueue,setListQueue,fetchedLists);
+          updateDB('/locs',locQueue,setLocationQueue,fetchedLocs);
       })
     })();
     ///////////////////////////////////////

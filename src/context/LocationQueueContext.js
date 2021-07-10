@@ -1,5 +1,4 @@
 import createDataContext from './createDataContext';
-import locationApi from '../api/location';
 import * as SecureStore from 'expo-secure-store';
 import {setLocalData} from '../hooks/safeAsync';
 
@@ -9,8 +8,8 @@ const Reducer = (state,{type,payload}) => {
       return payload;
     case 'create':
       state.create.push(payload);
-      console.log('new list queue:',state);
-      setLocalData('listQueue',state);
+      console.log('new loc queue:',state);
+      setLocalData('locQueue',state);
       return state;
     case 'update':
       const existingItemIx = state.create.findIndex( ({_id})=>_id === payload._id );
@@ -20,8 +19,8 @@ const Reducer = (state,{type,payload}) => {
       } else {
         state.update.push(payload);
       }
-      console.log('new list queue:',state);
-      setLocalData('listQueue',state);
+      console.log('new loc queue:',state);
+      setLocalData('locQueue',state);
       return state;
     case 'delete':
       const existsCreateIx = state.create.findIndex( ({_id})=>{
@@ -36,59 +35,59 @@ const Reducer = (state,{type,payload}) => {
       } else {
         state.delete.push(payload);
       }
-      console.log('new list queue:',state);
-      setLocalData('listQueue',state);
+      console.log('new loc queue:',state);
+      setLocalData('locQueue',state);
       return state;
     case 'reset':
-      setLocalData('listQueue',{create:[], update:[], delete:[]});
+      setLocalData('locQueue',{create:[], update:[], delete:[]});
       return {create:[], update:[], delete:[]}  
     default: 
       return state;
   };
 };
 
-const loadLocalListQueue = dispatch => async()=> {
-  console.log('loadLocalListQueue called')
+const loadLocalLocationQueue = dispatch => async()=> {
+  console.log('loadLocalLocationQueue called')
   if(await SecureStore.isAvailableAsync()){
-    let queue = await SecureStore.getItemAsync('listQueue')
+    let queue = await SecureStore.getItemAsync('locQueue')
     if (queue) {
       queue = JSON.parse(queue);
-      console.log('list queue from local storage:',queue)
+      console.log('loc queue from local storage:',queue)
       dispatch({type:'set_queue',payload:queue});
-      console.log('loadLocalListQueue ran');
+      console.log('loadLocalLocationQueue ran');
       return queue
     } else {
-      console.log('list queue is empty. Creating it...');
-      setLocalData('listQueue',{create:[], update:[], delete:[]});
+      console.log('loc queue is empty. Creating it...');
+      setLocalData('locQueue',{create:[], update:[], delete:[]});
     }
   }
 }
 
-const listCreateQueue = dispatch => async(item) => {
-  console.log('queue create item:',item)
+const locationCreateQueue = dispatch => async(item) => {
+  console.log('locQueue create item:',item)
   dispatch({type:'create',payload:item})
 }
 
-const listUpdateQueue = dispatch => async(item)=> {
-  console.log('queue update item:',item)
+const locationUpdateQueue = dispatch => async(item)=> {
+  console.log('locQueue update item:',item)
   dispatch({type:'update',payload:item})
 }
 
-const listDeleteQueue = dispatch => async(item)=>{
-  console.log('queue delete item:',item._id);
+const locationDeleteQueue = dispatch => async(item)=>{
+  console.log('locQueue delete item:',item._id);
   dispatch({type:'delete',payload:item})
 }
 
-const resetListQueue = dispatch => async()=>{dispatch({type:'reset'})}
+const resetLocationQueue = dispatch => async()=>{dispatch({type:'reset'})}
 
-const setListQueue = dispatch => async (queue)=>{
-  setLocalData('listQueue',queue);
+const setLocationQueue = dispatch => async (queue)=>{
+  setLocalData('locQueue',queue);
   dispatch( {type:'set_queue', payload:queue} )
 }
 
 export const {Context, Provider} = createDataContext(
   Reducer,
-  {loadLocalListQueue,listCreateQueue,listUpdateQueue,listDeleteQueue,resetListQueue,setListQueue},
+  {loadLocalLocationQueue,locationCreateQueue,locationUpdateQueue,locationDeleteQueue,resetLocationQueue,setLocationQueue},
   {
     create:[], update:[], delete:[]
   }//initial state

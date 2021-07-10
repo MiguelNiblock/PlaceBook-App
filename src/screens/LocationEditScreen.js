@@ -6,11 +6,13 @@ import {navigate} from '../navigationRef'
 import {Context as LocationEditContext} from '../context/LocationEditContext';
 import {Context as LocationContext} from '../context/LocationContext';
 import {Context as ListContext} from '../context/ListContext';
+import {Context as LocationQueueContext} from '../context/LocationQueueContext';
 
 const LocationEditScreen = ({navigation}) => {
 
   const {state:{name,address,coords,notes,stars,tags,listId},changeName,changeAddress,changeCoords,changeNotes,changeStars,changeTags,changeListId} = useContext(LocationEditContext);
   const {editLocation,createLocation,deleteLocation} = useContext(LocationContext);
+  const {locationCreateQueue,locationUpdateQueue,locationDeleteQueue} = useContext(LocationQueueContext);
   const {state:lists} = useContext(ListContext);
   const [showBottomSheet,setshowBottomSheet] = useState(false);
 
@@ -31,17 +33,17 @@ const LocationEditScreen = ({navigation}) => {
 
   const saveLocation = async(locId,name,address,coords,notes,stars,tags,listId) => {
     if (locId){//if location exists...
-      const editedLoc = await editLocation(locId,name,address,coords,notes,stars,tags,listId);
+      const editedLoc = await editLocation(locId,name,address,coords,notes,stars,tags,listId,locationUpdateQueue);
       navigate('Map',{loc:editedLoc,hideDrawer:true,hideExplorerMarker:true});
     } else {
-      const createdLoc = await createLocation(name,address,coords,notes,stars,tags,listId);
+      const createdLoc = await createLocation(name,address,coords,notes,stars,tags,listId,locationCreateQueue);
       // console.log('createdLoc from locEdit scr:',createdLoc);
       navigate('Map',{loc:createdLoc,hideDrawer:true,hideExplorerMarker:true});
     }
   }
 
-  const handleDeleteLocation = (locId) => {
-    deleteLocation(locId);
+  const handleDeleteLocation = () => {
+    deleteLocation(loc,locationDeleteQueue);
     navigation.goBack();
   }
 
@@ -113,7 +115,7 @@ LocationEditScreen.navigationOptions = ({navigation}) => {
   return {
     title: placeName,
     headerRight: ()=>(
-      loc._id && <View style={{paddingRight:20}} ><Icon name='trash-can-outline' type='material-community' size={30} color='rgb(184, 3, 14)' onPress={()=>handleDeleteLocation(loc._id)} /></View>
+      loc._id && <View style={{paddingRight:20}} ><Icon name='trash-can-outline' type='material-community' size={30} color='rgb(184, 3, 14)' onPress={()=>handleDeleteLocation()} /></View>
     ) ,
     // headerRightContainerStyle: {paddingRight:'30%',width:'20%'}
   }

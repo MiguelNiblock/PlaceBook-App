@@ -55,7 +55,7 @@ const resolveQueueArray = async (endpoint,queueArray,method,remoteArray)=>{
         }
       })();
       
-      console.log('result:',result);
+      console.log(`${method} ${endpoint} result:`,result);
       if ( result ==='unnecessary' || result._id === item._id ) {
         return false
       } else return true
@@ -69,16 +69,14 @@ const resolveQueueArray = async (endpoint,queueArray,method,remoteArray)=>{
 }
 
 export const updateDB = async (endpoint,queue,setQueue,remoteState)=>{
-  console.log('updateDB called. current queue:',queue);
+  console.log(`updateDB called. current "${endpoint}" queue:`,queue);
   
   let newQueue = {create:[],update:[],delete:[]}
 
   //Create queue
   const newCreateQueueP = resolveQueueArray(endpoint, queue.create, 'post');
-
   //Update queue
   const newUpdateQueueP = resolveQueueArray(endpoint, queue.update, 'put', remoteState);
-
   //Delete queue 
   const newDeleteQueueP = resolveQueueArray(endpoint, queue.delete, 'delete', remoteState);
 
@@ -89,7 +87,7 @@ export const updateDB = async (endpoint,queue,setQueue,remoteState)=>{
   newQueue.delete = newDeleteQueue;
 
   //Set new queue
-  console.log('new queue:',newQueue);
+  console.log(`new "${endpoint}" queue:`,newQueue);
   setQueue(newQueue)
   
   return true

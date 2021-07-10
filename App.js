@@ -19,6 +19,7 @@ import {Provider as ListProvider} from './src/context/ListContext';
 import {Provider as LocationProvider} from './src/context/LocationContext';
 import {Provider as LocationEditProvider} from './src/context/LocationEditContext'
 import {Provider as ListQueueProvider} from './src/context/ListQueueContext';
+import {Provider as LocationQueueProvider} from './src/context/LocationQueueContext';
 import {setNavigator}  from './src/navigationRef';
 import ResolveAuthScreen from './src/screens/ResolveAuthScreen'
 
@@ -63,13 +64,15 @@ export default () => {
   return (
     <AuthProvider>
       <ListQueueProvider>
-        <ListProvider>    
-          <LocationProvider>
-            <LocationEditProvider>              
-              <App ref={ (navigator)=>{ setNavigator(navigator) }}/>
-            </LocationEditProvider>
-          </LocationProvider>
-        </ListProvider>
+        <LocationQueueProvider>
+          <ListProvider>    
+            <LocationProvider>
+              <LocationEditProvider>              
+                <App ref={ (navigator)=>{ setNavigator(navigator) }}/>
+              </LocationEditProvider>
+            </LocationProvider>
+          </ListProvider>
+        </LocationQueueProvider>
       </ListQueueProvider>
     </AuthProvider>
   )

@@ -123,7 +123,7 @@ ListEditScreen.navigationOptions = ({navigation}) => {
   return {
     title: listName,
     headerRight: ()=>(
-      list && <View style={{paddingRight:20}} ><Icon name='trash-can-outline' type='material-community' size={30} color='rgb(184, 3, 14)' onPress={()=>handleDeleteList(list)} /></View>
+      list && <View style={{paddingRight:20}} ><Icon name='trash-can-outline' type='material-community' size={30} color='rgb(184, 3, 14)' onPress={()=>handleDeleteList()} /></View>
     ) ,
     // headerRightContainerStyle: {paddingRight:'30%',width:'20%'}
   }
