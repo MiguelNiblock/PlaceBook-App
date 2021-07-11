@@ -17,7 +17,7 @@ const MapScreen = ({navigation})=>{
 
   const {loadLocalLists,fetchLists,createList,resetLists,state:lists} = useContext(ListContext);
   const {loadLocalLocs,fetchLocs,createLocation,resetLocations,state:locations} = useContext(LocationContext);
-  const {tryLocalSignin,signout} = useContext(AuthContext);
+  const {tryLocalSignin,signout,state:{token}} = useContext(AuthContext);
   const {loadLocalListQueue,resetListQueue,listCreateQueue,setListQueue} = useContext(ListQueueContext);
   const {loadLocalLocationQueue,resetLocationQueue,setLocationQueue} = useContext(LocationQueueContext);
 
@@ -42,13 +42,14 @@ const MapScreen = ({navigation})=>{
     // console.log('handleSheetChanges', index);
   }, []);
   const [readyToCheckNumLists, setReadyToCheckNumLists] = useState(false);
-
+  
   useEffect(()=>{
     // resetListQueue();
     // resetLists();
     // resetLocations();
     // resetLocationQueue();
     // signout();
+    setReadyToCheckNumLists(false);
 
     ////////////////////////////////////////////////////////////
     //Load data in stages
@@ -63,16 +64,17 @@ const MapScreen = ({navigation})=>{
         return [loadedLocalListQueue,loadedLocalLocationQueue,loadedLocalLists,loadedLocalLocs,signedInLocally]
       })();
       Promise.all(loadedLocals) // then load remote data
-      .then(([listQueue,locQueue])=>{ console.log('fetching...');
+      .then(([listQueue,locQueue])=>{               console.log('fetching...');
         const fetchedLists = fetchLists(listQueue);
         const fetchedLocs = fetchLocs(locQueue); 
         return new Promise.all([listQueue,fetchedLists,locQueue,fetchedLocs])
       })
       .then(([listQueue,fetchedLists,locQueue,fetchedLocs])=>{ // finally allow listCheck to run
-          console.log('listCheck ready');
-          setReadyToCheckNumLists(true);
-          updateDB('/lists',listQueue,setListQueue,fetchedLists);
-          updateDB('/locs',locQueue,setLocationQueue,fetchedLocs);
+        console.log('listCheck ready');
+        setReadyToCheckNumLists(true);
+        const updatedDBLists = updateDB('/lists',listQueue,setListQueue,fetchedLists);
+        const updatedDBLocs = updateDB('/locs',locQueue,setLocationQueue,fetchedLocs);
+        return new Promise.all([fetchedLists,updatedDBLists,updatedDBLocs]);
       })
     })();
     ///////////////////////////////////////
@@ -92,7 +94,7 @@ const MapScreen = ({navigation})=>{
       };
     })();
 
-  },[]);
+  },[token]);
 
   ////////////////////
   // listcheck
