@@ -6,17 +6,21 @@ import {withNavigation} from 'react-navigation';
 const NavLink = ({navigation, text, routeName}) => {
 
   return (
-    <TouchableOpacity onPress={ ()=> navigation.navigate(routeName)}>
-      <Spacer>
+    <TouchableOpacity style={styles.navLink} onPress={ ()=> navigation.navigate(routeName)}>
         <Text style={styles.link}>{text}</Text>
-      </Spacer>
     </TouchableOpacity>
   )
 };
 
 const styles = StyleSheet.create({
+  navLink: {
+    alignSelf: 'center',
+    marginTop: '6%'
+  },
   link: {
-    color: 'blue'
+    color: 'blue',
+    // fontStyle: 'italic',
+    
 }
 });
 

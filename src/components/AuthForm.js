@@ -4,8 +4,9 @@ import { Text, Button, Input} from 'react-native-elements';
 import Spacer from './Spacer';
 import {Context as ListQueueContext} from '../context/ListQueueContext';
 import {Context as LocationQueueContext} from '../context/LocationQueueContext';
+import NavLink from './NavLink';
 
-const AuthForm = ({ headerText, errorMessage, onSubmit, submitButtonText }) => {
+const AuthForm = ({ headerText, subtitle, errorMessage, onSubmit, submitButtonText, navText, navRoute }) => {
   const [username,setUsername] = useState('');
   const [password,setPassword] = useState('');
   const {state:listQueue,resetListQueue} = useContext(ListQueueContext);
@@ -26,6 +27,7 @@ const AuthForm = ({ headerText, errorMessage, onSubmit, submitButtonText }) => {
     <>
     <Spacer>
       <Text h3>{headerText}</Text>
+      <Text style={styles.subtitle} >{subtitle}</Text>
     </Spacer>
     
     <Input
@@ -43,9 +45,10 @@ const AuthForm = ({ headerText, errorMessage, onSubmit, submitButtonText }) => {
       secureTextEntry
         />
     {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
-    <Spacer>
-      <Button title={submitButtonText} onPress={()=>onSubmit({username,password,queues,resetQueues})}/>
-    </Spacer>
+    <Button containerStyle={styles.buttonBox} buttonStyle={styles.button} title={submitButtonText} onPress={()=>onSubmit({username,password,queues,resetQueues})}/>
+    <NavLink 
+      text={navText} routeName={navRoute} />
+
     {/* {listQueue.create.map( (item)=> <Text>{item.name}</Text> )}  */}
     </>
   )
@@ -53,6 +56,18 @@ const AuthForm = ({ headerText, errorMessage, onSubmit, submitButtonText }) => {
 }
 
 const styles = StyleSheet.create({
+  subtitle: {
+    fontSize:15,
+    margin: 5
+  },
+  buttonBox: {
+    marginTop: 10,
+    width: '40%',
+    alignSelf:'center'
+  },
+  button: {
+    borderRadius: 20
+  },
   errorMessage: {
     fontSize: 16,
     color: 'red',

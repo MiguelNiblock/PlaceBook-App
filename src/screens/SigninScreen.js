@@ -12,15 +12,14 @@ const SigninScreen = ()=>{
         <ScrollView>
         <View style={styles.container}>
             <NavigationEvents onWillFocus={clearErrorMessage}/>
-            <AuthForm 
-                headerText="Sign In to Your Account"
+            <AuthForm
+                headerText="Sign In"
+                subtitle="Access all your saved places!"
                 errorMessage={state.errorMessage}
-                onSubmit={signin}
                 submitButtonText="Sign In"
-            />
-            <NavLink 
-                text="Don't have an account? Sign up instead"
-                routeName="Signup"
+                onSubmit={signin}
+                navText="Don't have an account? Sign-Up instead"
+                navRoute='Settings'
             />
         </View>
         </ScrollView>
@@ -28,7 +27,7 @@ const SigninScreen = ()=>{
 };
 
 SigninScreen.navigationOptions = {
-    headerShown: false
+    title: ''
 }
 
 const styles = StyleSheet.create({

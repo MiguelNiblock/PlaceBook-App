@@ -45,20 +45,21 @@ const Stack = createStackNavigator({
   LocationList: LocationListScreen,
   LocationEdit: LocationEditScreen,
   ListEdit: ListEditScreen,
-  Account: AccountScreen
+  Settings: AccountScreen,
+  Signin: SigninScreen,
 })
 
 
-const switchNavigator = createSwitchNavigator({
-  mainFlow: Stack,
-  ResolveAuth: ResolveAuthScreen,
-  loginFlow: createStackNavigator({
-    Signin: SigninScreen,
-    Signup: SignupScreen
-  })
-});
+// const switchNavigator = createSwitchNavigator({
+//   mainFlow: Stack,
+//   ResolveAuth: ResolveAuthScreen,
+//   loginFlow: createStackNavigator({
+//     Signin: SigninScreen,
+//     Signup: SignupScreen
+//   })
+// });
 
-const App = createAppContainer(switchNavigator);
+const App = createAppContainer(Stack);
 
 export default () => {
   return (

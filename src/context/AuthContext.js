@@ -2,7 +2,6 @@ import createDataContext from './createDataContext';
 import locationApi from '../api/location';
 import * as SecureStore from 'expo-secure-store';
 import {navigate} from '../navigationRef';
-import {setLocalData} from '../hooks/safeAsync';
 
 //REDUCER
 //////////
@@ -50,8 +49,8 @@ const signup = (dispatch) => async ({username,password,queues,resetQueues}) => {
         //navigate to main flow
         navigate('Map');
     } catch (err) {
-        console.log(err.response.data);
-        dispatch({type:'add_error',payload:'Something went wrong with signup.'});
+        console.error(err);
+        dispatch({type:'add_error',payload:'Something went wrong with signup'});
     }
 };    
 

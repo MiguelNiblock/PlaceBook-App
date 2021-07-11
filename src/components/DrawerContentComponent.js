@@ -34,7 +34,7 @@ const DrawerContentComponent = (props) => {
             title="Settings" 
             containerStyle={styles.buttonContainer} 
             buttonStyle={[styles.button,{backgroundColor:'#8f8399'}]}
-            onPress={()=>navigate('Account')}
+            onPress={()=>navigate('Settings')}
             type='solid'
             icon={{name:'cog',type:'material-community',color:'white'}}
           />
