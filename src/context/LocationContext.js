@@ -104,7 +104,7 @@ const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tag
 
 const deleteLocation = dispatch => async(loc,queueDelete) => {
   try {
-    console.log('trying to DELETE loc:',loc);
+    console.log('trying to DELETE loc:',loc._id);
     const {data} = await locationApi.delete(`/locs/${loc._id}`);
     console.log('deleteLocation response:',data);
     dispatch({type:'delete_loc',payload:loc._id});
