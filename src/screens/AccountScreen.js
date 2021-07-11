@@ -36,12 +36,13 @@ const AccountScreen = ()=>{
         clearErrorMessage();
     },[]);
 
-    const handleSignOut = () => {
-        signout();
-        resetLocations();
-        resetLists();
-        resetLocationQueue();
-        resetListQueue();
+    const handleSignOut = async () => {
+        const resetedLocs = resetLocations();
+        const resetedLists = resetLists();
+        const resetedLocQueue = resetLocationQueue();
+        const resetedListQueue = resetListQueue();
+        const signedOut = signout();
+        await Promise.all([resetedLocs,resetedLists,resetedLocQueue,resetedListQueue,signedOut]).then(navigate('Map',{hideDrawer:true}));
     }
 
     return (

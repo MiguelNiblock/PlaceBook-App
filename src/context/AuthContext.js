@@ -39,14 +39,10 @@ const tryLocalSignin = dispatch => async() => {
 const signup = (dispatch) => async ({username,password,queues,resetQueues}) => {
     try {
         console.log('signup action input:',username,password,queues);
-        //make api req to sign up with that email and passwd
         const {data} = await locationApi.post('/signup',{username,password,queues});
-        console.log('response:',data);
-        //clear queues
+        console.log('signup response:',data);
         await resetQueues();
-        //update state to signed-in, with token
         dispatch({ type:'signin', payload:{ token:data.token, local:false} });
-        //navigate to main flow
         navigate('Map');
     } catch (err) {
         console.error(err);
@@ -54,15 +50,17 @@ const signup = (dispatch) => async ({username,password,queues,resetQueues}) => {
     }
 };    
 
-const signin = (dispatch) => async({username,password}) => {
+const signin = (dispatch) => async({username,password,queues,resetQueues}) => {
     try {
-        //http request to signin route
-        const {data} = await locationApi.post('/signin',{username,password});
-        //update state
+        console.log('signin action input:',username,password,queues);
+        const {data} = await locationApi.post('/signin',{username,password,queues});
+        console.log('signin response:',data);
+        await resetQueues();
+            //only if the signin action is not local, token will be set saved to localStore
         dispatch({type:'signin', payload:{ token:data.token, local:false } });
-        //navigate to main flow
-        navigate('mainFlow');
+        navigate('Map');
     } catch (err) {
+        console.error(err);
         dispatch({type:'add_error',payload:'Something went wrong with sign in'});
     }
 };
@@ -73,7 +71,6 @@ const clearErrorMessage = (dispatch) => () => {
 
 const signout = (dispatch) => async () => {
     dispatch({type:'signout'});
-    // navigate('Signin');
 }
 
 //EXPORT
