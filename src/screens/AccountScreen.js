@@ -10,7 +10,8 @@ import {SafeAreaView} from 'react-navigation';
 import {Text} from 'react-native-elements';
 import locationApi from '../api/location';
 import AuthForm from '../components/AuthForm';
-import * as SecureStore from 'expo-secure-store';
+import {navigate} from '../navigationRef';
+// import * as SecureStore from 'expo-secure-store';
 
 const AccountScreen = ()=>{
 
@@ -37,12 +38,12 @@ const AccountScreen = ()=>{
     },[]);
 
     const handleSignOut = async () => {
+        navigate('Map',{hideDrawer:true});
         const resetedLocs = resetLocations();
         const resetedLists = resetLists();
         const resetedLocQueue = resetLocationQueue();
         const resetedListQueue = resetListQueue();
-        const signedOut = signout();
-        await Promise.all([resetedLocs,resetedLists,resetedLocQueue,resetedListQueue,signedOut]).then(navigate('Map',{hideDrawer:true}));
+        await Promise.all([resetedLocs,resetedLists,resetedLocQueue,resetedListQueue]).then(signout())
     }
 
     return (
