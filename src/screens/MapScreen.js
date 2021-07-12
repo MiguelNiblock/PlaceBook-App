@@ -15,11 +15,16 @@ import {updateDB} from '../hooks/mergeWithQueue';
 
 const MapScreen = ({navigation})=>{
 
-  const {loadLocalLists,fetchLists,createList,resetLists,state:lists} = useContext(ListContext);
-  const {loadLocalLocs,fetchLocs,createLocation,resetLocations,state:locations} = useContext(LocationContext);
-  const {tryLocalSignin,signout,state:{token}} = useContext(AuthContext);
-  const {loadLocalListQueue,resetListQueue,listCreateQueue,setListQueue} = useContext(ListQueueContext);
-  const {loadLocalLocationQueue,resetLocationQueue,setLocationQueue} = useContext(LocationQueueContext);
+  const {state:lists,loadLocalLists,fetchLists,createList,resetLists} = 
+  useContext(ListContext);
+  const {state:locations,loadLocalLocs,fetchLocs,createLocation,resetLocations} = 
+  useContext(LocationContext);
+  const {state:{token},tryLocalSignin,signout} = 
+  useContext(AuthContext);
+  const {state:listQueue,loadLocalListQueue,resetListQueue,listCreateQueue,listUpdateQueue,setListQueue} = 
+  useContext(ListQueueContext);
+  const {state:locationQueue,loadLocalLocationQueue,resetLocationQueue,setLocationQueue} = 
+  useContext(LocationQueueContext);
 
   const [explorerMarker,setExplorerMarker] = useState({
     show:true,
@@ -42,73 +47,85 @@ const MapScreen = ({navigation})=>{
     // console.log('handleSheetChanges', index);
   }, []);
   const [readyToCheckNumLists, setReadyToCheckNumLists] = useState(false);
-  
+
+  ///////////////////////////////
+  //Load data from localStore
   useEffect(()=>{
     // resetListQueue();
     // resetLists();
     // resetLocations();
     // resetLocationQueue();
     // signout();
-    setReadyToCheckNumLists(false);
-
-    ////////////////////////////////////////////////////////////
-    //Load data in stages
     (async()=>{ //wait for local data to load
-      const loadedLocals = await (async()=>{
-        console.log('local async called');
-        const loadedLocalLists = loadLocalLists();
-        const loadedLocalListQueue = loadLocalListQueue();
-        const loadedLocalLocs = loadLocalLocs();
-        const loadedLocalLocationQueue = loadLocalLocationQueue();
-        const signedInLocally = tryLocalSignin(); //wait to get the token in context
-        return [loadedLocalListQueue,loadedLocalLocationQueue,loadedLocalLists,loadedLocalLocs,signedInLocally]
-      })();
-      Promise.all(loadedLocals) // then load remote data
-      .then(([listQueue,locQueue])=>{               console.log('fetching...');
-        const fetchedLists = fetchLists(listQueue);
-        const fetchedLocs = fetchLocs(locQueue); 
-        return new Promise.all([listQueue,fetchedLists,locQueue,fetchedLocs])
-      })
-      .then(([listQueue,fetchedLists,locQueue,fetchedLocs])=>{ // finally allow listCheck to run
-        console.log('listCheck ready');
-        setReadyToCheckNumLists(true);
-        const updatedDBLists = updateDB('/lists',listQueue,setListQueue,fetchedLists);
-        const updatedDBLocs = updateDB('/locs',locQueue,setLocationQueue,fetchedLocs);
-        return new Promise.all([fetchedLists,updatedDBLists,updatedDBLocs]);
-      })
-    })();
-    ///////////////////////////////////////
-    //Show current address
-    (async()=>{ //gets device location and sets it as map region
-      console.log('called showCurrentAddress');
-      let { status } = await Location.requestPermissionsAsync();
-      console.log('location permission:',status);
-      if(status==='granted'){
-        setTimeout(async function(){
-          let {coords:{latitude,longitude}} = await Location.getCurrentPositionAsync({});
-          const coords = {latitude,longitude};
-          console.log('coords:',latitude,longitude)
-          setCurrentRegion({longitudeDelta: 0.0154498592018939, latitudeDelta: 0.013360640311354643, ...coords});
-          handleLongPress({coords});
-        },2000);
-      };
-    })();
+      console.log('local async called');
+      const loadedLocalLists = loadLocalLists();
+      const loadedLocalListQueue = loadLocalListQueue();
+      const loadedLocalLocs = loadLocalLocs();
+      const loadedLocalLocationQueue = loadLocalLocationQueue();
+      return new Promise.all([loadedLocalListQueue,loadedLocalLocationQueue,loadedLocalLists,loadedLocalLocs]);
+    })()
+    .then(async()=>{
+      const signedInLocally = await tryLocalSignin();
+    })
+  },[]);
 
+  ////////////////////////////////
+  //Fetch data in stages
+  useEffect(()=>{
+    if(token){
+      setReadyToCheckNumLists(false);
+      (async()=>{                     console.log('fetching.... ');
+        const fetchedLists = fetchLists(listQueue);
+        const fetchedLocs = fetchLocs(locationQueue); 
+        return new Promise.all([listQueue,fetchedLists,locationQueue,fetchedLocs]);
+      })()
+      .then(([listQueue,fetchedLists,locationQueue,fetchedLocs])=>{
+        console.log('updating DBs...')
+        const updatedDBLists = updateDB('/lists',listQueue,setListQueue,fetchedLists);
+        const updatedDBLocs = updateDB('/locs',locationQueue,setLocationQueue,fetchedLocs);
+        return new Promise.all([updatedDBLists,updatedDBLocs]);
+      }).then(()=>{
+        setReadyToCheckNumLists(true);
+      })
+    }
   },[token]);
 
   ////////////////////
-  // listcheck
+  // Check for no lists
   useEffect(()=>{ //make sure there's always at least one default list
     console.log('lists:',lists.length,'readyToCheck:',readyToCheckNumLists);
     if(readyToCheckNumLists && lists.length===0){
       console.log('creating default list');
-      createList('MyList','black','map-marker',listCreateQueue);
+      createList('Default List','black','map-marker',listCreateQueue);
     }
     // return ()=>{ //only uncomment this cleanup fn during development
     //   console.log('cleanup create default list');
     //   setReadyToCheckNumLists(false);
     // }
   },[lists,readyToCheckNumLists]);
+
+  //////////////////////////
+  // Update list-create-queue's "hasLocs" property.
+    // If there's any locs in a given list, set its "hasLocs" to true.
+  // useEffect(()=>{
+  //   console.log('Called hasLocs useEffect. executing:',readyToCheckNumLists);
+  //   console.log('listQueue.create from hasLocs useEffect:',listQueue.create);
+  //   if(readyToCheckNumLists && listQueue.create.length > 0){
+  //     const uniqueListIds = locations.reduce((accum,item)=>{
+  //       if(!accum.includes(item.listId)){
+  //         accum.push(item.listId)
+  //       }
+  //       return accum
+  //     },[])
+  //     console.log('unique list Ids of saved locs:',uniqueListIds);
+  //     listQueue.create.forEach((item)=>{
+  //       console.log('item:',item);
+  //       if(uniqueListIds.includes(item._id)){
+  //         listUpdateQueue({_id:item._id, hasLocs:true})
+  //       }
+  //     })
+  //   }
+  // },[locations,readyToCheckNumLists])
   
   // console.log('lists:',lists)
 

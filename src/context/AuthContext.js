@@ -50,12 +50,11 @@ const signup = (dispatch) => async ({username,password,queues,resetQueues}) => {
     }
 };    
 
-const signin = (dispatch) => async({username,password,queues,resetQueues}) => {
+const signin = (dispatch) => async({username,password}) => {
     try {
-        console.log('signin action input:',username,password,queues);
-        const {data} = await locationApi.post('/signin',{username,password,queues});
+        console.log('signin action input:',username,password);
+        const {data} = await locationApi.post('/signin',{username,password});
         console.log('signin response:',data);
-        await resetQueues();
             //only if the signin action is not local, token will be set saved to localStore
         dispatch({type:'signin', payload:{ token:data.token, local:false } });
         navigate('Map');

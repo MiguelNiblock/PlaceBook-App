@@ -30,6 +30,7 @@ const resolveQueueArray = async (endpoint,queueArray,method,remoteArray)=>{
       const result = await ( async()=>{
         switch(method){
           case 'post': {
+            // if(item.hasLocs === false){return 'List has no locs. Skipping...'}
             const {data} = await api.request(  { url:endpoint, method, data:{item} }  );
             return data
           }
@@ -65,7 +66,7 @@ const resolveQueueArray = async (endpoint,queueArray,method,remoteArray)=>{
       }
   } );
   const results = await Promise.all(promises);
-  return queueArray.filter( (value,index)=> results[index] )
+  return queueArray.filter( (value,index) => results[index] )
 }
 
 export const updateDB = async (endpoint,queue,setQueue,remoteState)=>{
@@ -87,8 +88,7 @@ export const updateDB = async (endpoint,queue,setQueue,remoteState)=>{
   newQueue.delete = newDeleteQueue;
 
   //Set new queue
-  console.log(`new "${endpoint}" queue:`,newQueue);
-  setQueue(newQueue)
-  
+  const result = await setQueue(newQueue)
+  console.log(`new "${endpoint}" queue:`,result);
   return true
 }

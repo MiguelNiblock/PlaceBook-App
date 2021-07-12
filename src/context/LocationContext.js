@@ -61,7 +61,10 @@ const fetchLocs = dispatch => async(locQueue) => {
     //set to localState... must be done here, so when loading local lists, the reducer doesn't have to set em to local store again
     setLocalData('locs',result);
     return data
-  } catch(error){console.error(error)}
+  } catch(error){
+    console.error('Fetchlocs failed',error);
+    return []
+  }
 };
 
 const createLocation = dispatch => async(name,address,coords,notes,stars,tags,listId,queueCreate) => {

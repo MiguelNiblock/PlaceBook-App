@@ -15,7 +15,7 @@ const Reducer = (state,{type,payload}) => {
     case 'update':
       const existingItemIx = state.create.findIndex( ({_id})=>_id === payload._id );
       // console.log(existingItemIx);
-      if( existingItemIx !== -1 ){
+      if( existingItemIx !== -1 ){ //if item already in createQueue, overwrite it
         state.create.splice(existingItemIx,1,{...state.create[existingItemIx] ,...payload});
       } else {
         state.update.push(payload);
@@ -82,8 +82,9 @@ const listDeleteQueue = dispatch => async(item)=>{
 const resetListQueue = dispatch => async()=>{dispatch({type:'reset'})}
 
 const setListQueue = dispatch => async (queue)=>{
-  setLocalData('listQueue',queue);
-  dispatch( {type:'set_queue', payload:queue} )
+  dispatch( {type:'set_queue', payload:queue} );
+  await setLocalData('listQueue',queue);
+  return queue
 }
 
 export const {Context, Provider} = createDataContext(

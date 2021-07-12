@@ -81,8 +81,9 @@ const locationDeleteQueue = dispatch => async(item)=>{
 const resetLocationQueue = dispatch => async()=>{dispatch({type:'reset'})}
 
 const setLocationQueue = dispatch => async (queue)=>{
-  setLocalData('locQueue',queue);
-  dispatch( {type:'set_queue', payload:queue} )
+  dispatch( {type:'set_queue', payload:queue} );
+  await setLocalData('locQueue',queue);
+  return queue
 }
 
 export const {Context, Provider} = createDataContext(

@@ -83,7 +83,10 @@ const fetchLists = dispatch => async(listQueue) => {
     //set to localState... must be done here, so when loading local lists, the reducer doesn't have to set em to local store again
     setLocalData('lists',result);
     return data
-  } catch(error){console.error(error)}
+  } catch(error){
+    console.error('Fetchlists failed',error);
+    return []
+  }
 };
 
 const createList = dispatch => async(name,color,icon,queueCreate) => {
@@ -99,7 +102,9 @@ const createList = dispatch => async(name,color,icon,queueCreate) => {
   } catch(error){
     console.error(error);
     console.log('creating list locally');
-    queueCreate(newList);
+    queueCreate({...newList, 
+      // hasLocs:false
+    });
     dispatch({type:'create_list',payload:newList});
   }
   navigate('Drawer');

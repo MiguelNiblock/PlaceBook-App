@@ -42,10 +42,16 @@ const AuthForm = ({ headerText, subtitle, errorMessage, onSubmit, submitButtonTe
       onChangeText={setPassword} 
       autoCapitalize="none"
       autoCorrect={false}
-      secureTextEntry
-        />
+      secureTextEntry/>
+
     {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
-    <Button containerStyle={styles.buttonBox} buttonStyle={styles.button} title={submitButtonText} onPress={()=>onSubmit({username,password,queues,resetQueues})}/>
+
+    <Button 
+      containerStyle={styles.buttonBox} 
+      buttonStyle={styles.button} 
+      title={submitButtonText} 
+      onPress={()=>onSubmit({username,password,queues,resetQueues})}/>
+
     <NavLink 
       text={navText} routeName={navRoute} />
 
