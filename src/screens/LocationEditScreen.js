@@ -1,6 +1,5 @@
 import React,{useEffect,useContext,useState} from 'react';
 import {View, ScrollView,TextInput, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
-// import {Context as LocationContext} from '../context/LocationContext';
 import {ListItem, Input, Rating, AirbnbRating, Text, Button, Icon, BottomSheet} from 'react-native-elements';
 import {navigate} from '../navigationRef'
 import {Context as LocationEditContext} from '../context/LocationEditContext';
@@ -10,11 +9,16 @@ import {Context as LocationQueueContext} from '../context/LocationQueueContext';
 
 const LocationEditScreen = ({navigation}) => {
 
-  const {state:{name,address,coords,notes,stars,tags,listId},changeName,changeAddress,changeCoords,changeNotes,changeStars,changeTags,changeListId} = useContext(LocationEditContext);
-  const {editLocation,createLocation,deleteLocation} = useContext(LocationContext);
-  const {locationCreateQueue,locationUpdateQueue,locationDeleteQueue} = useContext(LocationQueueContext);
-  const {state:lists} = useContext(ListContext);
-  const [showBottomSheet,setshowBottomSheet] = useState(false);
+  const {state:{name,address,coords,notes,stars,tags,listId},changeName,changeAddress,changeCoords,changeNotes,changeStars,changeTags,changeListId} = 
+  useContext(LocationEditContext);
+  const {editLocation,createLocation,deleteLocation} = 
+  useContext(LocationContext);
+  const {locationCreateQueue,locationUpdateQueue,locationDeleteQueue} = 
+  useContext(LocationQueueContext);
+  const {state:lists} = 
+  useContext(ListContext);
+  const [showBottomSheet,setshowBottomSheet] = 
+  useState(false);
 
   const loc = navigation.getParam('loc');
   // console.log('loc:',loc)
