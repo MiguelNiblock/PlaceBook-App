@@ -50,9 +50,14 @@ const AccountScreen = ()=>{
     <SafeAreaView forceInset={{ top: 'always' }}>
     
     {token && <> 
-        <Text style={{fontWeight:'bold'}} >Username: </Text><Text>{username}</Text>
-        <Text style={{fontWeight:'bold'}} >Date joined: </Text><Text>{userDatetimeCreated}</Text>
-        <Button title="Sign Out" onPress={handleSignOut}/> 
+        <Text h3 style={styles.title} >Account</Text>
+        <Text style={styles.text} >Username: <Text>{username}</Text> </Text>
+        <Text style={styles.text} >Date joined: <Text>{userDatetimeCreated}</Text></Text>
+        <Button 
+            containerStyle={styles.buttonBox} 
+            buttonStyle={styles.button} 
+            title="Sign Out" 
+            onPress={handleSignOut}/> 
     </>}
     {!token && <>
         <AuthForm
@@ -76,7 +81,28 @@ AccountScreen.navigationOptions = ()=>{
     }
 }
 
-// const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+    title: {
+        alignSelf:'flex-start',
+        marginLeft:'5%',
+        marginTop: '10%',
+    },  
+    text: {
+        alignSelf: 'flex-start',
+        marginLeft:'10%',
+        marginTop: '10%',
+        fontWeight: 'bold',
+        fontSize:16
+    },
+    buttonBox: {
+        marginTop: '10%',
+        width: '40%',
+        alignSelf:'center'
+      },
+      button: {
+        borderRadius: 20
+      },
+});
 
 export default AccountScreen;
 
