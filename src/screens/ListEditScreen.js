@@ -135,9 +135,9 @@ ListEditScreen.navigationOptions = ({navigation}) => {
   const list = navigation.getParam('list');
   const handleDeleteList = navigation.getParam('handleDeleteList');
   return {
-    title: listName,
+    title: listName || 'New list',
     headerRight: ()=>(
-      list?._id !== 'default' && <View style={{paddingRight:20}} >
+      list && list?._id !== 'default' && <View style={{paddingRight:20}} >
         <Icon 
           name='trash-can-outline' 
           type='material-community' 
