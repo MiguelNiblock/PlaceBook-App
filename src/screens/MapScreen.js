@@ -46,7 +46,7 @@ const MapScreen = ({navigation})=>{
   const handleSheetChanges = useCallback((index) => {
     // console.log('handleSheetChanges', index);
   }, []);
-  const [readyToCheckNumLists, setReadyToCheckNumLists] = useState(false);
+  const [loadedLocalData, setloadedLocalData] = useState(false);
 
   ///////////////////////////////
   //Load data from localStore
@@ -56,16 +56,22 @@ const MapScreen = ({navigation})=>{
     // resetLocations();
     // resetLocationQueue();
     // signout();
+    setloadedLocalData(false);
     (async()=>{ //wait for local data to load
-      console.log('local async called');
+      console.log('Called local async step1...');
       const loadedLocalLists = loadLocalLists();
       const loadedLocalListQueue = loadLocalListQueue();
       const loadedLocalLocs = loadLocalLocs();
       const loadedLocalLocationQueue = loadLocalLocationQueue();
       return new Promise.all([loadedLocalListQueue,loadedLocalLocationQueue,loadedLocalLists,loadedLocalLocs]);
     })()
-    .then(async()=>{
-      const signedInLocally = await tryLocalSignin();
+    .then(([loadedLocalListQueue,loadedLocalLocationQueue,loadedLocalLists,loadedLocalLocs])=>{
+      console.log('Called local async step2...');
+      if(loadedLocalLists && !loadedLocalLists.find(list=>list._id === 'default')){
+        console.log('Creating default list');
+        createList('Default List','black','map-marker',listCreateQueue,'default');
+      }
+      tryLocalSignin();
     });
 
     ///////////////////////////////////////
@@ -91,7 +97,6 @@ const MapScreen = ({navigation})=>{
   //Fetch data in stages
   useEffect(()=>{
     if(token){
-      setReadyToCheckNumLists(false);
       (async()=>{                     console.log('fetching.... ');
         const fetchedLists = fetchLists(listQueue);
         const fetchedLocs = fetchLocs(locationQueue); 
@@ -102,50 +107,9 @@ const MapScreen = ({navigation})=>{
         const updatedDBLists = updateDB('/lists',listQueue,setListQueue,fetchedLists);
         const updatedDBLocs = updateDB('/locs',locationQueue,setLocationQueue,fetchedLocs);
         return new Promise.all([updatedDBLists,updatedDBLocs]);
-      }).then(()=>{
-        setReadyToCheckNumLists(true);
       })
     }
   },[token]);
-
-  ////////////////////
-  // Check for no lists
-  useEffect(()=>{ //make sure there's always at least one default list
-    console.log('lists:',lists.length,'readyToCheck:',readyToCheckNumLists);
-    if(readyToCheckNumLists && lists.length===0){
-      console.log('creating default list');
-      createList('Default List','black','map-marker',listCreateQueue);
-    }
-    // return ()=>{ //only uncomment this cleanup fn during development
-    //   console.log('cleanup create default list');
-    //   setReadyToCheckNumLists(false);
-    // }
-  },[lists,readyToCheckNumLists]);
-
-  //////////////////////////
-  // Update list-create-queue's "hasLocs" property.
-    // If there's any locs in a given list, set its "hasLocs" to true.
-  // useEffect(()=>{
-  //   console.log('Called hasLocs useEffect. executing:',readyToCheckNumLists);
-  //   console.log('listQueue.create from hasLocs useEffect:',listQueue.create);
-  //   if(readyToCheckNumLists && listQueue.create.length > 0){
-  //     const uniqueListIds = locations.reduce((accum,item)=>{
-  //       if(!accum.includes(item.listId)){
-  //         accum.push(item.listId)
-  //       }
-  //       return accum
-  //     },[])
-  //     console.log('unique list Ids of saved locs:',uniqueListIds);
-  //     listQueue.create.forEach((item)=>{
-  //       console.log('item:',item);
-  //       if(uniqueListIds.includes(item._id)){
-  //         listUpdateQueue({_id:item._id, hasLocs:true})
-  //       }
-  //     })
-  //   }
-  // },[locations,readyToCheckNumLists])
-  
-  // console.log('lists:',lists)
 
   /////////////////////////////////////////////////////////
   // FocusLoc navigation

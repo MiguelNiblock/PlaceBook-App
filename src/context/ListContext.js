@@ -58,10 +58,17 @@ const loadLocalLists = dispatch => async() => {
       lists = JSON.parse(lists);
       console.log('lists from local storage:',lists)
       dispatch({type:'set_lists',payload:lists});
+      return lists
+    } else {
+      console.log('No lists in local store');
+      setLocalData('lists',[]);
+      dispatch({ type:'set_lists', payload:[] });
+      return []
     }
+  } else { 
+    console.error('Local store not available');
+    return null
   }
-  console.log('loadLocalLists ran');
-  return true
 }
 
 const fetchLists = dispatch => async(listQueue) => {
@@ -89,8 +96,8 @@ const fetchLists = dispatch => async(listQueue) => {
   }
 };
 
-const createList = dispatch => async(name,color,icon,queueCreate) => {
-  const _id = uuid.v4();
+const createList = dispatch => async(name,color,icon,queueCreate,listId) => {
+  const _id = listId? listId : uuid.v4();
   const timeStamp = new Date().toISOString();
   const newList = {_id,name,color,icon,shown:true,expanded:true,datetimeCreated:timeStamp,datetimeModified:timeStamp}
   console.log('new list:',newList);

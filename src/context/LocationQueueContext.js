@@ -54,12 +54,16 @@ const loadLocalLocationQueue = dispatch => async()=> {
       queue = JSON.parse(queue);
       console.log('loc queue from local storage:',queue)
       dispatch({type:'set_queue',payload:queue});
-      console.log('loadLocalLocationQueue ran');
       return queue
     } else {
-      console.log('loc queue is empty. Creating it...');
+      console.log('No locQueue in local store. Creating it...');
       setLocalData('locQueue',{create:[], update:[], delete:[]});
+      dispatch({ type:'set_queue', payload: {create:[], update:[], delete:[]} });
+      return {create:[], update:[], delete:[]}
     }
+  } else {
+    console.error('Local store not available');
+    return null
   }
 }
 

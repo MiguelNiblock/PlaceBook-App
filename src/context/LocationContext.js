@@ -43,12 +43,19 @@ const loadLocalLocs = dispatch => async() => {
     let locs = await SecureStore.getItemAsync('locs')
     if (locs) {
       locs = JSON.parse(locs);
-      console.log('locs from local storage:',locs)
-      dispatch({type:'set_locs',payload:locs});
+      console.log('locs from local storage:',locs);
+      dispatch({ type:'set_locs', payload:locs });
+      return locs
+    } else {
+      console.log('No locations in local store');
+      setLocalData('locs',[]);
+      dispatch({ type:'set_locs', payload:[] });
+      return []
     }
+  } else {
+    console.error('Local store not available');
+    return null
   }
-  console.log('loadLocalLocs ran')
-  return true
 }
 
 const fetchLocs = dispatch => async(locQueue) => {

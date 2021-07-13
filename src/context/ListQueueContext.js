@@ -54,13 +54,17 @@ const loadLocalListQueue = dispatch => async()=> {
     if (queue) {
       queue = JSON.parse(queue);
       console.log('list queue from local storage:',queue)
-      dispatch({type:'set_queue',payload:queue});
-      console.log('loadLocalListQueue ran');
+      dispatch({ type:'set_queue' ,payload:queue });
       return queue
     } else {
-      console.log('list queue is empty. Creating it...');
+      console.log('No listQueue in local store. Creating it...');
+      dispatch({ type:'set_queue', payload: {create:[], update:[], delete:[]} });
       setLocalData('listQueue',{create:[], update:[], delete:[]});
+      return {create:[], update:[], delete:[]}
     }
+  } else {
+    console.error('Local store not available');
+    return null
   }
 }
 
