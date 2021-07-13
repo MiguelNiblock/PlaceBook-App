@@ -113,7 +113,7 @@ const MapScreen = ({navigation})=>{
 
   /////////////////////////////////////////////////////////
   // FocusLoc navigation
-  //When a screen navigates here with a 'loc' param, it'll activate the useEffect which focuses on that marker and displays the address.
+  ////When a screen navigates here with a 'loc' param, it'll activate the useEffect which focuses on that marker and displays the address.
   const focusLoc = navigation.getParam('loc');
   // console.log('focusLoc from comp body:',focusLoc)
   const hideDrawer = navigation.getParam('hideDrawer');

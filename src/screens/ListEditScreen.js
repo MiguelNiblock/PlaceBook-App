@@ -55,7 +55,13 @@ const ListEditScreen = ({navigation})=>{
 
   return (
     <ScrollView>
-      <Input label="List Name" value={listName} onChangeText={setListName} multiline={true} leftIcon={{ type:'material-community', name:'format-list-bulleted-type' }} />
+      <Input 
+        label="List Name" 
+        value={listName} 
+        onChangeText={setListName} 
+        multiline={true} 
+        leftIcon={{ type:'material-community', name:'format-list-bulleted-type' }} 
+        disabled={list?._id === 'default'} />
 
       <Input label="List Marker" disabled leftIconContainerStyle={styles.markerIconBox}
         leftIcon={
@@ -127,11 +133,17 @@ const ListEditScreen = ({navigation})=>{
 ListEditScreen.navigationOptions = ({navigation}) => {
   const listName = navigation.getParam('listName');
   const list = navigation.getParam('list');
-  const handleDeleteList = navigation.getParam('handleDeleteList')
+  const handleDeleteList = navigation.getParam('handleDeleteList');
   return {
     title: listName,
     headerRight: ()=>(
-      list && <View style={{paddingRight:20}} ><Icon name='trash-can-outline' type='material-community' size={30} color='rgb(184, 3, 14)' onPress={()=>handleDeleteList()} /></View>
+      list?._id !== 'default' && <View style={{paddingRight:20}} >
+        <Icon 
+          name='trash-can-outline' 
+          type='material-community' 
+          size={30} color='rgb(184, 3, 14)' 
+          onPress={()=>handleDeleteList()} />
+      </View>
     ) ,
     // headerRightContainerStyle: {paddingRight:'30%',width:'20%'}
   }
