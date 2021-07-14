@@ -70,7 +70,7 @@ const fetchLocs = dispatch => async(locQueue) => {
     return data
   } catch(error){
     console.error('Fetchlocs failed',error);
-    return []
+    return null
   }
 };
 

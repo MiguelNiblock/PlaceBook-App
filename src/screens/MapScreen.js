@@ -11,7 +11,7 @@ import {Context as ListQueueContext} from '../context/ListQueueContext';
 import {Context as LocationQueueContext} from '../context/LocationQueueContext'
 import {Icon, Button} from 'react-native-elements';
 import BottomSheet, {TouchableOpacity as ModalTouchable} from '@gorhom/bottom-sheet';
-import {updateDB} from '../hooks/mergeWithQueue';
+import {updateDB,removeDefaultList,processLocsQueue} from '../hooks/mergeWithQueue';
 
 const MapScreen = ({navigation})=>{
 
@@ -48,36 +48,54 @@ const MapScreen = ({navigation})=>{
   }, []);
   const [loadedLocalData, setloadedLocalData] = useState(false);
 
-  ///////////////////////////////
-  //Load data from localStore
+
   useEffect(()=>{
-    // resetListQueue();
-    // resetLists();
-    // resetLocations();
-    // resetLocationQueue();
-    // signout();
-    setloadedLocalData(false);
-    (async()=>{ //wait for local data to load
-      console.log('Called local async step1...');
-      const loadedLocalLists = loadLocalLists();
-      const loadedLocalListQueue = loadLocalListQueue();
-      const loadedLocalLocs = loadLocalLocs();
-      const loadedLocalLocationQueue = loadLocalLocationQueue();
-      return new Promise.all([loadedLocalListQueue,loadedLocalLocationQueue,loadedLocalLists,loadedLocalLocs]);
-    })()
-    .then(([loadedLocalListQueue,loadedLocalLocationQueue,loadedLocalLists,loadedLocalLocs])=>{
-      console.log('Called local async step2...');
-      if(loadedLocalLists && !loadedLocalLists.find(list=>list._id === 'default')){
-        console.log('Creating default list');
-        createList('Default List','black','map-marker',listCreateQueue,'default');
-      }
-      tryLocalSignin();
-    });
+    if(!token){
+
+      ///////////////////////////////
+      //Load data from localStore
+      setloadedLocalData(false);
+      (async()=>{ //wait for local data to load
+        console.log('Called local async step1...');
+        const loadedLocalLists = loadLocalLists();
+        const loadedLocalListQueue = loadLocalListQueue();
+        const loadedLocalLocs = loadLocalLocs();
+        const loadedLocalLocationQueue = loadLocalLocationQueue();
+        return new Promise.all([loadedLocalListQueue,loadedLocalLocationQueue,loadedLocalLists,loadedLocalLocs]);
+      })()
+      .then(([loadedLocalListQueue,loadedLocalLocationQueue,loadedLocalLists,loadedLocalLocs])=>{
+        setloadedLocalData(true);
+        if( loadedLocalLists && !loadedLocalLists.find(list=>list._id.startsWith('default')) ){
+          console.log('Creating default list');
+          createList('Default List','black','map-marker',listCreateQueue,'default');
+        }
+        tryLocalSignin();
+      });
+
+    } else {
+
+      ////////////////////////////////
+      //Fetch data in stages
+      (async()=>{  console.log('Called fetch stage.... ');
+        const readyListQ = removeDefaultList(listQueue);
+        const fetchedLists = fetchLists(readyListQ);
+        const fetchedLocs = fetchLocs(locationQueue);
+        return new Promise.all([readyListQ,fetchedLists,locationQueue,fetchedLocs]);
+      })()
+      .then(([readyListQ,fetchedLists,locationQueue,fetchedLocs])=>{
+        console.log('Called updating DBs stage...')
+        const readyLocQ = processLocsQueue(locationQueue,fetchedLists);
+        const newListQueue = updateDB('/lists',readyListQ,setListQueue,fetchedLists);
+        const newLocQueue = updateDB('/locs',readyLocQ,setLocationQueue,fetchedLocs);
+        return new Promise.all([newListQueue,newLocQueue]);
+      })
+
+    }
 
     ///////////////////////////////////////
     //Show current address
     (async()=>{ //gets device location and sets it as map region
-      console.log('called showCurrentAddress');
+      console.log('Called showCurrentAddress');
       let { status } = await Location.requestPermissionsAsync();
       console.log('location permission:',status);
       if(status==='granted'){
@@ -90,25 +108,7 @@ const MapScreen = ({navigation})=>{
         },2000);
       }
     })();
-    
-  },[]);
 
-  ////////////////////////////////
-  //Fetch data in stages
-  useEffect(()=>{
-    if(token){
-      (async()=>{                     console.log('fetching.... ');
-        const fetchedLists = fetchLists(listQueue);
-        const fetchedLocs = fetchLocs(locationQueue); 
-        return new Promise.all([listQueue,fetchedLists,locationQueue,fetchedLocs]);
-      })()
-      .then(([listQueue,fetchedLists,locationQueue,fetchedLocs])=>{
-        console.log('updating DBs...')
-        const updatedDBLists = updateDB('/lists',listQueue,setListQueue,fetchedLists);
-        const updatedDBLocs = updateDB('/locs',locationQueue,setLocationQueue,fetchedLocs);
-        return new Promise.all([updatedDBLists,updatedDBLocs]);
-      })
-    }
   },[token]);
 
   /////////////////////////////////////////////////////////

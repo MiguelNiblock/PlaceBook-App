@@ -1,7 +1,7 @@
 import api from '../api/location';
 
 export const mergeWithQueue = (data,queue)=>{
-  //apply queued operations to data
+  //apply queued operations to fetched data
 
   //Delete ops
   const deleteIds = queue.delete.map(item=>item._id);
@@ -30,7 +30,6 @@ const resolveQueueArray = async (endpoint,queueArray,method,remoteArray)=>{
       const result = await ( async()=>{
         switch(method){
           case 'post': {
-            // if(item.hasLocs === false){return 'List has no locs. Skipping...'}
             const {data} = await api.request(  { url:endpoint, method, data:{item} }  );
             return data
           }
@@ -61,7 +60,7 @@ const resolveQueueArray = async (endpoint,queueArray,method,remoteArray)=>{
         return false
       } else return true
     } catch(error){
-      console.error('error:',error);
+      console.error(`Error resolving ${endpoint} ${method} for item ${item._id}:`,error);
       return true
       }
   } );
@@ -71,8 +70,6 @@ const resolveQueueArray = async (endpoint,queueArray,method,remoteArray)=>{
 
 export const updateDB = async (endpoint,queue,setQueue,remoteState)=>{
   console.log(`updateDB called. current "${endpoint}" queue:`,queue);
-  
-  let newQueue = {create:[],update:[],delete:[]}
 
   //Create queue
   const newCreateQueueP = resolveQueueArray(endpoint, queue.create, 'post');
@@ -83,12 +80,40 @@ export const updateDB = async (endpoint,queue,setQueue,remoteState)=>{
 
   //Wait for all queues to finish and set to new queue
   const [newCreateQueue,newUpdateQueue,newDeleteQueue] = await Promise.all([newCreateQueueP,newUpdateQueueP,newDeleteQueueP]);
+
+  let newQueue = {create:[],update:[],delete:[]}
   newQueue.create = newCreateQueue;
   newQueue.update = newUpdateQueue;
   newQueue.delete = newDeleteQueue;
 
   //Set new queue
-  const result = await setQueue(newQueue)
+  const result = await setQueue(newQueue);
   console.log(`new "${endpoint}" queue:`,result);
-  return true
+  return result
+}
+
+export const removeDefaultList = (listQueue) => {
+  // Handle case where a new defaultList was created after signout or new app install
+  //// On SignIn, there will be a remote defaultList. Don't create a new defaultList on DB
+  return  {...listQueue, create: listQueue.create.filter(item=>!item._id.startsWith('default')) }
+}
+
+export const processLocsQueue = (locQueue, remoteLists) => {
+  // console.log('Called processLocsQueue. locQueue:',locQueue,'remoteLists:',remoteLists);
+
+  const remoteDefault = remoteLists.find(item => item._id.startsWith('default') );
+  // console.log('remoteDefault:',remoteDefault);
+
+  //// Locs' listId must have the remote defaultList' id
+  const readyLocQ = {...locQueue,
+    create: locQueue.create.map( item => {
+      if( item.listId.startsWith('default') ){
+        return {...item, listId: remoteDefault._id }
+      } else { return item }
+    }
+  )}
+
+  // console.log('readyLocQueue:',readyLocQ);
+  return readyLocQ
+
 }

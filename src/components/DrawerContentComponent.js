@@ -43,7 +43,7 @@ const DrawerContentComponent = (props) => {
         <FlatList
           data={lists}
           keyExtractor={item=>item._id}
-          renderItem={({item:list})=>{
+          renderItem={ ({item:list}) => {
             return (
               <>
               <ListItem.Accordion containerStyle={styles.accordion} //noIcon
@@ -65,8 +65,12 @@ const DrawerContentComponent = (props) => {
                   </>
                 }
               >
-                {places.filter(place=>place.listId === list._id).map((place, i) => (
-                  <ListItem containerStyle={styles.listItem} key={i} bottomDivider onPress={()=>navigate('Map',{hideDrawer:true, loc:place})} >
+                {places.filter( place => {
+                  if( list._id.startsWith('default') ){
+                    return place.listId.startsWith('default')
+                  } else { return place.listId === list._id}
+                }).map((place) => (
+                  <ListItem containerStyle={styles.listItem} key={place._id} bottomDivider onPress={()=>navigate('Map',{hideDrawer:true, loc:place})} >
                     <ListItem.Content>
                       <ListItem.Title numberOfLines={1} >{place.name}</ListItem.Title>
                       <ListItem.Subtitle numberOfLines={1} style={styles.subtitle} >{place.address}</ListItem.Subtitle>

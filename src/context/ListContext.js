@@ -76,15 +76,6 @@ const fetchLists = dispatch => async(listQueue) => {
   try {
     const {data} = await locationApi.get('/lists');  
     console.log('fetchLists response:',data);
-    ///////////////////////////////////////////////////////////
-    //Utility fn for when the model is changed, and new fields are expected
-    // response.data.map(async (list)=>{
-    //   if (!list.expanded){
-    //     res = await locationApi.put(`/lists/${list._id}`,{...list,expanded:true})
-    //   }
-    // })
-    // console.log('lists updated')
-    ////////////////////////////////////////////////////////////
     const result = mergeWithQueue(data,listQueue);
     dispatch({type:'set_lists',payload:result});
     //set to localState... must be done here, so when loading local lists, the reducer doesn't have to set em to local store again
@@ -92,12 +83,13 @@ const fetchLists = dispatch => async(listQueue) => {
     return data
   } catch(error){
     console.error('Fetchlists failed',error);
-    return []
+    return null
   }
 };
 
-const createList = dispatch => async(name,color,icon,queueCreate,listId) => {
-  const _id = listId? listId : uuid.v4();
+const createList = dispatch => async(name,color,icon,queueCreate,idPrefix) => {
+  let _id = uuid.v4();
+  if(idPrefix){ _id = idPrefix + _id }
   const timeStamp = new Date().toISOString();
   const newList = {_id,name,color,icon,shown:true,expanded:true,datetimeCreated:timeStamp,datetimeModified:timeStamp}
   console.log('new list:',newList);

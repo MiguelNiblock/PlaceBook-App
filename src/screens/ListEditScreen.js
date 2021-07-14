@@ -61,7 +61,7 @@ const ListEditScreen = ({navigation})=>{
         onChangeText={setListName} 
         multiline={true} 
         leftIcon={{ type:'material-community', name:'format-list-bulleted-type' }} 
-        disabled={list?._id === 'default'} />
+        disabled={list?._id.startsWith('default')} />
 
       <Input label="List Marker" disabled leftIconContainerStyle={styles.markerIconBox}
         leftIcon={
@@ -137,7 +137,7 @@ ListEditScreen.navigationOptions = ({navigation}) => {
   return {
     title: listName || 'New list',
     headerRight: ()=>(
-      list && list?._id !== 'default' && <View style={{paddingRight:20}} >
+      list && !list?._id.startsWith('default') && <View style={{paddingRight:20}} >
         <Icon 
           name='trash-can-outline' 
           type='material-community' 
