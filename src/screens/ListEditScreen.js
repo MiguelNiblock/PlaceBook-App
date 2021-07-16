@@ -73,7 +73,7 @@ const ListEditScreen = ({navigation})=>{
   return (
     <ScrollView>
       <Input 
-        label="List Name" 
+        label="List Name *" 
         value={listName} 
         onChangeText={setListName} 
         multiline={true} 
