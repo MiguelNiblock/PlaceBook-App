@@ -20,6 +20,7 @@ const ListEditScreen = ({navigation})=>{
   const [listName,setListName] = useState('');
   const [listColor,setListColor] = useState('rgba(0,0,0,1)');
   const [listIcon,setListIcon] = useState('map-marker');
+  const [error,setError] = useState(null);
 
   const list = navigation.getParam('list');
 
@@ -33,10 +34,26 @@ const ListEditScreen = ({navigation})=>{
     };
   },[]);
 
+  const validate = (inputs) => {
+    let errorMsg = '';
+    Object.keys(inputs).forEach( (field) => {
+      switch(field) {
+        case 'name': if (inputs[field].length === 0) {
+          errorMsg += 'List name is required\n'
+        }
+      }
+    })
+    return errorMsg
+  }
+
   const saveList = (name,color,icon)=>{
     // console.log('list in saveList before ifListId:',list);
-    if(list?._id) { editList( {...list,name,color,icon}, listUpdateQueue ) }
-    else {createList(name,color,icon,listCreateQueue)};
+    setError(null);
+    const validationErrors = validate({name});
+    if (!validationErrors){
+      if(list?._id) { editList( {...list,name,color,icon}, listUpdateQueue ) }
+      else {createList(name,color,icon,listCreateQueue)};
+    } else {setError(validationErrors)}
   };
 
   const deleteLocsByListId = (listId,locations,deleteLoc,queueDeletion) => {
@@ -123,6 +140,8 @@ const ListEditScreen = ({navigation})=>{
         </ScrollView>
       </Overlay>
 
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+
       {/* <Button title="Save" onPress={()=>saveList(listId,listName,listColor,listIcon)} /> */}
       <Button title="Save" containerStyle={styles.button} onPress={()=>saveList(listName,listColor,listIcon)} />
       {/* {listId && <Button title='Delete' onPress={()=>handleDeleteList(listId)} />}  */}
@@ -190,7 +209,13 @@ const styles = StyleSheet.create({
   },
   iconPickerIcons: {
     margin: 5,
-  }
+  },
+  error: {
+    fontSize: 16,
+    color: 'red',
+    marginLeft: 15,
+    // marginTop: 15
+},
 })
 
 export default ListEditScreen;
