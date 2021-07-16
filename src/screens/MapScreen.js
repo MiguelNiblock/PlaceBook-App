@@ -50,6 +50,9 @@ const MapScreen = ({navigation})=>{
 
 
   useEffect(()=>{
+    // resetLocations();
+    // signout();
+
     if(!token){
 
       ///////////////////////////////

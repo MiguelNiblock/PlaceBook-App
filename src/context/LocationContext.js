@@ -86,7 +86,7 @@ const createLocation = dispatch => async(name,address,coords,notes,stars,tags,li
     dispatch({type:'create_loc', payload:data});
     return newLoc
   } catch(error){
-    console.error(error);
+    console.error('Error saving new location:',error);
     console.log('creating loc locally');
     queueCreate(newLoc);
     dispatch({type:'create_loc', payload:newLoc});
@@ -97,8 +97,8 @@ const createLocation = dispatch => async(name,address,coords,notes,stars,tags,li
 const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tags,listId,queueEdit) => {
   const datetimeModified = new Date().toISOString();
   try {
-    console.log('trying to PUT loc:',locId,name,address,coords,notes,stars,tags,listId);
-    const {data} = await locationApi.put(`/locs/${locId}`,{name,address,coords,notes,stars,tags,listId,datetimeModified});
+    console.log('trying to PUT loc data:',{locId,name,notes,stars,tags,listId});
+    const {data} = await locationApi.put(`/locs/${locId}`,{name,notes,stars,tags,listId,datetimeModified});
     console.log('editLocation response:',data);
     dispatch({type:'edit_loc', payload:data});
     return data
@@ -108,7 +108,7 @@ const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tag
     console.log('updating loc locally:',updatedLoc);
     queueEdit(updatedLoc);
     dispatch({type:'edit_loc',payload:updatedLoc});    
-    return updatedLoc;
+    return updatedLoc
   }
 };
 
