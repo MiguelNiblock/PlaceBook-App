@@ -11,11 +11,11 @@ import {Text} from 'react-native-elements';
 import locationApi from '../api/location';
 import AuthForm from '../components/AuthForm';
 import {navigate} from '../navigationRef';
-// import * as SecureStore from 'expo-secure-store';
 
 const AccountScreen = ()=>{
 
-    const {signout,signup,clearErrorMessage,state:{token,errorMessage}} = useContext(AuthContext);
+    const {state:{token,errorMessage},signout,signup,clearErrorMessage} = 
+    useContext(AuthContext);
     const {resetLists} = useContext(ListContext);
     const {resetLocations} = useContext(LocationContext);
     const {resetListQueue} = useContext(ListQueueContext);
@@ -68,6 +68,7 @@ const AccountScreen = ()=>{
             onSubmit={signup}
             navText='Or Sign-In if you already have an account'
             navRoute='Signin'
+            clearErrorMessage={clearErrorMessage}
         />
     </>}
 

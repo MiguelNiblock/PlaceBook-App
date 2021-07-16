@@ -42,9 +42,11 @@ const LocationEditScreen = ({navigation}) => {
     let errorMsg = '';
     Object.keys(inputs).forEach( (field) => {
       switch(field) {
-        case 'name': if (inputs[field].length === 0) {
-          errorMsg += 'Place name is required\n'
-        }
+        case 'name': 
+          if (inputs[field].length === 0) {
+            errorMsg += 'Place name is required\n'
+          }
+          break
       }
     })
     return errorMsg

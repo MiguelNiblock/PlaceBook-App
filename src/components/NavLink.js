@@ -3,10 +3,13 @@ import {Text,TouchableOpacity,StyleSheet} from 'react-native';
 import Spacer from './Spacer';
 import {withNavigation} from 'react-navigation';
 
-const NavLink = ({navigation, text, routeName}) => {
+const NavLink = ({navigation, text, routeName, onPress}) => {
 
   return (
-    <TouchableOpacity style={styles.navLink} onPress={ ()=> navigation.navigate(routeName)}>
+    <TouchableOpacity 
+      style={styles.navLink} 
+      onPress={ ()=>{ navigation.navigate(routeName); onPress() } }
+    >
         <Text style={styles.link}>{text}</Text>
     </TouchableOpacity>
   )

@@ -6,11 +6,44 @@ import {Context as ListQueueContext} from '../context/ListQueueContext';
 import {Context as LocationQueueContext} from '../context/LocationQueueContext';
 import NavLink from './NavLink';
 
-const AuthForm = ({ headerText, subtitle, errorMessage, onSubmit, submitButtonText, navText, navRoute }) => {
+const AuthForm = ({ headerText, subtitle, errorMessage, clearErrorMessage, onSubmit, submitButtonText, navText, navRoute }) => {
   const [username,setUsername] = useState('');
   const [password,setPassword] = useState('');
   const {state:listQueue,resetListQueue} = useContext(ListQueueContext);
   const {state:locQueue,resetLocationQueue} = useContext(LocationQueueContext);
+  const [validationError,setValError] = useState(null);
+
+  const clearAllErrors = ()=> {
+    clearErrorMessage();
+    setValError(null);
+  }
+
+  const validate = (inputs) => {
+    let errorMsg = '';
+    Object.keys(inputs).forEach( (field) => {
+      switch(field) {
+        case 'username': 
+          if (inputs[field].length === 0 ) {
+            errorMsg += "Username can't be empty\n"
+          }
+          break
+        case 'password': 
+          if(inputs[field].length === 0 ) {
+            errorMsg += "Password can't be empty\n"
+          }
+          break
+      }
+    })
+    return errorMsg
+  }
+
+  const handleOnSubmit = ({username,password,queues,resetQueues}) => {
+    setValError(null);
+    const validationErrors = validate({username,password});
+    if (!validationErrors){
+      onSubmit({username,password,queues,resetQueues})
+    } else {setValError(validationErrors)}
+  }
 
   const queues = {
     lists: listQueue,
@@ -46,14 +79,16 @@ const AuthForm = ({ headerText, subtitle, errorMessage, onSubmit, submitButtonTe
 
     {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
 
+    {validationError ? <Text style={styles.errorMessage}>{validationError}</Text> : null}
+
     <Button 
       containerStyle={styles.buttonBox} 
       buttonStyle={styles.button} 
       title={submitButtonText} 
-      onPress={()=>onSubmit({username,password,queues,resetQueues})}/>
+      onPress={()=>handleOnSubmit({username,password,queues,resetQueues})}/>
 
     <NavLink 
-      text={navText} routeName={navRoute} />
+      text={navText} routeName={navRoute} onPress={clearAllErrors} />
 
     {/* {listQueue.create.map( (item)=> <Text>{item.name}</Text> )}  */}
     </>

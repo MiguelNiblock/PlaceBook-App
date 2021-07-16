@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext,useEffect} from 'react';
 import {View, StyleSheet, Text, ScrollView} from 'react-native';
 import AuthForm from '../components/AuthForm';
 import {Context as AuthContext} from '../context/AuthContext';
@@ -7,10 +7,13 @@ import {NavigationEvents} from 'react-navigation';
 const SigninScreen = ()=>{
     const {state, signin, clearErrorMessage} = useContext(AuthContext);
 
+    useEffect(() => {
+        clearErrorMessage();
+    },[]);
+
     return (
         <ScrollView>
         <View style={styles.container}>
-            <NavigationEvents onWillFocus={clearErrorMessage}/>
             <AuthForm
                 headerText="Sign In"
                 subtitle="Access all your saved places!"
@@ -19,6 +22,7 @@ const SigninScreen = ()=>{
                 onSubmit={signin}
                 navText="Don't have an account? Sign-Up instead"
                 navRoute='Settings'
+                clearErrorMessage={clearErrorMessage}
             />
         </View>
         </ScrollView>
