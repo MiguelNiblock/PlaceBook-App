@@ -82,7 +82,7 @@ const ListEditScreen = ({navigation})=>{
 
       <Input label="List Marker" disabled leftIconContainerStyle={styles.markerIconBox}
         leftIcon={
-          { type:'material-community', name:listIcon || 'map-marker', color:listColor || 'black', size:55 }
+          { type:'material-community', name:listIcon, color:listColor, size:55 }
         }
         InputComponent={()=>(
           <>
@@ -106,9 +106,9 @@ const ListEditScreen = ({navigation})=>{
       {/* <View style={{backgroundColor:listColor,height:50,width:50}} /> */}
       {/* <Button title="Choose List Color" onPress={toggleColorPicker} /> */}
       <Overlay isVisible={showColorPicker} onBackdropPress={toggleColorPicker} style={{}} >
-        <TriangleColorPicker color={toHsv(listColor)} 
-          onColorChange={color=>setListColor(fromHsv(color))}
-          onColorSelected={color=>{setListColor(fromHsv(color));toggleColorPicker()}}
+        <TriangleColorPicker color={listColor} 
+          onColorChange={color=>setListColor(color)}
+          onColorSelected={color=>{setListColor(color);toggleColorPicker()}}
           style={styles.colorPickerBox}
         />
         <Text>{"\n"}Press the rectangle to confirm color.</Text>

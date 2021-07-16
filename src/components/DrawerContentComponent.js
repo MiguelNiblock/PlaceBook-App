@@ -26,7 +26,7 @@ const DrawerContentComponent = (props) => {
             title="New List"
             containerStyle={styles.buttonContainer}
             buttonStyle={styles.button}
-            onPress={()=>navigate('ListEdit',{listId:null})}
+            onPress={()=>navigate('ListEdit')}
             type='solid' 
             icon={{name:'playlist-plus', type:'material-community', color:'white'}}
           />
