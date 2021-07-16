@@ -20,8 +20,11 @@ const LocationEditScreen = ({navigation}) => {
   const [showBottomSheet,setshowBottomSheet] = 
   useState(false);
 
+  const [error,setError] = useState(null);
+
   const loc = navigation.getParam('loc');
-  // console.log('loc:',loc)
+  // console.log('loc:',loc);
+  // console.log('lists:',lists);
   const {latitude, longitude} = loc.coords;
 
   useEffect(()=>{
@@ -31,18 +34,36 @@ const LocationEditScreen = ({navigation}) => {
     changeNotes(loc.notes)
     changeStars(loc.stars)
     changeTags(loc.tags)
-    changeListId(loc.listId)
+    changeListId(loc.listId || lists.find(item=>item._id.startsWith('default'))._id )
     navigation.setParams({handleDeleteLocation})
   },[])
 
+  const validate = (inputs) => {
+    let errorMsg = '';
+    Object.keys(inputs).forEach( (field) => {
+      switch(field) {
+        case 'name': if (inputs[field].length === 0) {
+          errorMsg += 'Place name is required\n'
+        }
+      }
+    })
+    return errorMsg
+  }
+
   const saveLocation = async(locId,name,address,coords,notes,stars,tags,listId) => {
-    if (locId){//if location exists...
-      const editedLoc = await editLocation(locId,name,address,coords,notes,stars,tags,listId,locationUpdateQueue);
-      navigate('Map',{loc:editedLoc,hideDrawer:true,hideExplorerMarker:true});
+    setError(null);
+    const validationErrors = validate({name});
+    if (!validationErrors){
+      if (locId){//if location exists...
+        const editedLoc = await editLocation(locId,name,address,coords,notes,stars,tags,listId,locationUpdateQueue);
+        navigate('Map',{loc:editedLoc,hideDrawer:true,hideExplorerMarker:true});
+      } else {
+        const createdLoc = await createLocation(name,address,coords,notes,stars,tags,listId,locationCreateQueue);
+        // console.log('createdLoc from locEdit scr:',createdLoc);
+        navigate('Map',{loc:createdLoc,hideDrawer:true,hideExplorerMarker:true});
+      }
     } else {
-      const createdLoc = await createLocation(name,address,coords,notes,stars,tags,listId,locationCreateQueue);
-      // console.log('createdLoc from locEdit scr:',createdLoc);
-      navigate('Map',{loc:createdLoc,hideDrawer:true,hideExplorerMarker:true});
+      setError(validationErrors)
     }
   }
 
@@ -58,7 +79,7 @@ const LocationEditScreen = ({navigation}) => {
   return (
     <ScrollView>
 
-      <Input label="Place Name" value={name} onChangeText={changeName} multiline={true} leftIcon={{ type:'material-community', name:'map-marker' }} />
+      <Input label="Place Name *" value={name} onChangeText={changeName} multiline={true} leftIcon={{ type:'material-community', name:'map-marker' }} />
 
       <Input label="Notes" value={notes} onChangeText={changeNotes} multiline={true}  leftIcon={{ type:'material-community', name:'text' }} />
 
@@ -106,6 +127,8 @@ const LocationEditScreen = ({navigation}) => {
         </ListItem>
       </BottomSheet>
 
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+
       <Button title="Save" containerStyle={styles.button} onPress={()=>saveLocation(loc._id,name,address,coords,notes,stars,tags,listId)}/>
 
     </ScrollView>
@@ -134,7 +157,13 @@ const styles = StyleSheet.create({
     width: '40%',
     alignSelf:'center',
     margin:'5%'
-  }
+  },
+  error: {
+    fontSize: 16,
+    color: 'red',
+    marginLeft: 15,
+    // marginTop: 15
+},
 })
 
 export default LocationEditScreen;
