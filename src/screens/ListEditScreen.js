@@ -144,7 +144,7 @@ const ListEditScreen = ({navigation})=>{
       <Overlay isVisible={showIconPicker} onBackdropPress={toggleIconPicker} overlayStyle={styles.iconPickerOverlay} >
         <ScrollView contentContainerStyle={styles.iconPickerScrollContent} horizontal={true} >
           {iconNames.map((iconName)=>{
-            return (
+            return (<>
                 <Icon
                   name={iconName}
                   type='material-community'
@@ -154,6 +154,8 @@ const ListEditScreen = ({navigation})=>{
                   containerStyle={styles.iconPickerIcons}
                   key={iconName}
                 />
+                {/* <Text >{iconName}</Text> */}
+                </>
             )
           })}
         </ScrollView>
