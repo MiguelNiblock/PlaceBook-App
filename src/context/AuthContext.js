@@ -41,12 +41,14 @@ const signup = (dispatch) => async ({username,password,queues,resetQueues}) => {
         console.log('signup action input:',username,password,queues);
         const {data} = await locationApi.post('/signup',{username,password,queues});
         console.log('signup response:',data);
-        await resetQueues();
-        dispatch({ type:'signin', payload:{ token:data.token, local:false} });
         navigate('Map');
+        dispatch({ type:'signin', payload:{ token:data.token, local:false} });
+        resetQueues();
+        return data.token
     } catch (err) {
         console.error(err);
         dispatch({type:'add_error',payload:'Something went wrong with signup'});
+        return null
     }
 };    
 
@@ -55,12 +57,14 @@ const signin = (dispatch) => async({username,password}) => {
         console.log('signin action input:',username,password);
         const {data} = await locationApi.post('/signin',{username,password});
         console.log('signin response:',data);
-            //only if the signin action is not local, token will be set saved to localStore
-        dispatch({type:'signin', payload:{ token:data.token, local:false } });
         navigate('Map');
+        ////only if the signin action is not local, token will be set saved to localStore
+        dispatch({type:'signin', payload:{ token:data.token, local:false } });
+        return data.token
     } catch (err) {
         console.error(err);
         dispatch({type:'add_error',payload:'Something went wrong with sign in'});
+        return null
     }
 };
 

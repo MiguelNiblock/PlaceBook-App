@@ -9,6 +9,7 @@ import NavLink from './NavLink';
 const AuthForm = ({ headerText, subtitle, errorMessage, clearErrorMessage, onSubmit, submitButtonText, navText, navRoute }) => {
   const [username,setUsername] = useState('');
   const [password,setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const {state:listQueue,resetListQueue} = useContext(ListQueueContext);
   const {state:locQueue,resetLocationQueue} = useContext(LocationQueueContext);
   const [validationError,setValError] = useState(null);
@@ -37,12 +38,17 @@ const AuthForm = ({ headerText, subtitle, errorMessage, clearErrorMessage, onSub
     return errorMsg
   }
 
-  const handleOnSubmit = ({username,password,queues,resetQueues}) => {
+  const handleOnSubmit = async ({username,password,queues,resetQueues}) => {
+    setLoading(true);
     setValError(null);
     const validationErrors = validate({username,password});
     if (!validationErrors){
-      onSubmit({username,password,queues,resetQueues})
-    } else {setValError(validationErrors)}
+      await onSubmit({username,password,queues,resetQueues});
+      setLoading(false);
+    } else {
+      setValError(validationErrors);
+      setLoading(false);
+    }
   }
 
   const queues = {
@@ -85,8 +91,9 @@ const AuthForm = ({ headerText, subtitle, errorMessage, clearErrorMessage, onSub
       containerStyle={styles.buttonBox} 
       buttonStyle={styles.button} 
       title={submitButtonText} 
+      disabled={loading}
       onPress={()=>handleOnSubmit({username,password,queues,resetQueues})}/>
-
+    
     <NavLink 
       text={navText} routeName={navRoute} onPress={clearAllErrors} />
 

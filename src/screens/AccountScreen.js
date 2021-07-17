@@ -43,7 +43,8 @@ const AccountScreen = ()=>{
         const resetedLists = resetLists();
         const resetedLocQueue = resetLocationQueue();
         const resetedListQueue = resetListQueue();
-        await Promise.all([resetedLocs,resetedLists,resetedLocQueue,resetedListQueue]).then(signout())
+        // await Promise.all([resetedLocs,resetedLists,resetedLocQueue,resetedListQueue]).then(signout())
+        signout()
     }
 
     return (
