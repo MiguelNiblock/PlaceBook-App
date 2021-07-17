@@ -241,8 +241,7 @@ const MapScreen = ({navigation})=>{
                   type='material-community'
                   color={locList.color? locList.color : 'rgba(255,0,0,1)'}
                   // color='rgba(255,0,0,1)'
-                  size={45}
-                />
+                  size={45} />
               </Marker>
             )
           }

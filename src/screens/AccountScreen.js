@@ -38,7 +38,7 @@ const AccountScreen = ()=>{
     },[]);
 
     const handleSignOut = async () => {
-        navigate('Map',{hideDrawer:true});
+        navigate('Map',{hideDrawer:true,hideBottomSheet:true});
         const resetedLocs = resetLocations();
         const resetedLists = resetLists();
         const resetedLocQueue = resetLocationQueue();
