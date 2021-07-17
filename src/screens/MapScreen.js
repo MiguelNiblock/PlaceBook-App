@@ -31,12 +31,13 @@ const MapScreen = ({navigation})=>{
     coords:{longitude: -93.35577942430973, latitude: 23.47555745333057},//dummy region in the sea
     opacity:0
   })
-  const [addressOverlay, setAddressOverlay] = useState('');
+  // const [addressOverlay, setAddressOverlay] = useState('');
+  // const [showSaveButton,setShowSaveButton] = useState(false);
+  // const [showEditButton,setShowEditButton] = useState(false);
+  const [bottomSheet, setBottomSheet] = useState({name:'',address:'',showEditButton:false,showSaveButton:false})
   const [currentSavedMarker, setCurrentSavedMarker] = useState({});
   const markerRef = useRef();
   const [editMap,setEditMap] = useState(false);//quickfix for bug: mapview not showing controls on load
-  const [showSaveButton,setShowSaveButton] = useState(false);
-  const [showEditButton,setShowEditButton] = useState(false);
   const [currentRegion,setCurrentRegion] = useState({ //default to north america
     longitudeDelta: 86.15907199680805, latitudeDelta: 75.92358466231565, longitude: -92.3610382899642, latitude: 24.193727440390386
   });
@@ -125,9 +126,7 @@ const MapScreen = ({navigation})=>{
       // console.log('focusLoc from useEffect:',focusLoc);
       setCurrentSavedMarker(focusLoc);
       setCurrentRegion({...currentRegion,...focusLoc.coords,longitudeDelta:0.0154498592018939, latitudeDelta:0.0193603328227141});
-      setAddressOverlay(focusLoc.address);
-      setShowSaveButton(false);
-      setShowEditButton(true);
+      setBottomSheet({name:focusLoc.name,address:focusLoc.address,showSaveButton:false,showEditButton:true})
       bottomSheetRef.current.snapTo(1);
     }
     if(hideBottomSheet){console.log('closing bottomSheet');bottomSheetRef.current.close()}
@@ -149,17 +148,13 @@ const MapScreen = ({navigation})=>{
       opacity:1,
       address
     });
-    setShowSaveButton(true);
-    setShowEditButton(false);
-    setAddressOverlay(address);
+    setBottomSheet({name:'',address,showSaveButton:true,showEditButton:false});
     bottomSheetRef.current.snapTo(1);
   };
 
   const mapTap = () => {
     setExplorerMarker({...explorerMarker,show:false});
-    setShowSaveButton(false);
-    setShowEditButton(false);
-    setAddressOverlay('');
+    setBottomSheet({name:'',address:'',showSaveButton:false,showEditButton:false});
     bottomSheetRef.current.close();
   };
 
@@ -168,7 +163,7 @@ const MapScreen = ({navigation})=>{
     const loc = {
       _id:null,
       name:'',
-      address:addressOverlay,
+      address:bottomSheet.address,
       coords:explorerMarker.coords,
       notes:'',
       stars:0,
@@ -210,9 +205,7 @@ const MapScreen = ({navigation})=>{
             "longitude": explorerMarker.coords.longitude,
           }}
           onPress={()=>{
-            setAddressOverlay(explorerMarker.address);
-            setShowEditButton(false);
-            setShowSaveButton(true);
+            setBottomSheet({name:'',address:explorerMarker.address,showSaveButton:true,showEditButton:false});
             setCurrentRegion({...currentRegion,...explorerMarker.coords,longitudeDelta:0.0154498592018939, latitudeDelta:0.0193603328227141});
             bottomSheetRef.current.snapTo(1);
           }}
@@ -236,10 +229,8 @@ const MapScreen = ({navigation})=>{
               <Marker key={item._id} 
                 coordinate={{...item.coords}}
                 onPress={()=>{
-                  setAddressOverlay(item.address);
+                  setBottomSheet({name:item.name,address:item.address,showSaveButton:false,showEditButton:true});
                   setCurrentSavedMarker(item);
-                  setShowSaveButton(false);
-                  setShowEditButton(true);
                   bottomSheetRef.current.snapTo(1);
                   setCurrentRegion({...currentRegion,...item.coords,longitudeDelta:0.0154498592018939, latitudeDelta:0.0193603328227141});
                 }}
@@ -267,15 +258,17 @@ const MapScreen = ({navigation})=>{
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
       >
-        <Text selectable style={styles.addressOverlay}>{addressOverlay}</Text>
-        {showSaveButton && 
+        {(bottomSheet.name !== '') && <Text selectable style={styles.name}>{bottomSheet.name}</Text>}
+        <Text selectable style={styles.address}>{bottomSheet.address}</Text>
+        {bottomSheet.showSaveButton && 
         <ModalTouchable style={styles.modalButton} onPress={saveLocation} >
           <Button title='Save' type='solid' />
         </ModalTouchable>}
-        {showEditButton &&
+
+        {bottomSheet.showEditButton &&
         <ModalTouchable style={styles.modalButton} onPress={editLocation} >
-        <Button title='Edit' type='solid' />
-      </ModalTouchable>}
+          <Button title='Edit' type='solid' />
+        </ModalTouchable>}
       </BottomSheet>
 
       <TouchableOpacity style={styles.drawerButton}
@@ -330,7 +323,7 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
     // justifyContent: 'center'
   },
-  addressOverlay: {
+  address: {
     width: '80%',
     padding: 5,
     margin: 5,
@@ -338,7 +331,16 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
     textAlign: 'center'
-  },  
+  },
+  name: {
+    width: '80%',
+    // padding: 5,
+    // margin: 5,
+    alignSelf: 'center',
+    fontSize: 16,
+    // fontWeight: 'bold',
+    textAlign: 'center'
+  },
   modalButton:{
     alignSelf: 'center',
     width: '50%'
