@@ -46,18 +46,32 @@ const MapScreen = ({navigation})=>{
   const handleSheetChanges = useCallback((index) => {
     // console.log('handleSheetChanges', index);
   }, []);
-  const [loadedLocalData, setloadedLocalData] = useState(false);
-
 
   useEffect(()=>{
     // resetLocations();
     // signout();
 
+    ///////////////////////////////////////
+    //Show current address
+    (async()=>{ //gets device location and sets it as map region
+      console.log('Called showCurrentAddress');
+      let { status } = await Location.requestPermissionsAsync();
+      console.log('location permission:',status);
+      if(status==='granted'){
+        setTimeout(async function(){
+          let {coords:{latitude,longitude}} = await Location.getCurrentPositionAsync({});
+          const coords = {latitude,longitude};
+          console.log('coords:',latitude,longitude)
+          setCurrentRegion({longitudeDelta: 0.0154498592018939, latitudeDelta: 0.013360640311354643, ...coords});
+          handleLongPress({coords});
+        },2000);
+      }
+    })();
+
     if(!token){
 
       ///////////////////////////////
       //Load data from localStore
-      setloadedLocalData(false);
       (async()=>{ //wait for local data to load
         console.log('Called local async step1...');
         const loadedLocalLists = loadLocalLists();
@@ -67,7 +81,6 @@ const MapScreen = ({navigation})=>{
         return new Promise.all([loadedLocalListQueue,loadedLocalLocationQueue,loadedLocalLists,loadedLocalLocs]);
       })()
       .then(([loadedLocalListQueue,loadedLocalLocationQueue,loadedLocalLists,loadedLocalLocs])=>{
-        setloadedLocalData(true);
         if( loadedLocalLists && !loadedLocalLists.find(list=>list._id.startsWith('default')) ){
           console.log('Creating default list');
           createList('Default List','black','map-marker',listCreateQueue,'default');
@@ -95,34 +108,15 @@ const MapScreen = ({navigation})=>{
 
     }
 
-    ///////////////////////////////////////
-    //Show current address
-    (async()=>{ //gets device location and sets it as map region
-      console.log('Called showCurrentAddress');
-      let { status } = await Location.requestPermissionsAsync();
-      console.log('location permission:',status);
-      if(status==='granted'){
-        setTimeout(async function(){
-          let {coords:{latitude,longitude}} = await Location.getCurrentPositionAsync({});
-          const coords = {latitude,longitude};
-          console.log('coords:',latitude,longitude)
-          setCurrentRegion({longitudeDelta: 0.0154498592018939, latitudeDelta: 0.013360640311354643, ...coords});
-          handleLongPress({coords});
-        },2000);
-      }
-    })();
-
   },[token]);
 
   /////////////////////////////////////////////////////////
   // FocusLoc navigation
   ////When a screen navigates here with a 'loc' param, it'll activate the useEffect which focuses on that marker and displays the address.
   const focusLoc = navigation.getParam('loc');
-  // console.log('focusLoc from comp body:',focusLoc)
   const hideDrawer = navigation.getParam('hideDrawer');
-  // console.log('hideDrawer:',hideDrawer);
   const hideExplorerMarker = navigation.getParam('hideExplorerMarker');
-  // console.log('hideExplorerMarker:',hideExplorerMarker);
+  const hideBottomSheet = navigation.getParam('hideBottomSheet');
   useEffect(()=>{
     // console.log('focusLoc useEffect called');
     if(hideDrawer){navigation.closeDrawer()};
@@ -135,12 +129,13 @@ const MapScreen = ({navigation})=>{
       setShowSaveButton(false);
       setShowEditButton(true);
       bottomSheetRef.current.snapTo(1);
-    };
+    }
+    if(hideBottomSheet){console.log('closing bottomSheet');bottomSheetRef.current.close()}
     return ()=> { 
       // console.log('cleanup fn called');
-      navigation.setParams({hideDrawer:null,loc:null})
+      navigation.setParams({hideDrawer:null,loc:null,hideBottomSheet:null})
     };
-  },[focusLoc,hideDrawer,hideExplorerMarker]);
+  },[focusLoc,hideDrawer,hideExplorerMarker,hideBottomSheet]);
 
   const handleLongPress = async({nativeEvent,coords})=>{
     // coords ??= nativeEvent?.coordinate

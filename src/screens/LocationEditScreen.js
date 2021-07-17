@@ -71,7 +71,7 @@ const LocationEditScreen = ({navigation}) => {
 
   const handleDeleteLocation = () => {
     deleteLocation(loc,locationDeleteQueue);
-    navigation.goBack();
+    navigate('Map',{hideBottomSheet:true});
   }
 
   const list = lists.find((item)=>item._id === listId);
