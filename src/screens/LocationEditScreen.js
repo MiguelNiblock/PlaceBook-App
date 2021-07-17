@@ -1,5 +1,5 @@
 import React,{useEffect,useContext,useState} from 'react';
-import {View, ScrollView,TextInput, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, ScrollView,TextInput, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator} from 'react-native';
 import {ListItem, Input, Rating, AirbnbRating, Text, Button, Icon, BottomSheet} from 'react-native-elements';
 import {navigate} from '../navigationRef'
 import {Context as LocationEditContext} from '../context/LocationEditContext';
@@ -20,6 +20,7 @@ const LocationEditScreen = ({navigation}) => {
   const [showBottomSheet,setshowBottomSheet] = 
   useState(false);
 
+  const [loading, setLoading] = useState(false);
   const [error,setError] = useState(null);
 
   const loc = navigation.getParam('loc');
@@ -35,7 +36,7 @@ const LocationEditScreen = ({navigation}) => {
     changeStars(loc.stars)
     changeTags(loc.tags)
     changeListId(loc.listId || lists.find(item=>item._id.startsWith('default'))._id )
-    navigation.setParams({handleDeleteLocation})
+    navigation.setParams({handleDeleteLocation,loading:false})
   },[])
 
   const validate = (inputs) => {
@@ -53,25 +54,33 @@ const LocationEditScreen = ({navigation}) => {
   }
 
   const saveLocation = async(locId,name,address,coords,notes,stars,tags,listId) => {
+    setLoading(true);
     setError(null);
     const validationErrors = validate({name});
     if (!validationErrors){
       if (locId){//if location exists...
         const editedLoc = await editLocation(locId,name,address,coords,notes,stars,tags,listId,locationUpdateQueue);
         navigate('Map',{loc:editedLoc,hideDrawer:true,hideExplorerMarker:true});
+        setLoading(false);
       } else {
         const createdLoc = await createLocation(name,address,coords,notes,stars,tags,listId,locationCreateQueue);
         // console.log('createdLoc from locEdit scr:',createdLoc);
         navigate('Map',{loc:createdLoc,hideDrawer:true,hideExplorerMarker:true});
+        setLoading(false);
       }
     } else {
       setError(validationErrors)
+      setLoading(false);
     }
   }
 
-  const handleDeleteLocation = () => {
-    deleteLocation(loc,locationDeleteQueue);
+  const handleDeleteLocation = async () => {
+    setLoading(true);
+    navigation.setParams({loading:true});
+    await deleteLocation(loc,locationDeleteQueue);
     navigate('Map',{hideBottomSheet:true});
+    setLoading(false);
+    navigation.setParams({loading:false});
   }
 
   const list = lists.find((item)=>item._id === listId);
@@ -91,7 +100,7 @@ const LocationEditScreen = ({navigation}) => {
 
       {/* <Input label="Tags" value={tags.join(' ')} onChangeText={changeTags} multiline={true} /> */}
 
-      <Input disabled label="Coordinates" InputComponent={()=>(<Text style={styles.disabledInput} selectable numberOfLines={0} >{[latitude,longitude].join(', ')}</Text> )} leftIcon={{ type:'material-community', name:'crosshairs-gps' }} />
+      <Input disabled label="Coordinates" InputComponent={()=>(<Text style={[styles.disabledInput,{fontSize:14}]} selectable numberOfLines={0} >{[latitude,longitude].join(', ')}</Text> )} leftIcon={{ type:'material-community', name:'crosshairs-gps' }} />
 
       <TouchableOpacity onPress={()=>setshowBottomSheet(true)} >
       <Input disabled label="List" 
@@ -131,7 +140,12 @@ const LocationEditScreen = ({navigation}) => {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <Button title="Save" containerStyle={styles.button} onPress={()=>saveLocation(loc._id,name,address,coords,notes,stars,tags,listId)}/>
+      <Button 
+        title="Save" 
+        containerStyle={styles.button} 
+        onPress={()=>saveLocation(loc._id,name,address,coords,notes,stars,tags,listId)}
+        loading={loading}
+        disabled={loading} />
 
     </ScrollView>
   )
@@ -140,11 +154,22 @@ const LocationEditScreen = ({navigation}) => {
 LocationEditScreen.navigationOptions = ({navigation}) => {
   const placeName = navigation.getParam('placeName');
   const loc = navigation.getParam('loc');
-  const handleDeleteLocation = navigation.getParam('handleDeleteLocation')
+  const handleDeleteLocation = navigation.getParam('handleDeleteLocation');
+  const headerLoading = navigation.getParam('loading');
   return {
     title: placeName,
     headerRight: ()=>(
-      loc._id && <View style={{paddingRight:20}} ><Icon name='trash-can-outline' type='material-community' size={30} color='rgb(184, 3, 14)' onPress={()=>handleDeleteLocation()} /></View>
+      loc._id && 
+      <View style={{paddingRight:20}} >
+        {!headerLoading
+        ? <Icon name='trash-can-outline' 
+            type='material-community' 
+            size={30} 
+            color='rgb(184, 3, 14)' 
+            onPress={()=>handleDeleteLocation()} 
+            disabled={headerLoading} />
+        : <ActivityIndicator color='rgb(184, 3, 14)' />}
+      </View>
     ) ,
     // headerRightContainerStyle: {paddingRight:'30%',width:'20%'}
   }
@@ -153,7 +178,8 @@ LocationEditScreen.navigationOptions = ({navigation}) => {
 const styles = StyleSheet.create({
   disabledInput: {
     fontSize: 16,
-    padding:'2%'
+    padding:'2%',
+    paddingRight:10
   },
   button: {
     width: '40%',

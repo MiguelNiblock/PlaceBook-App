@@ -100,8 +100,12 @@ const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tag
     console.log('trying to PUT loc data:',{locId,name,notes,stars,tags,listId});
     const {data} = await locationApi.put(`/locs/${locId}`,{name,notes,stars,tags,listId,datetimeModified});
     console.log('editLocation response:',data);
-    dispatch({type:'edit_loc', payload:data});
-    return data
+    if (data._id === locId){
+      dispatch({type:'edit_loc', payload:data});
+      return data
+    } else {
+      throw 'Updating location failed on backend'
+    }
   } catch (error) {
     console.error(error);
     const updatedLoc = {_id:locId,name,address,coords,notes,stars,tags,listId,datetimeModified};
@@ -117,12 +121,18 @@ const deleteLocation = dispatch => async(loc,queueDelete) => {
     console.log('trying to DELETE loc:',loc._id);
     const {data} = await locationApi.delete(`/locs/${loc._id}`);
     console.log('deleteLocation response:',data);
-    dispatch({type:'delete_loc',payload:loc._id});
+    if (data._id === loc._id){
+      dispatch({type:'delete_loc',payload:loc._id});
+      return data
+    } else {
+      throw 'Deleting location failed on backend'
+    }
   } catch (error) {
     console.error(error);
     console.log('deleting loc locally');
     queueDelete(loc);
     dispatch({type:'delete_loc',payload:loc._id});
+    return loc
   }
 };
 
