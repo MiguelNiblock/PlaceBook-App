@@ -98,15 +98,14 @@ const createList = dispatch => async(name,color,icon,queueCreate,idPrefix) => {
     const {data} = await locationApi.post('/lists',{item:newList});
     console.log('createList response:',data);
     dispatch({type:'create_list',payload:data});
+    return data
   } catch(error){
     console.error(error);
     console.log('creating list locally');
-    queueCreate({...newList, 
-      // hasLocs:false
-    });
+    queueCreate(newList);
     dispatch({type:'create_list',payload:newList});
-  }
-  navigate('Drawer');
+    return newLoc
+  } finally{navigate('Drawer')}
 };
 
 const editList = dispatch => async({_id,name,color,icon,shown,expanded},queueEdit) => {
@@ -115,15 +114,20 @@ const editList = dispatch => async({_id,name,color,icon,shown,expanded},queueEdi
     console.log('trying to PUT list:',_id,name,color,icon,shown,expanded);
     const {data} = await locationApi.put(`/lists/${_id}`,{name,color,icon,shown,expanded,datetimeModified});
     console.log('editList response:',data);
-    dispatch({type:'edit_list',payload:data});
+    if(data._id === _id){
+      dispatch({type:'edit_list',payload:data});
+      return data
+    } else {
+      throw 'Updating list failed on backend'
+    }
   } catch (error){
     console.error(error)
     const updatedList = {_id,name,color,icon,shown,expanded,datetimeModified};
     console.log('updating list locally:',updatedList);
     queueEdit(updatedList);
     dispatch({type:'edit_list',payload:updatedList});
-  }
-  navigate('Map');
+    return updatedList
+  } finally {navigate('Map')}
 };
 
 const deleteList = dispatch => async(list,queueDelete) => {
@@ -131,12 +135,18 @@ const deleteList = dispatch => async(list,queueDelete) => {
     console.log('trying to DELETE list:',list._id);
     const {data} = await locationApi.delete(`/lists/${list._id}`);
     console.log('deleteList response:',data);
-    dispatch({type:'delete_list',payload:list._id});
+    if(data._id === list._id){
+      dispatch({type:'delete_list',payload:list._id});
+      return data
+    } else{
+      throw 'Deleting list failed on backend'
+    }
   } catch(error){
     console.error(error)
     console.log('deleting list locally')
     queueDelete(list);
     dispatch({type:'delete_list',payload:list._id});
+    return list
   }
 };
 

@@ -84,7 +84,7 @@ const createLocation = dispatch => async(name,address,coords,notes,stars,tags,li
     const {data} = await locationApi.post('/locs',{item:newLoc});
     console.log('createLoc response:',data);
     dispatch({type:'create_loc', payload:data});
-    return newLoc
+    return data
   } catch(error){
     console.error('Error saving new location:',error);
     console.log('creating loc locally');

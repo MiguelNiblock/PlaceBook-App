@@ -1,5 +1,5 @@
 import React,{useState,useContext,useEffect} from 'react';
-import {ScrollView, View, TouchableOpacity,StyleSheet,Dimensions} from 'react-native';
+import {ScrollView, View, TouchableOpacity,StyleSheet,Dimensions, ActivityIndicator} from 'react-native';
 import {ListItem, Input, Text, Button, CheckBox, Overlay, Chip, Icon} from 'react-native-elements';
 import { TriangleColorPicker, toHsv, fromHsv } from 'react-native-color-picker'
 import {Context as ListContext} from '../context/ListContext';
@@ -21,6 +21,7 @@ const ListEditScreen = ({navigation})=>{
   const [listColor,setListColor] = useState('rgba(0,0,0,1)');
   const [listIcon,setListIcon] = useState('map-marker');
   const [error,setError] = useState(null);
+  const [loading,setLoading] = useState(false);
 
   const list = navigation.getParam('list');
 
@@ -33,6 +34,10 @@ const ListEditScreen = ({navigation})=>{
       setListIcon(list.icon);
     };
   },[]);
+
+  useEffect(()=>{
+    navigation.setParams({loading});
+  },[loading])
 
   const validate = (inputs) => {
     let errorMsg = '';
@@ -48,14 +53,24 @@ const ListEditScreen = ({navigation})=>{
     return errorMsg
   }
 
-  const saveList = (name,color,icon)=>{
+  const saveList = async (name,color,icon)=>{
     // console.log('list in saveList before ifListId:',list);
+    setLoading(true);
     setError(null);
     const validationErrors = validate({name});
     if (!validationErrors){
-      if(list?._id) { editList( {...list,name,color,icon}, listUpdateQueue ) }
-      else {createList(name,color,icon,listCreateQueue)};
-    } else {setError(validationErrors)}
+      if(list?._id) { 
+        await editList( {...list,name,color,icon}, listUpdateQueue );
+        setLoading(false);
+      }
+      else {
+        await createList(name,color,icon,listCreateQueue);
+        setLoading(false);
+      }
+    } else {
+      setError(validationErrors);
+      setLoading(false);
+    }
   };
 
   const deleteLocsByListId = (listId,locations,deleteLoc,queueDeletion) => {
@@ -63,10 +78,12 @@ const ListEditScreen = ({navigation})=>{
     locsToDelete.forEach((item)=>deleteLoc(item,queueDeletion))
   };
 
-  const handleDeleteList = () => {
-    deleteList(list,listDeleteQueue);
+  const handleDeleteList = async() => {
+    setLoading(true);
+    await deleteList(list,listDeleteQueue);
     deleteLocsByListId(list._id,locations,deleteLocation,locationDeleteQueue);
     navigation.goBack();
+    setLoading(false);
   };
 
   const toggleColorPicker = ()=>setShowColorPicker(!showColorPicker);
@@ -145,7 +162,12 @@ const ListEditScreen = ({navigation})=>{
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
       {/* <Button title="Save" onPress={()=>saveList(listId,listName,listColor,listIcon)} /> */}
-      <Button title="Save" containerStyle={styles.button} onPress={()=>saveList(listName,listColor,listIcon)} />
+      <Button 
+        title="Save" 
+        containerStyle={styles.button} 
+        onPress={()=>saveList(listName,listColor,listIcon)}
+        loading={loading}
+        disabled={loading} />
       {/* {listId && <Button title='Delete' onPress={()=>handleDeleteList(listId)} />}  */}
     </ScrollView>
   )
@@ -155,15 +177,18 @@ ListEditScreen.navigationOptions = ({navigation}) => {
   const listName = navigation.getParam('listName');
   const list = navigation.getParam('list');
   const handleDeleteList = navigation.getParam('handleDeleteList');
+  const headerLoading = navigation.getParam('loading');
   return {
     title: listName || 'New list',
     headerRight: ()=>(
       list && !list?._id.startsWith('default') && <View style={{paddingRight:20}} >
-        <Icon 
-          name='trash-can-outline' 
-          type='material-community' 
-          size={30} color='rgb(184, 3, 14)' 
-          onPress={()=>handleDeleteList()} />
+        {!headerLoading
+        ? <Icon 
+            name='trash-can-outline' 
+            type='material-community' 
+            size={30} color='rgb(184, 3, 14)' 
+            onPress={()=>handleDeleteList()} />
+        : <ActivityIndicator color='rgb(184, 3, 14)' />}
       </View>
     ) ,
     // headerRightContainerStyle: {paddingRight:'30%',width:'20%'}

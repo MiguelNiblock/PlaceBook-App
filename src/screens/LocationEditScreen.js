@@ -36,8 +36,12 @@ const LocationEditScreen = ({navigation}) => {
     changeStars(loc.stars)
     changeTags(loc.tags)
     changeListId(loc.listId || lists.find(item=>item._id.startsWith('default'))._id )
-    navigation.setParams({handleDeleteLocation,loading:false})
+    navigation.setParams({handleDeleteLocation})
   },[])
+
+  useEffect(()=>{
+    navigation.setParams({loading});
+  },[loading])
 
   const validate = (inputs) => {
     let errorMsg = '';
@@ -76,11 +80,9 @@ const LocationEditScreen = ({navigation}) => {
 
   const handleDeleteLocation = async () => {
     setLoading(true);
-    navigation.setParams({loading:true});
     await deleteLocation(loc,locationDeleteQueue);
     navigate('Map',{hideBottomSheet:true});
     setLoading(false);
-    navigation.setParams({loading:false});
   }
 
   const list = lists.find((item)=>item._id === listId);
