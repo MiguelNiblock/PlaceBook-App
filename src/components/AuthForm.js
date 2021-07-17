@@ -92,6 +92,7 @@ const AuthForm = ({ headerText, subtitle, errorMessage, clearErrorMessage, onSub
       buttonStyle={styles.button} 
       title={submitButtonText} 
       disabled={loading}
+      loading={loading}
       onPress={()=>handleOnSubmit({username,password,queues,resetQueues})}/>
     
     <NavLink 
