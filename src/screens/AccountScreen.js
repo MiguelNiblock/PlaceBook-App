@@ -1,5 +1,5 @@
 import React,{useContext,useEffect, useState} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import {Button} from 'react-native-elements';
 import {Context as AuthContext} from '../context/AuthContext';
 import {Context as ListContext} from '../context/ListContext';
@@ -11,8 +11,9 @@ import {Text} from 'react-native-elements';
 import locationApi from '../api/location';
 import AuthForm from '../components/AuthForm';
 import {navigate} from '../navigationRef';
+import * as WebBrowser from 'expo-web-browser';
 
-const AccountScreen = ()=>{
+const AccountScreen = ({navigation})=>{
 
     const {state:{token,errorMessage},signout,signup,clearErrorMessage} = 
     useContext(AuthContext);
@@ -69,8 +70,13 @@ const AccountScreen = ()=>{
             onSubmit={signup}
             navText='Or Sign-In if you already have an account'
             navRoute='Signin'
-            clearErrorMessage={clearErrorMessage}
-        />
+            clearErrorMessage={clearErrorMessage} />
+
+        <TouchableOpacity 
+            style={styles.privacy} 
+            onPress={ ()=>WebBrowser.openBrowserAsync('https://miguelniblock.github.io/PlaceBook-App/android-privacy-policy.html') } >
+            <Text >By signing up you agree to our <Text style={{textDecorationLine:'underline'}} >Privacy Policy</Text></Text>
+        </TouchableOpacity>
     </>}
 
     </SafeAreaView>
@@ -101,9 +107,13 @@ const styles = StyleSheet.create({
         width: '40%',
         alignSelf:'center'
       },
-      button: {
+    button: {
         borderRadius: 20
-      },
+    },
+    privacy: {
+        alignSelf: 'center',
+        marginTop: '6%'
+    }
 });
 
 export default AccountScreen;
