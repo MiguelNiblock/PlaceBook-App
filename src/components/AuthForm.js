@@ -4,12 +4,14 @@ import { Text, Button, Input} from 'react-native-elements';
 import Spacer from './Spacer';
 import {Context as ListQueueContext} from '../context/ListQueueContext';
 import {Context as LocationQueueContext} from '../context/LocationQueueContext';
-import NavLink from './NavLink';
+import {Context as AuthContext} from '../context/AuthContext';
+import {NavigationEvents} from 'react-navigation';
 
-const AuthForm = ({ headerText, subtitle, errorMessage, clearErrorMessage, onSubmit, submitButtonText, navText, navRoute }) => {
+const AuthForm = ({ headerText, subtitle, onSubmit, submitButtonText, navText, navRoute }) => {
   const [username,setUsername] = useState('');
   const [password,setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const {state:{token,errorMessage},clearErrorMessage} = useContext(AuthContext);
   const {state:listQueue,resetListQueue} = useContext(ListQueueContext);
   const {state:locQueue,resetLocationQueue} = useContext(LocationQueueContext);
   const [validationError,setValError] = useState(null);
@@ -64,6 +66,7 @@ const AuthForm = ({ headerText, subtitle, errorMessage, clearErrorMessage, onSub
 
   return (
     <>
+    <NavigationEvents onWillFocus={clearAllErrors}/>
     <Spacer>
       <Text h3>{headerText}</Text>
       <Text style={styles.subtitle} >{subtitle}</Text>
@@ -94,9 +97,6 @@ const AuthForm = ({ headerText, subtitle, errorMessage, clearErrorMessage, onSub
       disabled={loading}
       loading={loading}
       onPress={()=>handleOnSubmit({username,password,queues,resetQueues})}/>
-    
-    <NavLink 
-      text={navText} routeName={navRoute} onPress={clearAllErrors} />
 
     {/* {listQueue.create.map( (item)=> <Text>{item.name}</Text> )}  */}
     </>

@@ -1,40 +1,54 @@
 import React, {useContext,useEffect} from 'react';
-import {View, StyleSheet, ScrollView} from 'react-native';
+import {View, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
+import {Button, Text, Icon} from 'react-native-elements';
 import {Context as AuthContext} from '../context/AuthContext';
 import AuthForm from '../components/AuthForm';
-import NavLink from '../components/NavLink';
 import {NavigationEvents} from 'react-navigation';
+import * as WebBrowser from 'expo-web-browser';
 
 const SignupScreen = ({navigation})=>{
-    const {state,signup,clearErrorMessage,tryLocalSignin} = useContext(AuthContext);
-    // console.log(state);
-    useEffect(()=>{
-        tryLocalSignin();
-    },[])
+    
+    const {state:{token,errorMessage},signup,clearErrorMessage} = useContext(AuthContext);
+
     return (
     <ScrollView>
     <View style={styles.container}>
     <NavigationEvents onWillFocus={clearErrorMessage}/>
     <AuthForm
-        headerText="Sign Up for PlaceBook"
-        errorMessage={state.errorMessage}
+        headerText="Sign Up"
+        subtitle="Access your places on all your devices!"
         submitButtonText="Sign Up"
-        onSubmit={signup}
-    />
-    <NavLink
-        routeName="Signin"
-        text="Already have an account? Sign in instead"
-    />
+        onSubmit={signup} />
+
+    <TouchableOpacity 
+        style={styles.link} 
+        onPress={ ()=>navigation.navigate('Signin') } >
+        <Text style={styles.blue} >Or <Text style={[styles.blue,{textDecorationLine:'underline'}]} >Sign-In</Text> if you already have an account </Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity 
+        style={styles.link} 
+        onPress={ ()=>WebBrowser.openBrowserAsync('https://miguelniblock.github.io/PlaceBook-App/android-privacy-policy.html') } >
+        <Text >By signing up you agree to our <Text style={{textDecorationLine:'underline'}} >Privacy Policy</Text></Text>
+    </TouchableOpacity>
+    
     </View> 
     </ScrollView>
     );
 };
 
-SignupScreen.navigationOptions = () => {
+SignupScreen.navigationOptions = ({navigation})=>{
     return {
-        headerShown: false
-    };
-};
+        title: '',
+        headerLeft: ()=>(
+            <Icon name='arrow-left' 
+            type='material-community' 
+            size={27} 
+            onPress={()=>navigation.popToTop()} 
+            containerStyle={{marginLeft:10}} />
+        )
+    }
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -44,6 +58,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center', //centers vertically
         marginBottom: 150 // centering starts from higher
     },
+    link: {
+        alignSelf: 'center',
+        marginTop: '6%'
+    },
+    blue: {
+        color: '#2089dc'
+    }
 });
 
 export default SignupScreen;

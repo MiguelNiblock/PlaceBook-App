@@ -6,7 +6,7 @@ import { createDrawerNavigator } from 'react-navigation-drawer';
 import DrawerContentComponent from './src/components/DrawerContentComponent'
 
 import SigninScreen from './src/screens/SigninScreen';
-// import SignupScreen from './src/screens/SignupScreen';
+import SignupScreen from './src/screens/SignupScreen';
 import AccountScreen from './src/screens/AccountScreen';
 import MapScreen from './src/screens/MapScreen';
 import LocationListScreen from './src/screens/LocationListScreen';
@@ -45,18 +45,9 @@ const Stack = createStackNavigator({
   LocationEdit: LocationEditScreen,
   ListEdit: ListEditScreen,
   Settings: AccountScreen,
+  Signup: SignupScreen,
   Signin: SigninScreen,
 })
-
-
-// const switchNavigator = createSwitchNavigator({
-//   mainFlow: Stack,
-//   ResolveAuth: ResolveAuthScreen,
-//   loginFlow: createStackNavigator({
-//     Signin: SigninScreen,
-//     Signup: SignupScreen
-//   })
-// });
 
 const App = createAppContainer(Stack);
 
