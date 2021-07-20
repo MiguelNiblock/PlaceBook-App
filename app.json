@@ -1,20 +1,19 @@
 {
   "expo": {
     "name": "PlaceBook",
+    "description": "Save and access all of your life's important places.",
     "slug": "PlaceBook",
     "privacy": "public",
     "platforms": [
       "ios",
       "android"
     ],
+    "githubUrl": "https://github.com/MiguelNiblock/PlaceBook-App",
     "version": "1.0.0",
     "orientation": "portrait",
+    "primaryColor": "#42a878",
+    "extra": {},
     "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
@@ -26,6 +25,7 @@
     },
     "android": {
       "package": "com.miguelniblock.PlaceBook",
+      "permissions": ["ACCESS_FINE_LOCATION"],
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyDe1__AtFL5ENtGVrYIuXI0AUkewvkVSUg"
