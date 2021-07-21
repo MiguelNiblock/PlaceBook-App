@@ -10,10 +10,9 @@ import {SafeAreaView} from 'react-navigation';
 import locationApi from '../api/location';
 import {navigate} from '../navigationRef';
 
-const AccountScreen = ({navigation})=>{
+const AccountScreen = ()=>{
 
-    const {state:{token,errorMessage},signout,signup,clearErrorMessage} = 
-    useContext(AuthContext);
+    const {signout} = useContext(AuthContext);
     const {resetLists} = useContext(ListContext);
     const {resetLocations} = useContext(LocationContext);
     const {resetListQueue} = useContext(ListQueueContext);
@@ -30,9 +29,7 @@ const AccountScreen = ({navigation})=>{
     };
 
     useEffect(() => {
-        console.log('accountScreen useEffect called');
-        if (!token) {navigate('Signup')} else {getUser()}
-        clearErrorMessage();
+        getUser();
     },[]);
 
     const handleSignOut = async () => {

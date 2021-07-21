@@ -3,17 +3,15 @@ import {View, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
 import {Button, Text, Icon} from 'react-native-elements';
 import {Context as AuthContext} from '../context/AuthContext';
 import AuthForm from '../components/AuthForm';
-import {NavigationEvents} from 'react-navigation';
 import * as WebBrowser from 'expo-web-browser';
 
 const SignupScreen = ({navigation})=>{
     
-    const {state:{token,errorMessage},signup,clearErrorMessage} = useContext(AuthContext);
+    const {signup} = useContext(AuthContext);
 
     return (
     <ScrollView>
     <View style={styles.container}>
-    <NavigationEvents onWillFocus={clearErrorMessage}/>
     <AuthForm
         headerText="Sign Up"
         subtitle="Access your places on all your devices!"

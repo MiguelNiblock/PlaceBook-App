@@ -5,7 +5,7 @@ import AuthForm from '../components/AuthForm';
 import {Context as AuthContext} from '../context/AuthContext';
 
 const SigninScreen = ({navigation})=>{
-    const {state, signin, clearErrorMessage} = useContext(AuthContext);
+    const {signin} = useContext(AuthContext);
 
     return (
         <ScrollView>
@@ -14,9 +14,7 @@ const SigninScreen = ({navigation})=>{
                 headerText="Sign In"
                 subtitle="Access all your saved places!"
                 submitButtonText="Sign In"
-                onSubmit={signin}
-                navText="Don't have an account? Sign-Up instead"
-                navRoute='Signup' />
+                onSubmit={signin} />
 
             <TouchableOpacity 
                 style={styles.link} 
