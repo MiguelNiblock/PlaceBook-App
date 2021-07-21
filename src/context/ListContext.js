@@ -104,7 +104,7 @@ const createList = dispatch => async(name,color,icon,queueCreate,idPrefix) => {
     console.log('creating list locally');
     queueCreate(newList);
     dispatch({type:'create_list',payload:newList});
-    return newLoc
+    return newList
   } finally{navigate('Drawer')}
 };
 
