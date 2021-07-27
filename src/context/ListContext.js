@@ -67,7 +67,7 @@ const loadLocalLists = dispatch => async() => {
     }
   } else { 
     console.error('Local store not available');
-    return null
+    return []
   }
 }
 

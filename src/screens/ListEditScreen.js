@@ -77,7 +77,7 @@ const ListEditScreen = ({navigation})=>{
 
   const deleteLocsByListId = (listId,locations,deleteLoc,queueDeletion) => {
     const locsToDelete = locations.filter((item)=>item.listId === listId);
-    locsToDelete.forEach((item)=>deleteLoc(item,queueDeletion))
+    locsToDelete.forEach((item)=>deleteLoc(item,queueDeletion,token))
   };
 
   const handleDeleteList = async() => {

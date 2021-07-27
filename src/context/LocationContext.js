@@ -54,13 +54,14 @@ const loadLocalLocs = dispatch => async() => {
     }
   } else {
     console.error('Local store not available');
-    return null
+    return []
   }
 }
 
-const fetchLocs = dispatch => async(locQueue) => {
+const fetchLocs = dispatch => async(locQueue,token) => {
   console.log('fetchLocs called. Queue:',locQueue);
   try{
+    if(!token){throw 'No token'}
     const {data} = await locationApi.get('/locs');
     console.log('fetchLocs response:',data);
     const result = mergeWithQueue(data,locQueue);
@@ -70,17 +71,18 @@ const fetchLocs = dispatch => async(locQueue) => {
     return data
   } catch(error){
     console.error('Fetchlocs failed',error);
-    return null
+    return []
   }
 };
 
-const createLocation = dispatch => async(name,address,coords,notes,stars,tags,listId,queueCreate) => {
+const createLocation = dispatch => async(name,address,coords,notes,stars,tags,listId,queueCreate,token) => {
   const _id = uuid.v4();
   const timeStamp = new Date().toISOString();
   const newLoc = {_id,name,address,coords,notes,stars,tags,listId,datetimeCreated:timeStamp,datetimeModified:timeStamp}
   console.log('new loc:',newLoc);
   try {
     console.log('trying to POST loc');
+    if(!token){throw 'No token'}
     const {data} = await locationApi.post('/locs',{item:newLoc});
     console.log('createLoc response:',data);
     dispatch({type:'create_loc', payload:data});
@@ -94,10 +96,11 @@ const createLocation = dispatch => async(name,address,coords,notes,stars,tags,li
   }
 };
 
-const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tags,listId,queueEdit) => {
+const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tags,listId,queueEdit,token) => {
   const datetimeModified = new Date().toISOString();
   try {
     console.log('trying to PUT loc data:',{locId,name,notes,stars,tags,listId});
+    if(!token){throw 'No token'}
     const {data} = await locationApi.put(`/locs/${locId}`,{name,notes,stars,tags,listId,datetimeModified});
     console.log('editLocation response:',data);
     if (data._id === locId){
@@ -107,7 +110,7 @@ const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tag
       throw 'Updating location failed on backend'
     }
   } catch (error) {
-    console.error(error);
+    console.error('Error updating location:',error);
     const updatedLoc = {_id:locId,name,address,coords,notes,stars,tags,listId,datetimeModified};
     console.log('updating loc locally:',updatedLoc);
     queueEdit(updatedLoc);
@@ -116,9 +119,10 @@ const editLocation = dispatch => async(locId,name,address,coords,notes,stars,tag
   }
 };
 
-const deleteLocation = dispatch => async(loc,queueDelete) => {
+const deleteLocation = dispatch => async(loc,queueDelete,token) => {
   try {
     console.log('trying to DELETE loc:',loc._id);
+    if(!token){throw 'No token'}
     const {data} = await locationApi.delete(`/locs/${loc._id}`);
     console.log('deleteLocation response:',data);
     if (data._id === loc._id){
@@ -128,7 +132,7 @@ const deleteLocation = dispatch => async(loc,queueDelete) => {
       throw 'Deleting location failed on backend'
     }
   } catch (error) {
-    console.error(error);
+    console.error('Error deleting location',error);
     console.log('deleting loc locally');
     queueDelete(loc);
     dispatch({type:'delete_loc',payload:loc._id});

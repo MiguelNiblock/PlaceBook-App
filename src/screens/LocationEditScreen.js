@@ -6,6 +6,7 @@ import {Context as LocationEditContext} from '../context/LocationEditContext';
 import {Context as LocationContext} from '../context/LocationContext';
 import {Context as ListContext} from '../context/ListContext';
 import {Context as LocationQueueContext} from '../context/LocationQueueContext';
+import {Context as AuthContext} from '../context/AuthContext';
 
 const LocationEditScreen = ({navigation}) => {
 
@@ -15,8 +16,9 @@ const LocationEditScreen = ({navigation}) => {
   useContext(LocationContext);
   const {locationCreateQueue,locationUpdateQueue,locationDeleteQueue} = 
   useContext(LocationQueueContext);
-  const {state:lists} = 
-  useContext(ListContext);
+  const {state:lists} = useContext(ListContext);
+  const {state:{token}} = useContext(AuthContext);
+  
   const [showBottomSheet,setshowBottomSheet] = 
   useState(false);
 
@@ -63,11 +65,11 @@ const LocationEditScreen = ({navigation}) => {
     const validationErrors = validate({name});
     if (!validationErrors){
       if (locId){//if location exists...
-        const editedLoc = await editLocation(locId,name,address,coords,notes,stars,tags,listId,locationUpdateQueue);
+        const editedLoc = await editLocation(locId,name,address,coords,notes,stars,tags,listId,locationUpdateQueue,token);
         navigate('Map',{loc:editedLoc,hideDrawer:true,hideExplorerMarker:true});
         setLoading(false);
       } else {
-        const createdLoc = await createLocation(name,address,coords,notes,stars,tags,listId,locationCreateQueue);
+        const createdLoc = await createLocation(name,address,coords,notes,stars,tags,listId,locationCreateQueue,token);
         // console.log('createdLoc from locEdit scr:',createdLoc);
         navigate('Map',{loc:createdLoc,hideDrawer:true,hideExplorerMarker:true});
         setLoading(false);
@@ -80,7 +82,7 @@ const LocationEditScreen = ({navigation}) => {
 
   const handleDeleteLocation = async () => {
     setLoading(true);
-    await deleteLocation(loc,locationDeleteQueue);
+    deleteLocation(loc,locationDeleteQueue,token);
     navigate('Map',{hideBottomSheet:true});
     setLoading(false);
   }

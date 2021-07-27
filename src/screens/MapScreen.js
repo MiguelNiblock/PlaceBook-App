@@ -17,11 +17,11 @@ const MapScreen = ({navigation})=>{
 
   const {state:lists,loadLocalLists,fetchLists,createList,resetLists} = 
   useContext(ListContext);
-  const {state:locations,loadLocalLocs,fetchLocs,createLocation,resetLocations} = 
+  const {state:locations,loadLocalLocs,fetchLocs,resetLocations} = 
   useContext(LocationContext);
   const {state:{token},tryLocalSignin,signout} = 
   useContext(AuthContext);
-  const {state:listQueue,loadLocalListQueue,resetListQueue,listCreateQueue,listUpdateQueue,setListQueue} = 
+  const {state:listQueue,loadLocalListQueue,resetListQueue,listCreateQueue,setListQueue} = 
   useContext(ListQueueContext);
   const {state:locationQueue,loadLocalLocationQueue,resetLocationQueue,setLocationQueue} = 
   useContext(LocationQueueContext);
@@ -96,7 +96,7 @@ const MapScreen = ({navigation})=>{
       (async()=>{  console.log('Called fetch stage.... ');
         const readyListQ = removeDefaultList(listQueue);
         const fetchedLists = fetchLists(readyListQ,token);
-        const fetchedLocs = fetchLocs(locationQueue);
+        const fetchedLocs = fetchLocs(locationQueue,token);
         return new Promise.all([readyListQ,fetchedLists,locationQueue,fetchedLocs]);
       })()
       .then(([readyListQ,fetchedLists,locationQueue,fetchedLocs])=>{
@@ -173,7 +173,7 @@ const MapScreen = ({navigation})=>{
     navigate('LocationEdit',{loc})
   };
 
-  const editLocation = ()=>{
+  const editLocationHandler = ()=>{
     console.log('editLocation button pressed')
     navigate('LocationEdit',{loc:currentSavedMarker, placeName:currentSavedMarker.name})
   }
@@ -265,7 +265,7 @@ const MapScreen = ({navigation})=>{
         </ModalTouchable>}
 
         {bottomSheet.showEditButton &&
-        <ModalTouchable style={styles.modalButton} onPress={editLocation} >
+        <ModalTouchable style={styles.modalButton} onPress={editLocationHandler} >
           <Button title='Edit' type='solid' />
         </ModalTouchable>}
       </BottomSheet>
