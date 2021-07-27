@@ -39,7 +39,6 @@ const Reducer = (state,{type,payload}) => {
       setLocalData('locQueue',state);
       return state;
     case 'reset':
-      setLocalData('locQueue',{create:[], update:[], delete:[]});
       return {create:[], update:[], delete:[]}  
     default: 
       return state;
@@ -82,7 +81,11 @@ const locationDeleteQueue = dispatch => async(item)=>{
   dispatch({type:'delete',payload:item})
 }
 
-const resetLocationQueue = dispatch => async()=>{dispatch({type:'reset'})}
+const resetLocationQueue = dispatch => async()=>{
+  await setLocalData('locQueue',{create:[], update:[], delete:[]});
+  dispatch({type:'reset'})
+  return 'Loc queue reset'
+}
 
 const setLocationQueue = dispatch => async (queue)=>{
   dispatch( {type:'set_queue', payload:queue} );

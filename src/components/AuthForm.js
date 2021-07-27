@@ -40,7 +40,18 @@ const AuthForm = ({ headerText, subtitle, onSubmit, submitButtonText, navText, n
     return errorMsg
   }
 
-  const handleOnSubmit = async ({username,password,queues,resetQueues}) => {
+  const queues = {
+    lists: listQueue,
+    locs: locQueue
+  }
+
+  const resetQueues =async()=>{
+    const resetListQP = await resetListQueue();
+    const resetLocQP = await resetLocationQueue();
+    return Promise.all([resetListQP,resetLocQP]).then(console.log('Queues were reset'))
+  }
+
+  const handleOnSubmit = async ({username,password}) => {
     setLoading(true);
     setValError(null);
     const validationErrors = validate({username,password});
@@ -52,17 +63,6 @@ const AuthForm = ({ headerText, subtitle, onSubmit, submitButtonText, navText, n
       setLoading(false);
     }
   }
-
-  const queues = {
-    lists: listQueue,
-    locs: locQueue
-  }
-
-  const resetQueues =async()=>{
-    const resetListQP = await resetListQueue();
-    const resetLocQP = await resetLocationQueue();
-    return Promise.all([resetListQP,resetLocQP]).then(console.log('Queues were reset'))
-  };
 
   return (
     <>
@@ -96,7 +96,7 @@ const AuthForm = ({ headerText, subtitle, onSubmit, submitButtonText, navText, n
       title={submitButtonText} 
       disabled={loading}
       loading={loading}
-      onPress={()=>handleOnSubmit({username,password,queues,resetQueues})}/>
+      onPress={()=>handleOnSubmit({username,password})}/>
 
     {/* {listQueue.create.map( (item)=> <Text>{item.name}</Text> )}  */}
     </>

@@ -41,9 +41,9 @@ const signup = (dispatch) => async ({username,password,queues,resetQueues}) => {
         console.log('signup action input:',username,password,queues);
         const {data} = await locationApi.post('/signup',{username,password,queues});
         console.log('signup response:',data);
+        await resetQueues();
         navigate('Map');
         dispatch({ type:'signin', payload:{ token:data.token, local:false} });
-        resetQueues();
         return data.token
     } catch (err) {
         console.error(err);
