@@ -128,11 +128,10 @@ const ListEditScreen = ({navigation})=>{
       {/* <Button title="Choose List Color" onPress={toggleColorPicker} /> */}
       <Overlay isVisible={showColorPicker} onBackdropPress={toggleColorPicker} style={{}} >
         <TriangleColorPicker color={listColor} 
-          onColorChange={color=>setListColor(color)}
-          onColorSelected={color=>{setListColor(color);toggleColorPicker()}}
+          onColorChange={color=>setListColor(fromHsv(color))}
+          onColorSelected={color=>{setListColor(fromHsv(color));toggleColorPicker()}}
           style={styles.colorPickerBox}
         />
-        <Text>{"\n"}Press the rectangle to confirm color.</Text>
       </Overlay>
       
       {/* <Icon
