@@ -102,7 +102,7 @@ const createList = dispatch => async(name,color,icon,queueCreate,token,idPrefix)
     dispatch({type:'create_list',payload:data});
     return data
   } catch(error){
-    console.error(error);
+    console.error('Error creating list:',error);
     console.log('creating list locally');
     queueCreate(newList);
     dispatch({type:'create_list',payload:newList});
@@ -124,7 +124,7 @@ const editList = dispatch => async({_id,name,color,icon,shown,expanded},queueEdi
       throw 'Updating list failed on backend'
     }
   } catch (error){
-    console.error(error)
+    console.error('Error updating list:',error)
     const updatedList = {_id,name,color,icon,shown,expanded,datetimeModified};
     console.log('updating list locally:',updatedList);
     queueEdit(updatedList);
@@ -146,7 +146,7 @@ const deleteList = dispatch => async(list,queueDelete,token) => {
       throw 'Deleting list failed on backend'
     }
   } catch(error){
-    console.error(error)
+    console.error('Error deleting list:',error)
     console.log('deleting list locally')
     queueDelete(list);
     dispatch({type:'delete_list',payload:list._id});
