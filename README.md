@@ -6,7 +6,7 @@ PlaceBook aims to be a easy-to-use tool for bookmarking, organizing and consumin
 
 Try the app live on expo snack: https://snack.expo.io/@miguelniblock/github.com-miguelniblock-placebook-app 
 
-Download the .apk from expo build: https://expo.io/accounts/miguelniblock/projects/PlaceBook/builds/1ffbc8ab-5dff-4985-b563-dbf8c4f7263d
+Download the .apk from expo build: https://exp-shell-app-assets.s3.us-west-1.amazonaws.com/android/%40miguelniblock/PlaceBook-dfc98186b0e34ee5933320ac9b835bbf-signed.apk
 
 ### Technology stack:
 
