@@ -44,9 +44,9 @@ const DrawerContentComponent = (props) => {
           return (<>
             <ListItem.Accordion containerStyle={styles.accordion} //noIcon
               isExpanded={list.expanded}
-              onPress={() => toggleExpandList(list)}
+              onPress={() => toggleExpandList(list,token)}
               content={<>
-                <ListItem.CheckBox checked={list.shown} onPress={()=>toggleShowList(list)} />
+                <ListItem.CheckBox checked={list.shown} onPress={()=>toggleShowList(list,token)} />
                 <Icon
                   name={list.icon}
                   type='material-community'

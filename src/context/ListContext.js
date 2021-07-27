@@ -71,9 +71,10 @@ const loadLocalLists = dispatch => async() => {
   }
 }
 
-const fetchLists = dispatch => async(listQueue) => {
+const fetchLists = dispatch => async(listQueue,token) => {
   console.log('fetchLists called. queue:',listQueue);
   try {
+    if(!token){throw 'No token'}
     const {data} = await locationApi.get('/lists');  
     console.log('fetchLists response:',data);
     const result = mergeWithQueue(data,listQueue);
@@ -83,11 +84,11 @@ const fetchLists = dispatch => async(listQueue) => {
     return data
   } catch(error){
     console.error('Fetchlists failed',error);
-    return null
+    return []
   }
 };
 
-const createList = dispatch => async(name,color,icon,queueCreate,idPrefix) => {
+const createList = dispatch => async(name,color,icon,queueCreate,token,idPrefix) => {
   let _id = uuid.v4();
   if(idPrefix){ _id = idPrefix + _id }
   const timeStamp = new Date().toISOString();
@@ -95,6 +96,7 @@ const createList = dispatch => async(name,color,icon,queueCreate,idPrefix) => {
   console.log('new list:',newList);
   try {
     console.log('trying to POST list')
+    if(!token){throw 'No token'}
     const {data} = await locationApi.post('/lists',{item:newList});
     console.log('createList response:',data);
     dispatch({type:'create_list',payload:data});
@@ -108,10 +110,11 @@ const createList = dispatch => async(name,color,icon,queueCreate,idPrefix) => {
   } finally{navigate('Drawer')}
 };
 
-const editList = dispatch => async({_id,name,color,icon,shown,expanded},queueEdit) => {
+const editList = dispatch => async({_id,name,color,icon,shown,expanded},queueEdit,token) => {
   const datetimeModified = new Date().toISOString()
   try{
     console.log('trying to PUT list:',_id,name,color,icon,shown,expanded);
+    if(!token){throw 'No token'}
     const {data} = await locationApi.put(`/lists/${_id}`,{name,color,icon,shown,expanded,datetimeModified});
     console.log('editList response:',data);
     if(data._id === _id){
@@ -130,9 +133,10 @@ const editList = dispatch => async({_id,name,color,icon,shown,expanded},queueEdi
   } finally {navigate('Map')}
 };
 
-const deleteList = dispatch => async(list,queueDelete) => {
+const deleteList = dispatch => async(list,queueDelete,token) => {
   try{
     console.log('trying to DELETE list:',list._id);
+    if(!token){throw 'No token'}
     const {data} = await locationApi.delete(`/lists/${list._id}`);
     console.log('deleteList response:',data);
     if(data._id === list._id){
@@ -150,18 +154,20 @@ const deleteList = dispatch => async(list,queueDelete) => {
   }
 };
 
-const toggleShowList = dispatch => async({_id,name,color,icon,shown,expanded}) => {
+const toggleShowList = dispatch => async({_id,name,color,icon,shown,expanded},token) => {
   console.log('toggleShowList called')
-  if (await SecureStore.getItemAsync('token')){
+  // console.log('List id:',_id);
+  if (token){
     const toggledShown = !shown;
     locationApi.put(`/lists/${_id}`,{name,color,icon,shown:toggledShown,expanded});
   }
   dispatch({type:'show_list',payload: _id});
 };
 
-const toggleExpandList = dispatch => async({_id,name,color,icon,shown,expanded}) => {
+const toggleExpandList = dispatch => async({_id,name,color,icon,shown,expanded},token) => {
   console.log('toggleExpandList called');
-  if (await SecureStore.getItemAsync('token')){
+  console.log('List id:',_id);
+  if (token){
     const toggledExpanded = !expanded;
     locationApi.put(`/lists/${_id}`,{name,color,icon,shown,expanded:toggledExpanded});
   }

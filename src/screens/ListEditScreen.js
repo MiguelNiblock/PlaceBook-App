@@ -6,14 +6,16 @@ import {Context as ListContext} from '../context/ListContext';
 import {Context as ListQueueContext} from '../context/ListQueueContext';
 import {Context as LocationContext} from '../context/LocationContext';
 import {Context as LocationQueueContext} from '../context/LocationQueueContext';
+import {Context as AuthContext} from '../context/AuthContext';
 import iconNames from '../hooks/iconNames';
 
 const ListEditScreen = ({navigation})=>{
 
-  const {createList,editList,deleteList,state:lists} = useContext(ListContext);
+  const {state:lists,createList,editList,deleteList} = useContext(ListContext);
   const {listCreateQueue,listUpdateQueue,listDeleteQueue} = useContext(ListQueueContext);
-  const {deleteLocation,state:locations} = useContext(LocationContext);
+  const {state:locations,deleteLocation} = useContext(LocationContext);
   const {locationDeleteQueue} = useContext(LocationQueueContext);
+  const {state:{token}} = useContext(AuthContext);
 
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState(false);
@@ -60,11 +62,11 @@ const ListEditScreen = ({navigation})=>{
     const validationErrors = validate({name});
     if (!validationErrors){
       if(list?._id) { 
-        await editList( {...list,name,color,icon}, listUpdateQueue );
+        await editList( {...list,name,color,icon}, listUpdateQueue, token );
         setLoading(false);
       }
       else {
-        await createList(name,color,icon,listCreateQueue);
+        await createList(name,color,icon,listCreateQueue,token);
         setLoading(false);
       }
     } else {
@@ -80,7 +82,7 @@ const ListEditScreen = ({navigation})=>{
 
   const handleDeleteList = async() => {
     setLoading(true);
-    await deleteList(list,listDeleteQueue);
+    await deleteList(list,listDeleteQueue,token);
     deleteLocsByListId(list._id,locations,deleteLocation,locationDeleteQueue);
     navigation.goBack();
     setLoading(false);

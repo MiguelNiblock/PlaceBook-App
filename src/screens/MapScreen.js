@@ -84,7 +84,7 @@ const MapScreen = ({navigation})=>{
       .then(([loadedLocalListQueue,loadedLocalLocationQueue,loadedLocalLists,loadedLocalLocs])=>{
         if( loadedLocalLists && !loadedLocalLists.find(list=>list._id.startsWith('default')) ){
           console.log('Creating default list');
-          createList('Default List','black','map-marker',listCreateQueue,'default');
+          createList('Default List','black','map-marker',listCreateQueue,token,'default');
         }
         tryLocalSignin();
       });
@@ -95,7 +95,7 @@ const MapScreen = ({navigation})=>{
       //Fetch data in stages
       (async()=>{  console.log('Called fetch stage.... ');
         const readyListQ = removeDefaultList(listQueue);
-        const fetchedLists = fetchLists(readyListQ);
+        const fetchedLists = fetchLists(readyListQ,token);
         const fetchedLocs = fetchLocs(locationQueue);
         return new Promise.all([readyListQ,fetchedLists,locationQueue,fetchedLocs]);
       })()
