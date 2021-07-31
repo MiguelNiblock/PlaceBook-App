@@ -8,7 +8,7 @@ Expo project: https://expo.dev/@miguelniblock/PlaceBook
 
 Play Store url: https://play.google.com/store/apps/details?id=com.miguelniblock.PlaceBook
 
-Try the app live on expo snack: https://snack.expo.io/@miguelniblock/github.com-miguelniblock-placebook-app 
+Try the app live on expo snack: https://snack.expo.dev/@miguelniblock/placebook-app
 
 
 ### Technology stack:
