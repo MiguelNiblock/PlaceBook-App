@@ -179,7 +179,10 @@ const MapScreen = ({navigation})=>{
   }
 
   let mapStyle = styles.map; //bug quickfix. shows controls on map load on android
-  if (Platform.OS==='android' && !editMap){mapStyle = {}}
+  if (Platform.OS==='android' && !editMap){
+    // console.log('editmap false & android')
+    mapStyle = {}
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -293,13 +296,13 @@ const MapScreen = ({navigation})=>{
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    // paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
   map: {
     position: 'absolute',
     top: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     width: Dimensions.get('window').width,
-    height: Platform.OS === "android" ? Dimensions.get('window').height - StatusBar.currentHeight : Dimensions.get('window').height ,
+    height: Dimensions.get('window').height,
   },
   drawerButton: {
     position: 'absolute',
