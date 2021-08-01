@@ -1,5 +1,5 @@
 import React,{useEffect,useState,useRef,useContext,useMemo,useCallback} from 'react';
-import MapView,{Marker,Callout} from 'react-native-maps';
+import MapView,{Marker,Callout,PROVIDER_GOOGLE} from 'react-native-maps';
 import { StyleSheet, Text, View, Dimensions, Alert, SafeAreaView, StatusBar, TouchableOpacity, Platform} from 'react-native';
 import * as Location from 'expo-location';
 import {reverseGeocodeAsync} from 'expo-location';
@@ -178,16 +178,18 @@ const MapScreen = ({navigation})=>{
     navigate('LocationEdit',{loc:currentSavedMarker, placeName:currentSavedMarker.name})
   }
 
+  let mapStyle = styles.map; //bug quickfix. shows controls on map load on android
+  if (Platform.OS==='android' && !editMap){mapStyle = {}}
+
   return (
     <SafeAreaView style={styles.container}>
       
-      <MapView showsUserLocation showsMyLocationButton zoomControlEnabled 
-      // loadingEnabled
-        style={editMap ? styles.map : {}}//bug quickfix. shows controls on map load
-        // style={styles.map} // this doesn't show controls on map load
+      <MapView showsUserLocation={true} showsMyLocationButton={true} zoomControlEnabled={true} 
+        style={mapStyle}
+        // style={styles.map} // this doesn't show controls on map load on android
         onMapReady={() =>{ setEditMap(true);console.log('map ready')}}//bug quickfix
         region={currentRegion}
-        provider="google"
+        provider={PROVIDER_GOOGLE}
         mapType="standard"
         onLongPress={handleLongPress}
         onPress={mapTap}
