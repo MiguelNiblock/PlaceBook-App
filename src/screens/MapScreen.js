@@ -184,6 +184,24 @@ const MapScreen = ({navigation})=>{
     mapStyle = {}
   }
 
+  let saveButton = (
+  <ModalTouchable style={styles.modalButton} onPress={saveLocation} >
+    <Button title='Save' type='solid' />
+  </ModalTouchable>
+  )
+  if (Platform.OS === 'ios') {
+    saveButton = <Button title='Save' type='solid' buttonStyle={styles.modalButton} onPress={saveLocation} />
+  }
+
+  let editButton = (
+    <ModalTouchable style={styles.modalButton} onPress={editLocationHandler} >
+      <Button title='Edit' type='solid' />
+    </ModalTouchable>
+  )
+  if (Platform.OS === 'ios') {
+    editButton = <Button title='Edit' type='solid' buttonStyle={styles.modalButton} onPress={editLocationHandler} />
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       
@@ -263,16 +281,13 @@ const MapScreen = ({navigation})=>{
         onChange={handleSheetChanges}
       >
         {(bottomSheet.name !== '') && <Text selectable style={styles.name}>{bottomSheet.name}</Text>}
-        <Text selectable style={styles.address}>{bottomSheet.address}</Text>
-        {bottomSheet.showSaveButton && 
-        <ModalTouchable style={styles.modalButton} onPress={saveLocation} >
-          <Button title='Save' type='solid' />
-        </ModalTouchable>}
 
-        {bottomSheet.showEditButton &&
-        <ModalTouchable style={styles.modalButton} onPress={editLocationHandler} >
-          <Button title='Edit' type='solid' />
-        </ModalTouchable>}
+        <Text selectable style={styles.address}>{bottomSheet.address}</Text>
+
+        {bottomSheet.showSaveButton && saveButton }
+
+        {bottomSheet.showEditButton && editButton }
+
       </BottomSheet>
 
       <TouchableOpacity style={styles.drawerButton}
